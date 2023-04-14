@@ -1,0 +1,30 @@
+$border-color: #000;
+$stroke-width: 4px;
+
+@mixin default-stroke {
+    stroke: $border-color;
+    stroke-width: $stroke-width;
+}
+
+.container {
+    overflow: scroll;
+}
+
+.container svg {
+    margin: 0 auto;
+}
+
+.rect {
+    fill: #fff;
+    @include default-stroke;
+}
+
+.line {
+    @include default-stroke;
+}
+
+@media only screen and (max-width: 1280) {
+    .container {
+      overflow: scroll;
+  }
+}
