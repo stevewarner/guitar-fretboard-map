@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "npx prettier --check pages",
+    "format:fix": "npx prettier --write pages"
   },
   "dependencies": {
     "@types/node": "18.15.11",

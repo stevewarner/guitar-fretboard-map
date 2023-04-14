@@ -1,12 +1,12 @@
-import Head from 'next/head'
-import Navbar from './Navbar'
-import { useRouter } from 'next/router'
+import Head from 'next/head';
+import Navbar from './Navbar';
+import { useRouter } from 'next/router';
 
 interface props {
-  title?: string
-  keywords?: string
-  description?: string
-  children: React.ReactNode
+  title?: string;
+  keywords?: string;
+  description?: string;
+  children: React.ReactNode;
 }
 
 const Layout: React.FC<props> = ({
@@ -15,7 +15,7 @@ const Layout: React.FC<props> = ({
   description,
   children,
 }) => {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <>
       <Head>
@@ -28,13 +28,13 @@ const Layout: React.FC<props> = ({
         <div className="container mx-auto px-6">{children}</div>
       </div>
     </>
-  )
-}
+  );
+};
 
 Layout.defaultProps = {
   title: 'Music Theory',
   description: 'Music theory lessons and resources',
   keywords: 'music, theory, guitar, scales, chords',
-}
+};
 
-export default Layout
+export default Layout;
