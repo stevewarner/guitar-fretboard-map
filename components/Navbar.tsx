@@ -67,14 +67,14 @@ const Navbar: React.FC = () => {
               navOpen ? 'block' : 'hidden'
             }`}
           >
-            <ul className="items-center justify-center no-underline md:flex">
-              <li className="py-4 text-center hover:bg-gray-200">
+            <ul className="items-center justify-center space-y-8 no-underline md:flex md:space-x-6 md:space-y-0">
+              <li className="text-center ">
                 <Link href="/chord">Chords</Link>
               </li>
-              <li className="py-4 text-center hover:bg-gray-200">
+              <li className="text-center ">
                 <Link href="/scale">Scales</Link>
               </li>
-              <li className="py-4 text-center hover:bg-gray-200">
+              <li className="text-center ">
                 <Link href="/about">About</Link>
               </li>
             </ul>

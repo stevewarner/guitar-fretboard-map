@@ -56,7 +56,7 @@ export const getServerSideProps = async (context: Context) => {
     props: {
       // chord: root.toUpperCase() + quality + extension,
       name,
-      tab: tab,
+      tab: tab.reverse(),
     },
   };
 };
