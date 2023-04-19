@@ -25,7 +25,7 @@ const Layout: React.FC<props> = ({
       </Head>
       <Navbar />
       <div className="flex">
-        <div className="container mx-auto px-6">{children}</div>
+        <div className="container mx-auto">{children}</div>
       </div>
     </>
   );

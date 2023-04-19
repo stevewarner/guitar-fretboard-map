@@ -2,44 +2,20 @@ import type { NextPage } from 'next';
 import Layout from '@/components/Layout';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 
-const getNotes = (chordName: string) => {
-  switch (chordName) {
-    case 'Cmajor':
-      return ['x', 3, 2, 0, 1, 0];
-    case 'Dmajor':
-      return ['x', 'x', 0, 2, 3, 2];
-    case 'Emajor':
-      return [0, 2, 2, 1, 0, 0];
-    case 'Fmajor':
-      return [1, 3, 3, 2, 1, 1];
-    case 'Fminor':
-      return [1, 3, 3, 1, 1, 1];
-    case 'Gmajor':
-      return [3, 2, 0, 0, 0, 3];
-    case 'Amajor':
-      return ['x', 0, 2, 2, 2, 0];
-    case 'Bmajor':
-      return ['x', 2, 4, 4, 4, 2];
-    case 'B7':
-      return ['x', 2, 1, 2, 0, 2];
-    default:
-      return [];
-  }
-};
+import ChordData from '../../chordData.json';
 
 type Props = {
-  chord: string;
+  name: string;
+  tab: number[] | string[];
 };
 
-const Chord: NextPage<Props> = ({ chord }) => {
-  const chordTab = getNotes(chord);
-
+const Chord: NextPage<Props> = ({ name, tab }) => {
   return (
-    <Layout title="Resources">
+    <Layout title={`${name} chord`}>
       <div className="flex flex-col items-center">
-        <h1 className="mb-4">{chord}</h1>
+        <h1 className="mb-4">{name}</h1>
         <Fretboard numFrets={4} showOpenNotes>
-          <Pattern tab={chordTab.reverse()} fillColor="#000" />
+          <Pattern tab={tab} fillColor="#000" />
         </Fretboard>
       </div>
     </Layout>
@@ -56,12 +32,10 @@ type Context = {
 
 export const getServerSideProps = async (context: Context) => {
   const { param } = context.params;
-  // is valid
+  // check if param is valid chord
   // const chordRegex = /^([A-G])([a-z]+)(\d*|\+|#)*$/
-  const chordRegex = /^([a-g][#b]?)(maj|min|dim|aug|maj7|min7|7|9|11|13)?$/i;
-  const parsedChord = param.match(chordRegex); // chordRegex.exec(param)
-
-  // console.log(parsedChord);
+  // const chordRegex = /^([a-g][#b]?)(maj|min|dim|aug|maj7|min7|7|9|11|13)?$/i;
+  // const parsedChord = param.match(chordRegex); // chordRegex.exec(param)
 
   // const root = parsedChord[1]
   // const quality = parsedChord[2]
@@ -69,10 +43,20 @@ export const getServerSideProps = async (context: Context) => {
 
   // else return notFound: true
 
+  const data: any | IChordData = ChordData; // Todo fix type here
+
+  const formattedParam = param
+    .toLowerCase()
+    .replace('major7', 'maj7')
+    .replace('minor', 'm')
+    .replace('major', '');
+
+  const { name, tab } = data.openChords[formattedParam];
   return {
     props: {
       // chord: root.toUpperCase() + quality + extension,
-      chord: param,
+      name,
+      tab: tab,
     },
   };
 };
