@@ -43,20 +43,25 @@ export const getServerSideProps = async (context: Context) => {
 
   // else return notFound: true
 
-  const data: any | IChordData = ChordData; // Todo fix type here
+  const data: any | IChordData = ChordData; // Todo fix type here so doesnt need any
 
   const formattedParam = param
     .toLowerCase()
     .replace('major7', 'maj7')
     .replace('minor', 'm')
-    .replace('major', '');
+    .replace('min', 'm')
+    .replace('major', '')
+    .replace('maj', '');
 
-  const { name, tab } = data.openChords[formattedParam];
+  const { name, tab } = data.openChords[formattedParam] || {};
+
+  if (!name || !tab) return { notFound: true }; // 404 page
+
   return {
     props: {
       // chord: root.toUpperCase() + quality + extension,
       name,
-      tab: tab.reverse(),
+      tab: tab,
     },
   };
 };

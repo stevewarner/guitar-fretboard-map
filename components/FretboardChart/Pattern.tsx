@@ -18,44 +18,47 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
 
   return (
     <>
-      {tab.map((fret, index) =>
-        !Array.isArray(fret) ? (
-          typeof fret === 'string' ? (
-            <svg key={`${index}-${fret}`}>
-              <line
-                x1={fretWidth / 2 + stroke / 2 - circRad / 1.8}
-                y1={topSpace + strHeight * index + circRad / 1.8}
-                x2={fretWidth / 2 + stroke / 2 + circRad / 1.8}
-                y2={topSpace + strHeight * index - circRad / 1.8}
+      {tab
+        .slice(0) // need to make a copy of arr before reverse otherwise each render will reverse
+        .reverse()
+        .map((fret, index) =>
+          !Array.isArray(fret) ? (
+            typeof fret === 'string' ? (
+              <svg key={`${index}-${fret}`}>
+                <line
+                  x1={fretWidth / 2 + stroke / 2 - circRad / 1.8}
+                  y1={topSpace + strHeight * index + circRad / 1.8}
+                  x2={fretWidth / 2 + stroke / 2 + circRad / 1.8}
+                  y2={topSpace + strHeight * index - circRad / 1.8}
+                  stroke="#000"
+                  strokeWidth={stroke}
+                />
+                <line
+                  x1={fretWidth / 2 + stroke / 2 - circRad / 1.8}
+                  y1={topSpace + strHeight * index - circRad / 1.8}
+                  x2={fretWidth / 2 + stroke / 2 + circRad / 1.8}
+                  y2={topSpace + strHeight * index + circRad / 1.8}
+                  stroke="#000"
+                  strokeWidth={stroke}
+                />
+              </svg>
+            ) : (
+              <circle
+                key={`${index}-${fret}`}
+                // fret
+                cx={fretWidth / 2 + stroke / 2 + fretWidth * fret}
+                // string
+                cy={topSpace + strHeight * index}
+                r={fret === 0 && showOpenNotes ? circRad / 1.5 : circRad}
+                fill={fret === 0 && showOpenNotes ? '#fff' : fillColor}
                 stroke="#000"
                 strokeWidth={stroke}
               />
-              <line
-                x1={fretWidth / 2 + stroke / 2 - circRad / 1.8}
-                y1={topSpace + strHeight * index - circRad / 1.8}
-                x2={fretWidth / 2 + stroke / 2 + circRad / 1.8}
-                y2={topSpace + strHeight * index + circRad / 1.8}
-                stroke="#000"
-                strokeWidth={stroke}
-              />
-            </svg>
+            )
           ) : (
-            <circle
-              key={`${index}-${fret}`}
-              // fret
-              cx={fretWidth / 2 + stroke / 2 + fretWidth * fret}
-              // string
-              cy={topSpace + strHeight * index}
-              r={fret === 0 && showOpenNotes ? circRad / 1.5 : circRad}
-              fill={fret === 0 && showOpenNotes ? '#fff' : fillColor}
-              stroke="#000"
-              strokeWidth={stroke}
-            />
+            console.log('array')
           )
-        ) : (
-          console.log('array')
-        )
-      )}
+        )}
 
       {/* <circle
         cx={fretWidth / 2 + stroke / 2 + fretWidth}
