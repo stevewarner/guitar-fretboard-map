@@ -9,12 +9,28 @@ type Props = {
   tab: number[] | string[];
 };
 
+const fbHeight = 360 / 2;
+const fbWidth = 400 / 2;
+const stroke = 4 / 2;
+
 const Chord: NextPage<Props> = ({ name, tab }) => {
   return (
     <Layout title={`${name} chord`}>
       <div className="flex flex-col items-center">
         <h1 className="mb-4">{name}</h1>
-        <Fretboard numFrets={4} showOpenNotes>
+        <Fretboard
+          numFrets={4}
+          showOpenNotes
+          options={{
+            fbHeight: fbHeight,
+            fbWidth: fbWidth,
+            strHeight: fbHeight / 5,
+            fretWidth: fbWidth / 4,
+            stroke: stroke,
+            circRad: fbHeight / 20,
+            topSpace: fbHeight / 20 + stroke / 2,
+          }}
+        >
           <Pattern tab={tab} fillColor="#000" />
         </Fretboard>
       </div>

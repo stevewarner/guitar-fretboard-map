@@ -3,6 +3,8 @@ import Pattern from './Pattern';
 import { FretboardContext } from './contexts';
 import styles from './styles.module.scss';
 
+// some sizing properties like stroke are defined in styles, css in js could fix?
+
 type Props = {
   numFrets: number;
   showOpenNotes: boolean;
