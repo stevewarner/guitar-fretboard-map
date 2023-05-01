@@ -48,16 +48,6 @@ type Context = {
 
 export const getServerSideProps = async (context: Context) => {
   const { param } = context.params;
-  // check if param is valid chord
-  // const chordRegex = /^([A-G])([a-z]+)(\d*|\+|#)*$/
-  // const chordRegex = /^([a-g][#b]?)(maj|min|dim|aug|maj7|min7|7|9|11|13)?$/i;
-  // const parsedChord = param.match(chordRegex); // chordRegex.exec(param)
-
-  // const root = parsedChord[1]
-  // const quality = parsedChord[2]
-  // const extension = parsedChord[3] || ''
-
-  // else return notFound: true
 
   const data: any | IChordData = ChordData; // Todo fix type here so doesnt need any
 
@@ -65,9 +55,7 @@ export const getServerSideProps = async (context: Context) => {
     .toLowerCase()
     .replace('major7', 'maj7')
     .replace('minor', 'm')
-    .replace('min', 'm')
-    .replace('major', '')
-    .replace('maj', '');
+    .replace('min', 'm');
 
   const { name, tab } = data.openChords[formattedParam] || {};
 
@@ -75,9 +63,8 @@ export const getServerSideProps = async (context: Context) => {
 
   return {
     props: {
-      // chord: root.toUpperCase() + quality + extension,
       name,
-      tab: tab,
+      tab,
     },
   };
 };
