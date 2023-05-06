@@ -1,13 +1,11 @@
 import { useContext } from 'react';
 import Pattern from './Pattern';
 import { FretboardContext } from './contexts';
-import styles from './styles.module.scss';
-
-// some sizing properties like stroke are defined in styles, css in js could fix?
 
 type Props = {
   numFrets: number;
-  showOpenNotes: boolean;
+  showOpenNotes?: boolean;
+  small?: boolean;
   options?: {
     fbHeight: number;
     fbWidth: number;
@@ -25,6 +23,7 @@ const Fretboard = ({
   numFrets,
   showOpenNotes = false,
   options,
+  small = false,
 }: Props) => {
   const initialState = useContext(FretboardContext);
 
@@ -39,15 +38,19 @@ const Fretboard = ({
 
   return (
     <FretboardContext.Provider value={modState}>
-      <div className={styles.container}>
-        <svg width={fbWidth + stroke} height={fbHeight + topSpace * 2}>
+      <div className="max-w-full overflow-scroll">
+        <svg
+          className={`mx-auto my-0 ${small ? 'stroke-[2]' : 'stroke-[4]'}`}
+          width={fbWidth + stroke}
+          height={fbHeight + topSpace * 2}
+        >
           <title>Fretboard</title>
           <rect
             x={stroke / 2 + openFret}
             y={topSpace}
             width={fretWidth * numFrets}
             height={fbHeight}
-            className={styles.rect}
+            className="fill-white	stroke-black"
             // rx="8" // border radius
             // ry="8"
           />
@@ -59,7 +62,7 @@ const Fretboard = ({
               y1={strHeight * (index + 1) + topSpace}
               x2={fretWidth * numFrets + stroke + openFret}
               y2={strHeight * (index + 1) + topSpace}
-              className={styles.line}
+              className="stroke-black"
             />
           ))}
           {/* frets */}
@@ -70,7 +73,7 @@ const Fretboard = ({
               y1={topSpace}
               x2={fretWidth * (index + 1) + stroke / 2 + openFret}
               y2={fbHeight + topSpace}
-              className={styles.line}
+              className="stroke-black"
             />
           ))}
           {children}

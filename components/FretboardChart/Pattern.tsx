@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { FretboardContext } from './contexts';
-// use css in js?
 
 // <Fretboard numFrets={4}>
 // <Pattern tab={['x', 3, 2, 0, 1, 0]} />
@@ -56,6 +55,7 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
               />
             )
           ) : (
+            // TODO handle nested array
             console.log('array')
           )
         )}

@@ -21,6 +21,7 @@ const Chord: NextPage<Props> = ({ name, tab }) => {
         <Fretboard
           numFrets={4}
           showOpenNotes
+          small
           options={{
             fbHeight: fbHeight,
             fbWidth: fbWidth,
