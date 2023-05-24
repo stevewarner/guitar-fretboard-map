@@ -6,6 +6,7 @@ type Props = {
   numFrets: number;
   showOpenNotes?: boolean;
   small?: boolean;
+  styles?: string;
   options?: {
     fbHeight: number;
     fbWidth: number;
@@ -24,6 +25,7 @@ const Fretboard = ({
   showOpenNotes = false,
   options,
   small = false,
+  styles = '',
 }: Props) => {
   const initialState = useContext(FretboardContext);
 
@@ -38,7 +40,7 @@ const Fretboard = ({
 
   return (
     <FretboardContext.Provider value={modState}>
-      <div className="max-w-full overflow-scroll">
+      <div className={`max-w-full overflow-scroll ${styles}`}>
         <svg
           className={`mx-auto my-0 ${small ? 'stroke-[2]' : 'stroke-[4]'}`}
           width={fbWidth + stroke}

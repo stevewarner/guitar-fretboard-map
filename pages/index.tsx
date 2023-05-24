@@ -11,13 +11,28 @@ export default function Home() {
   return (
     <Layout>
       <header className="flex flex-row flex-wrap items-center justify-between md:flex-nowrap">
-        <div className="min-w-[45%]">
-          <h1 className="m-0">Learn the entire guitar fretboard</h1>
+        {/* <div className="min-w-[45%]"> */}
+        <div className="mx-auto mb-8 min-w-[45%] max-w-md text-center md:my-0 lg:mx-0 lg:flex-auto lg:px-4 lg:py-32 lg:text-left">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Learn the entire guitar fretboard
+          </h1>
+          <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+            <a
+              href="#"
+              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              Get started
+            </a>
+            <a href="#" className="text-sm font-semibold leading-6 ">
+              Learn more <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
 
         <Fretboard
           numFrets={numFrets}
           // showOpenNotes
+          styles="mx-4 md:mx-0"
           options={{
             fbHeight: fbHeight,
             strHeight: fbHeight / 5,
@@ -37,13 +52,16 @@ export default function Home() {
             fill="transparent"
           />
           <Pattern
-            // TODO make nested arrays work for scales
-            // tab={[
-            //   [2, 4],
-            //   [1, 2, 4],
-            //   [1, 3, 4],
-            // ]}
-            tab={[0, 2, 2, 1, 0, 12]}
+            // nested array for scales
+            tab={[
+              [0, 2, 4, 5, 7, 9, 11, 12],
+              [0, 2, 4, 6, 7, 9, 11, 12],
+              [1, 2, 4, 6, 7, 9, 11],
+              [1, 2, 4, 6, 8, 9, 11],
+              [0, 2, 4, 5, 7, 9, 10, 12],
+              [0, 2, 4, 5, 7, 9, 11, 12],
+            ]}
+            // tab={[0, 2, 2, 1, 0, 12]}
             fillColor="#000"
           />
         </Fretboard>

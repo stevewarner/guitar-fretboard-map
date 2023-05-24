@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
         <div>
           <div className="flex items-center justify-between py-3 md:block md:py-5">
             <h2 className="text-2xl font-bold">
-              <Link href="/">Home</Link>
+              <Link href="/">FretboardMap</Link>
             </h2>
             <div className="md:hidden">
               <button
