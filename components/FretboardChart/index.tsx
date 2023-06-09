@@ -7,6 +7,7 @@ type Props = {
   showOpenNotes?: boolean;
   small?: boolean;
   styles?: string;
+  title?: string;
   options?: {
     fbHeight: number;
     fbWidth: number;
@@ -26,6 +27,7 @@ const Fretboard = ({
   options,
   small = false,
   styles = '',
+  title = '',
 }: Props) => {
   const initialState = useContext(FretboardContext);
 
@@ -46,7 +48,7 @@ const Fretboard = ({
           width={fbWidth + stroke}
           height={fbHeight + topSpace * 2}
         >
-          <title>Fretboard</title>
+          <title>{title}</title>
           <rect
             x={stroke / 2 + openFret}
             y={topSpace}
