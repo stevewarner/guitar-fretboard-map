@@ -10,6 +10,7 @@ const fretWidth = 100; // fbWidth / 10
 const stroke = 4;
 const circRad = fbHeight / 20;
 const topSpace = circRad + stroke / 2;
+const scrollPos = 0;
 
 export const initialState = {
   numFrets: numFrets,
@@ -21,6 +22,17 @@ export const initialState = {
   stroke: stroke,
   circRad: circRad,
   topSpace: topSpace,
+  scrollPos: scrollPos,
 };
+
+export function reducer(state, action) {
+  switch (action.type) {
+    case 'update scrollPos':
+      return {
+        ...state,
+        scrollPos: action.payload
+      }
+  }
+}
 
 export const FretboardContext = createContext(initialState);

@@ -1,6 +1,6 @@
-import { useContext } from 'react';
+import { useContext, useReducer } from 'react';
 import Pattern from './Pattern';
-import { FretboardContext } from './contexts';
+import { FretboardContext, reducer } from './contexts';
 
 type Props = {
   numFrets: number;
@@ -38,11 +38,20 @@ const Fretboard = ({
 
   const openFret = showOpenNotes ? fretWidth : 0;
 
+  const [state, dispatch] = useReducer(reducer, modState);
+
+  const handleScroll = (event) => {
+    dispatch({type: 'update scrollPos', payload: event.target.scrollLeft})
+  }
+
   //   if (showOpenNotes) numFrets++
 
   return (
-    <FretboardContext.Provider value={modState}>
-      <div className={`max-w-full overflow-scroll ${styles}`}>
+    <FretboardContext.Provider value={{state, dispatch}}>
+      <div 
+        className={`max-w-full overflow-scroll ${styles}`} 
+        onScroll={(e) => handleScroll(e)}
+      >
         <svg
           className={`mx-auto my-0 ${small ? 'stroke-[2]' : 'stroke-[4]'}`}
           width={fbWidth + stroke}
