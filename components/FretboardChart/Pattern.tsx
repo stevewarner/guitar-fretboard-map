@@ -18,8 +18,9 @@ const lick = [
 
 // comes from fb width divided by lick length (on line 35) originally 81.5
 const factor = 50;
-const salmon = '#ff6760';
+const salmon = '#f55968';
 const skyblue = '#6090ff';
+const sun = '#f6f671';
 
 const Pattern = ({ tab = [], fillColor }: Props) => {
   // const { fretWidth, strHeight, stroke, topSpace, circRad, showOpenNotes, scrollPos } =
@@ -46,7 +47,7 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
 
   const updateCurrNote = (position) => {
     let newCurrent = Math.floor(position / factor);
-    if (position == 670) {
+    if (position >= 670) {
       newCurrent++;
     }
     setCurrNote(newCurrent);
