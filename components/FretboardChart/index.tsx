@@ -1,3 +1,4 @@
+'use client';
 import { useContext } from 'react';
 import Pattern from './Pattern';
 import { FretboardContext } from './contexts';
@@ -44,7 +45,9 @@ const Fretboard = ({
     <FretboardContext.Provider value={modState}>
       <div className={`max-w-full overflow-scroll ${styles}`}>
         <svg
-          className={`mx-auto my-0 ${small ? 'stroke-[2]' : 'stroke-[4]'}`}
+          className={`mx-auto my-0 overflow-visible ${
+            small ? 'stroke-[2]' : 'stroke-[4]'
+          }`}
           width={fbWidth + stroke}
           height={fbHeight + topSpace * 2}
         >

@@ -1,4 +1,3 @@
-import Layout from '@/components/Layout';
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 
@@ -9,12 +8,11 @@ const stroke = 4;
 
 export default function Home() {
   return (
-    <Layout>
+    <>
       <header className="flex flex-row flex-wrap items-center justify-between md:flex-nowrap">
-        {/* <div className="min-w-[45%]"> */}
         <div className="mx-auto mb-8 min-w-[45%] max-w-md text-center md:my-0 lg:mx-0 lg:flex-auto lg:px-4 lg:py-32 lg:text-left">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Learn the entire guitar fretboard
+            Learn chords and scales across the fretboard
           </h1>
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <a
@@ -31,7 +29,6 @@ export default function Home() {
 
         <Fretboard
           numFrets={numFrets}
-          // showOpenNotes
           styles="mx-4 md:mx-0"
           options={{
             fbHeight: fbHeight,
@@ -70,6 +67,6 @@ export default function Home() {
           look up a chord in the url like <Link href={'/chord/C'}>Cmajor</Link>
         </h2>
       </section>
-    </Layout>
+    </>
   );
 }

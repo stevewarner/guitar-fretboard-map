@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -68,14 +69,11 @@ const Navbar: React.FC = () => {
             }`}
           >
             <ul className="items-center justify-center space-y-8 no-underline md:flex md:space-x-6 md:space-y-0">
-              <li className="text-center ">
+              <li className="text-center">
                 <Link href="/chord">Chords</Link>
               </li>
-              <li className="text-center ">
+              <li className="text-center">
                 <Link href="/scale">Scales</Link>
-              </li>
-              <li className="text-center ">
-                <Link href="/about">About</Link>
               </li>
             </ul>
           </div>

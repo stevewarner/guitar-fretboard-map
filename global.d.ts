@@ -1,6 +1,6 @@
 type ChordValue = {
   name: string;
-  tab: string[] | number[];
+  tab: (string | number)[];
 };
 
 type IChordData = {

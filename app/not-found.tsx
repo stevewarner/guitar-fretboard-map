@@ -1,9 +1,8 @@
 import type { NextPage } from 'next';
-import Layout from '../components/Layout';
 
 const PageNotFound: NextPage = () => {
   return (
-    <Layout title="404">
+    <>
       <div className="absolute inset-x-0 flex h-3/5 flex-col items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +22,7 @@ const PageNotFound: NextPage = () => {
 
         <h1 className="text-9xl font-bold">404</h1>
       </div>
-    </Layout>
+    </>
   );
 };
 
