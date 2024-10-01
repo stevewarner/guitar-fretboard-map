@@ -32,11 +32,11 @@ const Locrian = () => {
               setCurrPosition(e.target.value)
             }
           >
-            <option value="E">Em shape</option>
-            <option value="D">Dm shape</option>
-            <option value="C">Cm shape</option>
-            <option value="A">Am shape</option>
-            <option value="G">Gm shape</option>
+            <option value="E">Em7b5 shape</option>
+            <option value="D">Dm7b5 shape</option>
+            <option value="C">Cm7b5 shape</option>
+            <option value="A">Am7b5 shape</option>
+            <option value="G">Gm7b5 shape</option>
           </select>
         </div>
 
