@@ -29,7 +29,8 @@ export default function Home() {
 
         <Fretboard
           numFrets={numFrets}
-          styles="mx-4 md:mx-0"
+          showOpenNotes={false}
+          styles="m-4 md:mx-0"
           options={{
             fbHeight: fbHeight,
             strHeight: fbHeight / 5,
@@ -48,6 +49,20 @@ export default function Home() {
             strokeLinecap="round"
             fill="transparent"
           />
+          {/* <Pattern
+            // nested array for scales
+            // full major scale
+            tab={[
+              [0, 2, 4, 5, 7, 9, 11, 12],
+              [0, 2, 4, 6, 7, 9, 11, 12],
+              [1, 2, 4, 6, 7, 9, 11],
+              [1, 2, 4, 6, 8, 9, 11],
+              [0, 2, 4, 5, 7, 9, 10, 12],
+              [0, 2, 4, 5, 7, 9, 11, 12],
+            ]}
+            // tab={[0, 2, 2, 1, 0, 12]}
+            fillColor="#000"
+          /> */}
           <Pattern
             // pentatonic
             tab={[
@@ -60,12 +75,30 @@ export default function Home() {
             ]}
             fillColor="#000"
           />
+          {/* <Pattern
+            // chord tones 1 - 3 - 5
+            tab={[
+              [0, 4, 7, 12],
+              [2, 6, 7, 11],
+              [2, 6, 9],
+              [1, 4, 9],
+              [0, 5, 9, 12],
+              [0, 4, 7, 12],
+            ]}
+            fillColor="#2200ff"
+          /> */}
+          {/* <Pattern
+            // root
+            tab={[[0, 12], [7], [2], [9], [5], [0, 12]]}
+            fillColor="#ff0000"
+          /> */}
         </Fretboard>
       </header>
       <section>
         <h2>
           look up a chord in the url like <Link href={'/chord/C'}>Cmajor</Link>
         </h2>
+        <p>chord carousel here</p>
       </section>
     </>
   );

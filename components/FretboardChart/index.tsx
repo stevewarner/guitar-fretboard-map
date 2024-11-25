@@ -39,7 +39,7 @@ const Fretboard = ({
 
   const openFret = showOpenNotes ? fretWidth : 0;
 
-  //   if (showOpenNotes) numFrets++
+  // if (showOpenNotes) numFrets++;
 
   return (
     <FretboardContext.Provider value={modState}>

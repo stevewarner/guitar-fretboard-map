@@ -9,11 +9,25 @@ import { FretboardContext } from './contexts';
 type Props = {
   tab: any[];
   fillColor: string;
+  startFret?: number;
 };
 
-const Pattern = ({ tab = [], fillColor }: Props) => {
+const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
   const { fretWidth, strHeight, stroke, topSpace, circRad, showOpenNotes } =
     useContext(FretboardContext);
+
+  const calcFret = (fretKey: number) => {
+    if (fretKey === 0) {
+      return fretWidth / 2 + stroke / 2 + fretWidth * Number(fretKey);
+    } else {
+      return (
+        fretWidth / 2 +
+        stroke / 2 +
+        fretWidth * Number(fretKey) -
+        fretWidth * (startFret - 1)
+      );
+    }
+  };
 
   return (
     <>
@@ -24,8 +38,9 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
           // string is not a nested array
           !Array.isArray(string) ? (
             // handle string value 'X'
-            typeof string === 'string' ? (
+            string === 'x' ? (
               <svg key={`${stringIndex}-${string}`}>
+                {/* X svg 2 lines */}
                 <line
                   x1={fretWidth / 2 + stroke / 2 - circRad / 1.8}
                   y1={topSpace + strHeight * stringIndex + circRad / 1.8}
@@ -47,11 +62,13 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
               <circle
                 key={`${stringIndex}-${string}`}
                 // fret
-                cx={fretWidth / 2 + stroke / 2 + fretWidth * string}
+                cx={calcFret(Number(string))}
                 // string
                 cy={topSpace + strHeight * stringIndex}
                 r={string === 0 && showOpenNotes ? circRad / 1.5 : circRad}
-                fill={string === 0 && showOpenNotes ? '#fff' : fillColor}
+                fill={
+                  Number(string) === 0 && showOpenNotes ? '#fff' : fillColor
+                }
                 stroke="#000"
                 strokeWidth={stroke}
               />
@@ -73,7 +90,7 @@ const Pattern = ({ tab = [], fillColor }: Props) => {
                 />
               );
             })
-          )
+          ),
         )}
     </>
   );

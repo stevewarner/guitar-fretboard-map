@@ -21,11 +21,14 @@
   p {
     @apply mt-6;
   }
-  button, input {
+  input {
     @apply border rounded px-2;
   }
   a:hover {
     @apply underline;
+  }
+  button {
+    @apply bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded-md;
   }
 }
 

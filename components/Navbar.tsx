@@ -10,12 +10,13 @@ const Navbar: React.FC = () => {
       <div className="mx-auto justify-between px-4 md:flex md:items-center md:px-8 lg:max-w-7xl">
         <div>
           <div className="flex items-center justify-between py-3 md:block md:py-5">
-            <h2 className="text-2xl font-bold">
-              <Link href="/">FretboardMap</Link>
-            </h2>
+            <Link className="text-2xl font-bold" href="/">
+              FretboardMap
+            </Link>
+
             <div className="md:hidden">
               <button
-                className="inline-flex items-center justify-center rounded-md bg-white p-2 focus:outline-none focus:ring-2 focus:ring-inset"
+                className="p-2"
                 onClick={() => setNavOpen((prevState) => !prevState)}
               >
                 {navOpen ? (
@@ -64,7 +65,7 @@ const Navbar: React.FC = () => {
 
         <div>
           <div
-            className={`mt-8 flex-1 justify-self-center pb-3 md:mt-0 md:block md:pb-0 ${
+            className={`flex-1 justify-self-center pb-3 pt-8 md:mt-0 md:block md:pb-0 ${
               navOpen ? 'block' : 'hidden'
             }`}
           >

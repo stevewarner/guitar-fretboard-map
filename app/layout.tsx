@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <div className="flex">
+        <div className="flex px-2">
           <div className="container mx-auto">{children}</div>
         </div>
       </body>
