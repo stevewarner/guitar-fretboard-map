@@ -36,7 +36,7 @@ export async function createNewChord(
     isSuccessful = true;
 
     // revalidate cache
-    revalidatePath('/');
+    revalidatePath('/chord');
 
     return { success: true, message: 'Successfully created new chord' };
   } catch (e) {
