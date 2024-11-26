@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/react';
 import '@/styles/globals.css';
 import Navbar from '@/components/Navbar';
 
@@ -20,7 +21,10 @@ export default function RootLayout({
       <body>
         <Navbar />
         <div className="flex px-2">
-          <div className="container mx-auto">{children}</div>
+          <div className="container mx-auto">
+            {children}
+            <Analytics />
+          </div>
         </div>
       </body>
     </html>

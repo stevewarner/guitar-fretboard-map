@@ -56,7 +56,7 @@ const NewChordForm: React.FC = () => {
               id="tab"
               name="tab"
               label="Chord tab"
-              placeholder="x32010"
+              placeholder="x32000"
               value={chordTab}
               onChange={(e) => setChordTab(e.target.value)}
               helpText="6 numbers (or x for muted string)"
