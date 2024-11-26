@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
 
         <div>
           <div
-            className={`flex-1 justify-self-center pb-3 pt-8 md:mt-0 md:block md:pb-0 ${
+            className={`flex-1 justify-self-center md:mt-0 md:block md:pb-0 ${
               navOpen ? 'block' : 'hidden'
             }`}
           >

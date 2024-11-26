@@ -58,7 +58,11 @@ const Chord = async ({ params }: Props) => {
               topSpace: fbHeight / 20 + stroke / 2,
             }}
           >
-            <Pattern tab={chord.tab} fillColor="#000" />
+            <Pattern
+              tab={chord.tab}
+              startFret={chord.start_fret}
+              fillColor="#000"
+            />
           </Fretboard>
         </div>
       ))}

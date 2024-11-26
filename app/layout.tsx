@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <div className="flex px-2">
+        <div className="my-9 flex px-2">
           <div className="container mx-auto">
             {children}
             <Analytics />

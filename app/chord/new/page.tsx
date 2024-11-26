@@ -13,7 +13,7 @@ const NewChord = () => {
           Add a new chord
         </h1>
         <p className="mt-2 text-lg leading-8 text-gray-600">
-          Aute magna irure deserunt veniam aliqua magna enim voluptate.
+          Submit a new chord to the chord database
         </p>
 
         <NewChordForm />
