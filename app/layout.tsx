@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import '@/styles/globals.css';
 import Navbar from '@/components/Navbar';
 
@@ -24,6 +25,7 @@ export default function RootLayout({
           <div className="container mx-auto">
             {children}
             <Analytics />
+            <SpeedInsights />
           </div>
         </div>
       </body>

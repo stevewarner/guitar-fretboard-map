@@ -29,6 +29,15 @@ const FilteredChordsList = ({ chords }: Props) => {
       </div>
       <div className="grid grid-cols-1 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4">
         {chords
+          .sort((a, b) => {
+            if (a.name < b.name) {
+              return -1;
+            }
+            if (a.name > b.name) {
+              return 1;
+            }
+            return 0;
+          })
           .filter((chord) =>
             chord.name.toLowerCase().includes(userSearch.toLowerCase()),
           )
