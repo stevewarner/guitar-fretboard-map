@@ -58,6 +58,7 @@ const NewChordForm: React.FC = () => {
               placeholder="x32000"
               value={chordTab}
               pattern="^[0-9x]{6}$"
+              errorText="value must be 6 digits containing only numbers and 'x'"
               onChange={(event) => setChordTab(event.target.value)}
               helpText="6 numbers (or x for muted string)"
             />
@@ -73,6 +74,7 @@ const NewChordForm: React.FC = () => {
               type="text"
               inputMode="decimal" // show numpad on mobile
               pattern="^[1-9]$"
+              errorText="value must be a number"
               min={1}
               max={15}
               value={startFret}
@@ -89,6 +91,7 @@ const NewChordForm: React.FC = () => {
               type="text"
               inputMode="decimal" // show numpad on mobile
               pattern="^[1-9]$"
+              errorText="value must be a number"
               min={3}
               max={6}
               value={numFrets}
