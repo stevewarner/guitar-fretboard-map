@@ -18,7 +18,7 @@ const FilteredChordsList = ({ chords }: Props) => {
 
   return (
     <>
-      <div className="flex flex-wrap justify-between gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SearchInput
           value={userSearch}
           onChange={(e) => setUserSearch(e.target.value)}

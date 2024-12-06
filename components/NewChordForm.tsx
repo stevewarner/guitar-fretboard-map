@@ -1,5 +1,4 @@
 'use client';
-import { useRouter } from 'next/router';
 import { useState, useActionState } from 'react';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Input } from './Input';
@@ -22,8 +21,8 @@ const NewChordForm: React.FC = () => {
 
   const [chordName, setChordName] = useState('');
   const [chordTab, setChordTab] = useState('');
-  const [startFret, setStartFret] = useState(1);
-  const [numFrets, setNumFrets] = useState(4);
+  const [startFret, setStartFret] = useState('1');
+  const [numFrets, setNumFrets] = useState('4');
 
   const createTab = (val: string) => {
     const newArr: string[] = [];
@@ -47,7 +46,7 @@ const NewChordForm: React.FC = () => {
               label="Chord name"
               placeholder="Cmaj7"
               value={chordName}
-              onChange={(e) => setChordName(e.target.value)}
+              onChange={(event) => setChordName(event.target.value)}
             />
           </div>
           <div className="sm:col-span-2">
@@ -58,7 +57,8 @@ const NewChordForm: React.FC = () => {
               label="Chord tab"
               placeholder="x32000"
               value={chordTab}
-              onChange={(e) => setChordTab(e.target.value)}
+              pattern="^[0-9x]{6}$"
+              onChange={(event) => setChordTab(event.target.value)}
               helpText="6 numbers (or x for muted string)"
             />
           </div>
@@ -70,10 +70,13 @@ const NewChordForm: React.FC = () => {
               name="startFret"
               label="Starting fret"
               placeholder="1"
-              type="number"
+              type="text"
+              inputMode="decimal" // show numpad on mobile
+              pattern="^[1-9]$"
               min={1}
+              max={15}
               value={startFret}
-              onChange={(e) => setStartFret(parseInt(e.target.value))}
+              onChange={(event) => setStartFret(event.target.value)}
             />
           </div>
           {/* num_frets */}
@@ -83,17 +86,20 @@ const NewChordForm: React.FC = () => {
               name="numFrets"
               label="# of frets"
               placeholder="1"
-              type="number"
-              min={1}
+              type="text"
+              inputMode="decimal" // show numpad on mobile
+              pattern="^[1-9]$"
+              min={3}
+              max={6}
               value={numFrets}
-              onChange={(e) => setNumFrets(parseInt(e.target.value))}
+              onChange={(event) => setNumFrets(event.target.value)}
             />
           </div>
         </div>
         <div className="flex flex-auto flex-col items-center">
           {!!chordName && <h2 className="mb-4">{chordName}</h2>}
           <Fretboard
-            numFrets={numFrets}
+            numFrets={Number(numFrets) || 1}
             small
             showOpenNotes
             options={{
@@ -109,7 +115,7 @@ const NewChordForm: React.FC = () => {
             <Pattern
               tab={createTab(chordTab)}
               fillColor="#000"
-              startFret={startFret}
+              startFret={Number(startFret)}
             />
           </Fretboard>
         </div>
@@ -122,10 +128,7 @@ const NewChordForm: React.FC = () => {
         >
           Add Chord
         </button>
-        <p
-          // aria-live="polite" className="sr-only"
-          role="status"
-        >
+        <p aria-live="polite" className="sr-only" role="status">
           {formState?.message}
         </p>
       </div>
