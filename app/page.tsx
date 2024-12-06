@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { ChordCarousel } from '@/components/ChordCarousel';
 
 const numFrets = 13;
 const fbHeight = 360;
@@ -15,15 +16,15 @@ export default function Home() {
             Learn chords and scales across the fretboard
           </h1>
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-            <a
-              href="#"
+            <Link
+              href="/scale"
               className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Get started
-            </a>
-            <a href="#" className="text-sm font-semibold leading-6 ">
+            </Link>
+            <Link href="/about" className="text-sm font-semibold leading-6 ">
               Learn more <span aria-hidden="true">→</span>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -96,9 +97,9 @@ export default function Home() {
       </header>
       <section>
         <h2>
-          look up a chord in the url like <Link href={'/chord/C'}>Cmajor</Link>
+          <Link href={'/chord'}>Chords</Link>
         </h2>
-        <p>chord carousel here</p>
+        <ChordCarousel />
       </section>
     </>
   );
