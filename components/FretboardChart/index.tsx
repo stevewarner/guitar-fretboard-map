@@ -43,7 +43,7 @@ const Fretboard = ({
 
   return (
     <FretboardContext.Provider value={modState}>
-      <div className={`max-w-full overflow-scroll ${styles}`}>
+      <div className={`max-w-full overflow-x-scroll ${styles}`}>
         <svg
           className={`mx-auto my-0 overflow-visible ${
             small ? 'stroke-[2]' : 'stroke-[4]'

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { sql } from '@vercel/postgres';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordsList } from '@/types';
 
@@ -13,7 +12,7 @@ interface ChordCarouselProps {
 
 export const ChordCarousel = ({ chords }: ChordCarouselProps) => {
   return (
-    <div className="mt-4 flex flex-nowrap gap-4 overflow-scroll pb-4">
+    <div className="mt-4 flex flex-nowrap gap-4 overflow-x-scroll pb-4">
       {chords.map((chord) => (
         <div key={chord.id} className="flex items-center justify-center">
           <Link
