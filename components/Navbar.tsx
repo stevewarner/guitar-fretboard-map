@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
         <div>
           <div className="flex items-center justify-between py-3 md:block md:py-5">
             <Link className="text-2xl font-bold" href="/">
-              FretboardMap
+              GuitarTheory
             </Link>
 
             <div className="md:hidden">

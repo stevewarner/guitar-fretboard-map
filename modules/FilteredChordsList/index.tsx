@@ -45,7 +45,7 @@ const FilteredChordsList = ({ chords }: Props) => {
             <div key={chord.id} className="flex items-center justify-center">
               <Link
                 className="flex flex-col gap-4 rounded border border-current px-4 py-2 hover:bg-gray-100"
-                href={`/chord/${chord.name}`}
+                href={`/chord/${encodeURIComponent(chord.name)}`}
               >
                 <span>{chord.name}</span>
                 <div className="mb-[-100px] mr-[-120px] origin-top-left scale-50">
