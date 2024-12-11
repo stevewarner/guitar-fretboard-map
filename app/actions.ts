@@ -13,6 +13,8 @@ const createTab = (val: string) => {
   return newArr;
 };
 
+// CREATE NEW
+
 export async function createNewChord(
   prevState: {
     success: boolean;
@@ -48,5 +50,23 @@ export async function createNewChord(
       // redirect to new chord page
       redirect(`/chord/${name}`);
     }
+  }
+}
+
+// EDIT
+
+// REPORT
+
+interface ReportChordProps {
+  id: number;
+}
+export async function reportChord({ id }: ReportChordProps) {
+  try {
+    await sql.query(
+      `UPDATE chords SET report_count = report_count + 1 WHERE id = ${id};`,
+    );
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Error:', e);
   }
 }

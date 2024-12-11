@@ -3,6 +3,7 @@ import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordsList } from '@/types';
+import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
 type Props = {
   params: Promise<{ param: string }>;
@@ -51,6 +52,16 @@ const Chord = async ({ params }: Props) => {
 
     const chordExists = chords.length > 0;
 
+    const startFret = Math.min(
+      ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
+    );
+
+    const endFret = Math.max(
+      ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
+    );
+
+    const numFrets = endFret - startFret + 1 >= 4 ? endFret - startFret + 1 : 4;
+
     // TODO what if the same tab has multiple chord names?
 
     // TODO if it doesn't exist, add CREATE button (opens edit chord modal)
@@ -60,12 +71,12 @@ const Chord = async ({ params }: Props) => {
         <div className="flex flex-col items-center">
           {chordExists && <h1 className="mb-4">{chords[0].name}</h1>}
           <Fretboard
-            numFrets={4}
+            numFrets={numFrets}
             small
             showOpenNotes
             options={{
               fbHeight: fbHeight,
-              fbWidth: tab.some((val) => Number(val) >= 4) ? 250 : fbWidth,
+              fbWidth: (fbWidth / 4) * numFrets + 100, // TODO fix all this
               strHeight: fbHeight / 5,
               fretWidth: fbWidth / 4,
               stroke: stroke,
@@ -73,7 +84,12 @@ const Chord = async ({ params }: Props) => {
               topSpace: fbHeight / 20 + stroke / 2,
             }}
           >
-            <Pattern tab={tab} startFret={1} fillColor="#000" />
+            <Pattern
+              tab={tab}
+              // get the smallest number in the param
+              startFret={startFret}
+              fillColor="#000"
+            />
           </Fretboard>
         </div>
       </>
@@ -89,7 +105,7 @@ const Chord = async ({ params }: Props) => {
   return (
     <>
       {chords.map((chord) => (
-        <div className="flex flex-col items-center" key={chord.id}>
+        <div className="flex flex-col items-center gap-4" key={chord.id}>
           <h1 className="mb-4">{chord.name}</h1>
           <Fretboard
             numFrets={chord.num_frets}
@@ -113,6 +129,7 @@ const Chord = async ({ params }: Props) => {
               fillColor="#000"
             />
           </Fretboard>
+          <ChordActionDropdown id={chord.id} />
         </div>
       ))}
     </>
