@@ -74,6 +74,7 @@ const Chord = async ({ params }: Props) => {
             numFrets={numFrets}
             small
             showOpenNotes
+            startFret={startFret}
             options={{
               fbHeight: fbHeight,
               fbWidth: (fbWidth / 4) * numFrets + 100, // TODO fix all this
@@ -111,6 +112,7 @@ const Chord = async ({ params }: Props) => {
             numFrets={chord.num_frets}
             small
             showOpenNotes
+            startFret={chord.start_fret}
             options={{
               fbHeight: fbHeight,
               fbWidth: chord.tab.some((val) => Number(val) >= 4)

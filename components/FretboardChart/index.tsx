@@ -6,6 +6,7 @@ import { FretboardContext } from './contexts';
 type Props = {
   numFrets: number;
   showOpenNotes?: boolean;
+  startFret?: number;
   small?: boolean;
   styles?: string;
   title?: string;
@@ -25,6 +26,7 @@ const Fretboard = ({
   children,
   numFrets,
   showOpenNotes = false,
+  startFret,
   options,
   small = false,
   styles = '',
@@ -49,7 +51,9 @@ const Fretboard = ({
             small ? 'stroke-[2]' : 'stroke-[4]'
           }`}
           width={fbWidth + stroke}
-          height={fbHeight + topSpace * 2}
+          height={
+            fbHeight + topSpace * 2 + (startFret && startFret > 1 ? 30 : 0)
+          }
         >
           <title>{title}</title>
           <rect
@@ -83,7 +87,17 @@ const Fretboard = ({
               className="stroke-black"
             />
           ))}
+
           {children}
+          {startFret && startFret > 1 && (
+            <text
+              x={fretWidth + openFret / 2 - 5}
+              y={strHeight * (5 + 1) + topSpace}
+              fontSize="20" // subract 5 from x to center text
+            >
+              {startFret}
+            </text>
+          )}
         </svg>
       </div>
     </FretboardContext.Provider>
