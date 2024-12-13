@@ -46,9 +46,9 @@ export async function createNewChord(
     console.error('Error:', e);
     return { success: false, message: 'Failed to create chord' };
   } finally {
-    if (isSuccessful) {
+    if (isSuccessful && name) {
       // redirect to new chord page
-      redirect(`/chord/${name}`);
+      redirect(`/chord/${encodeURIComponent(name?.toString())}`);
     }
   }
 }

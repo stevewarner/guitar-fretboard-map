@@ -10,6 +10,18 @@ This project uses
 - PostgreSQL DB
 - Tailwind CSS
 
+The fretboard chart is created with SVG using a composition pattern. Fretboard is a component that creates the base SVG and grid for the fretboard. Pattern (dots to represent finger placement) is passed in separately so it can be dynamically updated (or even animated). Any SVG element could be passed in children.
+
+Folowing this pattern separates logic and makes it easier to implement across the app. Fretboard and Pattern share a context for base dimensions to keep all math / coordinates in sync.
+
+```
+<Fretboard numFrets={4}>
+    <Pattern
+      tab={['x',3,2,0,1,0]}
+    />
+</Fretboard>
+```
+
 ## Getting Started
 
 First, run the development server:
@@ -23,3 +35,7 @@ pnpm dev
 ```
 
 [http://localhost:3000](http://localhost:3000)
+
+## Want to contribute to this project?
+
+Submit a Pull Request
