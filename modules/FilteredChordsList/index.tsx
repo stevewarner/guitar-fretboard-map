@@ -1,20 +1,23 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ChordsList } from '@/types';
+import { ChordType } from '@/types';
 import { SearchInput } from '@/components/SearchInput';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Modal } from '@/components/Modal';
+import NewChordForm from '@/components/NewChordForm';
 
 const fbHeight = 360 / 2;
 const fbWidth = 400 / 2;
 const stroke = 4 / 2;
 
 type Props = {
-  chords: ChordsList[];
+  chords: ChordType[];
 };
 
 const FilteredChordsList = ({ chords }: Props) => {
   const [userSearch, setUserSearch] = useState('');
+  const [modalOpen, toggleModalOpen] = useState(false);
 
   return (
     <>
@@ -23,7 +26,16 @@ const FilteredChordsList = ({ chords }: Props) => {
           value={userSearch}
           onChange={(e) => setUserSearch(e.target.value)}
         />
-        <Link className="w-fit" href="/chord/new">
+        <Link
+          className="w-fit"
+          href="/chord/new"
+          onClick={(e) => {
+            e.preventDefault();
+            // open modal
+            toggleModalOpen(true);
+            // push route or query param ?=modalOpen
+          }}
+        >
           Add a new chord ➕
         </Link>
       </div>
@@ -74,6 +86,13 @@ const FilteredChordsList = ({ chords }: Props) => {
             </div>
           ))}
       </div>
+      {modalOpen && (
+        <Modal
+          title="Add a new chord"
+          onClose={() => toggleModalOpen(false)}
+          content={<NewChordForm />}
+        />
+      )}
     </>
   );
 };

@@ -1,6 +1,7 @@
 'use server';
 import { sql } from '@vercel/postgres';
 import { redirect } from 'next/navigation';
+import { ChordType } from '@/types';
 
 import { revalidatePath } from 'next/cache';
 
@@ -54,6 +55,45 @@ export async function createNewChord(
 }
 
 // EDIT
+
+export async function updateChord(
+  chord: ChordType | null,
+  prevState: {
+    success: boolean;
+    message: string;
+  },
+  formData: FormData,
+) {
+  const name = formData.get('name');
+  const tab = formData.get('tab');
+  const startFret = formData.get('startFret');
+  const numFrets = formData.get('numFrets');
+
+  const tabArr = createTab(tab as string);
+
+  let isSuccessful = false;
+
+  try {
+    await sql.query(
+      `UPDATE chords SET name = '${name}', tab = array [${tabArr}], tab_id = '${tab}', start_fret = ${startFret}, num_frets = ${numFrets} WHERE id = ${chord?.id};`,
+    );
+    isSuccessful = true;
+
+    // revalidate cache
+    revalidatePath('/chord');
+
+    return { success: true, message: 'Successfully created new chord' };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Error:', e);
+    return { success: false, message: 'Failed to create chord' };
+  } finally {
+    if (isSuccessful && name) {
+      // redirect to new chord page
+      redirect(`/chord/${encodeURIComponent(name?.toString())}`);
+    }
+  }
+}
 
 // REPORT
 

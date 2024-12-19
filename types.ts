@@ -1,4 +1,4 @@
-export type ChordsList = {
+export type ChordType = {
   created_at: Date;
   finger_position: number;
   id: number;

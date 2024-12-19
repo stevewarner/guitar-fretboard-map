@@ -2,7 +2,8 @@
 import { useState, useActionState } from 'react';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Input } from './Input';
-import { createNewChord } from '@/app/actions';
+import { createNewChord, updateChord } from '@/app/actions';
+import { ChordType } from '@/types';
 
 const fbHeight = 360 / 2;
 const fbWidth = 400 / 2;
@@ -13,16 +14,21 @@ const initialState = {
   message: '',
 };
 
-const NewChordForm: React.FC = () => {
+interface ChordFormProps {
+  initFormValues?: ChordType;
+}
+
+const NewChordForm = ({ initFormValues }: ChordFormProps) => {
+  const updateChordWithProps = updateChord.bind(null, initFormValues || null);
   const [formState, formAction, isPending] = useActionState(
-    createNewChord,
+    initFormValues ? updateChordWithProps : createNewChord,
     initialState,
   );
 
-  const [chordName, setChordName] = useState('');
-  const [chordTab, setChordTab] = useState('');
-  const [startFret, setStartFret] = useState('1');
-  const [numFrets, setNumFrets] = useState('4');
+  const [chordName, setChordName] = useState(initFormValues?.name || '');
+  const [chordTab, setChordTab] = useState(initFormValues?.tab_id || '');
+  const [startFret, setStartFret] = useState(initFormValues?.start_fret || '1');
+  const [numFrets, setNumFrets] = useState(initFormValues?.num_frets || '4');
 
   const createTab = (val: string) => {
     const newArr: string[] = [];
@@ -35,7 +41,7 @@ const NewChordForm: React.FC = () => {
   const isValidForm = !!chordName && chordTab.length === 6;
 
   return (
-    <form action={formAction} className="mx-auto mt-16 max-w-xl sm:mt-20">
+    <form action={formAction} className="mx-auto max-w-xl">
       <div className="flex flex-row flex-wrap gap-8 p-4">
         <div className="grid flex-[40%] grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
@@ -105,6 +111,7 @@ const NewChordForm: React.FC = () => {
             numFrets={Number(numFrets) || 1}
             small
             showOpenNotes
+            startFret={Number(startFret)}
             options={{
               fbHeight: fbHeight,
               fbWidth: 250,
@@ -129,7 +136,7 @@ const NewChordForm: React.FC = () => {
           disabled={!isValidForm}
           className="w-full bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:bg-gray-500"
         >
-          Add Chord
+          {initFormValues ? 'Edit Chord' : 'Add Chord'}
         </button>
         <p aria-live="polite" className="sr-only" role="status">
           {formState?.message}

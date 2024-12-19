@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { sql } from '@vercel/postgres';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
-import { ChordsList } from '@/types';
+import { ChordType } from '@/types';
 import { ChordCarousel } from '@/components/ChordCarousel';
 
 const numFrets = 13;
@@ -11,7 +11,7 @@ const stroke = 4;
 
 export default async function Home() {
   const { rows: chords } =
-    await sql<ChordsList>`SELECT * from CHORDS ORDER BY created_at DESC LIMIT 10`;
+    await sql<ChordType>`SELECT * from CHORDS ORDER BY created_at DESC LIMIT 10`;
 
   return (
     <>

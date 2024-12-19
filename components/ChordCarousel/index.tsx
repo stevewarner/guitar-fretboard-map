@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
-import { ChordsList } from '@/types';
+import { ChordType } from '@/types';
 
 const fbHeight = 360 / 2;
 const fbWidth = 400 / 2;
 const stroke = 4 / 2;
 
 interface ChordCarouselProps {
-  chords: ChordsList[];
+  chords: ChordType[];
 }
 
 export const ChordCarousel = ({ chords }: ChordCarouselProps) => {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
-import { ChordsList } from '@/types';
+import { ChordType } from '@/types';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
 type Props = {
@@ -48,7 +48,7 @@ const Chord = async ({ params }: Props) => {
 
     // get chords from DB that match param
     const { rows: chords } =
-      await sql<ChordsList>`SELECT * from CHORDS WHERE LOWER(tab_id) = ${param}`;
+      await sql<ChordType>`SELECT * from CHORDS WHERE LOWER(tab_id) = ${param}`;
 
     const chordExists = chords.length > 0;
 
@@ -99,7 +99,7 @@ const Chord = async ({ params }: Props) => {
 
   // get chords from DB that match param
   const { rows: chords } =
-    await sql<ChordsList>`SELECT * from CHORDS WHERE LOWER(name) = ${formattedParam}`;
+    await sql<ChordType>`SELECT * from CHORDS WHERE LOWER(name) = ${formattedParam}`;
 
   if (chords.length === 0) return notFound(); // 404 page
 
@@ -131,7 +131,7 @@ const Chord = async ({ params }: Props) => {
               fillColor="#000"
             />
           </Fretboard>
-          <ChordActionDropdown id={chord.id} />
+          <ChordActionDropdown chord={chord} />
         </div>
       ))}
     </>
