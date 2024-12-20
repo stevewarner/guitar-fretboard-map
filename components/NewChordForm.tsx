@@ -38,7 +38,17 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
     return newArr;
   };
 
-  const isValidForm = !!chordName && chordTab.length === 6;
+  const requiredFields = !!chordName && !!chordTab && !!startFret && !!numFrets;
+
+  const noEdits =
+    chordName === initFormValues?.name &&
+    chordTab === initFormValues?.tab_id &&
+    Number(startFret) === initFormValues?.start_fret &&
+    Number(numFrets) === initFormValues?.num_frets;
+
+  const isValidForm = initFormValues
+    ? requiredFields && chordTab.length === 6 && !noEdits
+    : requiredFields && chordTab.length === 6;
 
   return (
     <form action={formAction} className="mx-auto max-w-xl">
