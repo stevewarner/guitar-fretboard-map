@@ -1,13 +1,10 @@
 import { ImageResponse } from 'next/og';
+import Chord from '@/svgs/chord.svg';
 
 export const runtime = 'edge';
 
 // Image metadata
 export const alt = 'Guitar Theory';
-export const size = {
-  width: 196,
-  height: 196,
-};
 
 export const contentType = 'image/png';
 
@@ -18,24 +15,19 @@ export default async function Image() {
       // ImageResponse JSX element
       <div
         style={{
-          fontSize: size.width,
+          background: '#4F46E5',
+          color: '#fff',
           width: '100%',
           height: '100%',
           display: 'flex',
+          fontSize: '1rem',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        🎸
+        <Chord width={196} height={196} />
       </div>
     ),
-    // ImageResponse options
-    {
-      // For convenience, we can re-use the exported opengraph-image
-      // size config to also set the ImageResponse's width and height.
-      ...size,
-      // Default to 'twemoji'
-      emoji: 'twemoji',
-    },
+    {},
   );
 }
