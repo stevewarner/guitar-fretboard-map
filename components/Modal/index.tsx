@@ -30,7 +30,7 @@ export const Modal = ({ title, onClose, content }: ModalProps) => {
       }}
     >
       <div
-        className="w-11/12 max-w-3xl rounded bg-white p-6 lg:w-3/5"
+        className="max-h-[80vh] w-11/12 max-w-3xl overflow-y-auto rounded bg-white p-6 lg:w-3/5"
         onClick={(e) => {
           // needed for click outside modal to close
           e.stopPropagation();
