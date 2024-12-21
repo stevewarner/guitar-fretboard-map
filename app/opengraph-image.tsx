@@ -25,7 +25,7 @@ export default async function Image() {
           justifyContent: 'center',
         }}
       >
-        <Chord width={196} height={196} />
+        <Chord width="100vh" height="100vh" />
       </div>
     ),
     {},
