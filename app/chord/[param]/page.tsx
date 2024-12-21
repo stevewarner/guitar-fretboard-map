@@ -52,9 +52,10 @@ const Chord = async ({ params }: Props) => {
 
     const chordExists = chords.length > 0;
 
-    const startFret = Math.min(
-      ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
-    );
+    const startFret =
+      Math.min(
+        ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
+      ) || 1;
 
     const endFret = Math.max(
       ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
