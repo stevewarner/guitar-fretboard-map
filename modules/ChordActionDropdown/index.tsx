@@ -34,7 +34,7 @@ const ChordActionDropdown = ({ chord }: ChordActionDropdownProps) => {
           }}
         >
           <FlagIcon className="" height={20} width={20} />
-          Report
+          Incorrect
         </button>
       </div>
       {modalOpen && (

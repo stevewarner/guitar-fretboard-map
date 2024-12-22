@@ -76,6 +76,9 @@ const Navbar: React.FC = () => {
               <li className="text-center">
                 <Link href="/scale">Scales</Link>
               </li>
+              <li className="text-center">
+                <Link href="/lesson">Lessons</Link>
+              </li>
             </ul>
           </div>
         </div>
