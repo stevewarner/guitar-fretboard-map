@@ -8,6 +8,11 @@ const stroke = 4;
 
 export const metadata: Metadata = {
   title: '4 note voicing intro',
+  description: 'Introduction to four note voicings and inversions',
+  openGraph: {
+    title: 'GuitarTheory | 4 note voicing intro',
+    description: 'Introduction to four note voicings and inversions',
+  },
 };
 
 const VoicingIntro = () => {

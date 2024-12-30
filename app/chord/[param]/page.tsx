@@ -15,6 +15,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${param} chord`,
+    description: `How to play ${param} chord on guitar`,
+    openGraph: {
+      title: `${param} chord`,
+      description: `How to play ${param} chord on guitar`,
+    },
   };
 }
 

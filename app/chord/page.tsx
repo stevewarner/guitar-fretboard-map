@@ -4,7 +4,12 @@ import FilteredChordsList from '@/modules/FilteredChordsList';
 import { ChordType } from '@/types';
 
 export const metadata: Metadata = {
-  title: 'Chord Library',
+  title: 'Chord Database',
+  description: 'Guitar chord chart database',
+  openGraph: {
+    title: 'GuitarTheory | Chord Database',
+    description: 'Guitar chord chart database',
+  },
 };
 
 export default async function Chords(): Promise<JSX.Element> {

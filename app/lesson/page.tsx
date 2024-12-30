@@ -3,6 +3,11 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Lessons',
+  description: 'Introduction to music theory for guitarists',
+  openGraph: {
+    title: 'GuitarTheory | Lessons',
+    description: 'Introduction to music theory for guitarists',
+  },
 };
 
 const Lessons = () => {
