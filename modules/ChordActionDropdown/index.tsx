@@ -41,7 +41,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
             }}
           >
             <ExportIcon className="" height={20} width={20} />
-            Export
+            Export SVG
           </button>,
           <button
             key="edit"

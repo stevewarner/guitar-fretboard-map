@@ -67,7 +67,7 @@ const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
                 cy={topSpace + strHeight * stringIndex}
                 r={string === 0 && showOpenNotes ? circRad / 1.5 : circRad}
                 fill={
-                  Number(string) === 0 && showOpenNotes ? '#fff' : fillColor
+                  Number(string) === 0 && showOpenNotes ? 'none' : fillColor
                 }
                 stroke="#000"
                 strokeWidth={stroke}
