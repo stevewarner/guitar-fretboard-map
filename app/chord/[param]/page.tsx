@@ -113,7 +113,11 @@ const Chord = async ({ params }: Props) => {
     <>
       {chords.map((chord) => (
         <div className="flex flex-col items-center gap-4" key={chord.id}>
-          <h1 className="mb-4">{chord.name}</h1>
+          <span className="flex items-baseline gap-6">
+            <h1 className="mb-4">{chord.name}</h1>
+            <ChordActionDropdown chord={chord} />
+          </span>
+
           <Fretboard
             numFrets={chord.num_frets}
             small
@@ -137,7 +141,6 @@ const Chord = async ({ params }: Props) => {
               fillColor="#000"
             />
           </Fretboard>
-          <ChordActionDropdown chord={chord} />
         </div>
       ))}
     </>

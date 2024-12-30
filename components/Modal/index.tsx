@@ -23,7 +23,7 @@ export const Modal = ({ title, onClose, content }: ModalProps) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-gray-500/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
       onClick={() => {
         // click outside modal to close
         onClose();
