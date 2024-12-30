@@ -111,38 +111,42 @@ const Chord = async ({ params }: Props) => {
 
   return (
     <>
-      {chords.map((chord) => (
-        <div className="flex flex-col items-center gap-4" key={chord.id}>
-          <span className="flex items-baseline gap-6">
-            <h1 className="mb-4">{chord.name}</h1>
-            <ChordActionDropdown chord={chord} />
-          </span>
+      {chords.map((chord) => {
+        const chordId = `chord-${chord.id}`;
+        return (
+          <div className="flex flex-col items-center gap-4" key={chord.id}>
+            <span className="flex items-baseline gap-6">
+              <h1 className="mb-4">{chord.name}</h1>
+              <ChordActionDropdown id={chordId} chord={chord} />
+            </span>
 
-          <Fretboard
-            numFrets={chord.num_frets}
-            small
-            showOpenNotes
-            startFret={chord.start_fret}
-            options={{
-              fbHeight: fbHeight,
-              fbWidth: chord.tab.some((val) => Number(val) >= 4)
-                ? 250
-                : fbWidth,
-              strHeight: fbHeight / 5,
-              fretWidth: fbWidth / 4,
-              stroke: stroke,
-              circRad: fbHeight / 20,
-              topSpace: fbHeight / 20 + stroke / 2,
-            }}
-          >
-            <Pattern
-              tab={chord.tab}
+            <Fretboard
+              id={chordId}
+              numFrets={chord.num_frets}
+              small
+              showOpenNotes
               startFret={chord.start_fret}
-              fillColor="#000"
-            />
-          </Fretboard>
-        </div>
-      ))}
+              options={{
+                fbHeight: fbHeight,
+                fbWidth: chord.tab.some((val) => Number(val) >= 4)
+                  ? 250
+                  : fbWidth,
+                strHeight: fbHeight / 5,
+                fretWidth: fbWidth / 4,
+                stroke: stroke,
+                circRad: fbHeight / 20,
+                topSpace: fbHeight / 20 + stroke / 2,
+              }}
+            >
+              <Pattern
+                tab={chord.tab}
+                startFret={chord.start_fret}
+                fillColor="#000"
+              />
+            </Fretboard>
+          </div>
+        );
+      })}
     </>
   );
 };

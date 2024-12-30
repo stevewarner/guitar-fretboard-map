@@ -7,13 +7,16 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import EditIcon from '@/svgs/edit.svg';
 import FlagIcon from '@/svgs/flag.svg';
 import EllipsisIcon from '@/svgs/more.svg';
+import ExportIcon from '@/svgs/download.svg';
 import { ChordType } from '@/types';
+import { downloadSvg } from '@/app/utils/downloadSvg';
 
 interface ChordActionDropdownProps {
+  id: string;
   chord: ChordType;
 }
 
-const ChordActionDropdown = ({ chord }: ChordActionDropdownProps) => {
+const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
   const [modalOpen, toggleModalOpen] = useState(false);
 
   return (
@@ -26,6 +29,20 @@ const ChordActionDropdown = ({ chord }: ChordActionDropdownProps) => {
           </button>
         }
         menuContents={[
+          <button
+            key="export"
+            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
+            onClick={() => {
+              // export SVG
+              const svgElement = document.getElementById(
+                id,
+              ) as unknown as SVGSVGElement;
+              downloadSvg({ svgElement, fileName: `${chord.name}.svg` });
+            }}
+          >
+            <ExportIcon className="" height={20} width={20} />
+            Export
+          </button>,
           <button
             key="edit"
             className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"

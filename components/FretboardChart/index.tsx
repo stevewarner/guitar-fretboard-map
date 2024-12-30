@@ -20,6 +20,7 @@ type Props = {
     circRad: number;
   };
   children?: React.ReactNode;
+  id?: string;
 };
 
 const Fretboard = ({
@@ -31,6 +32,7 @@ const Fretboard = ({
   small = false,
   styles = '',
   title = '',
+  id,
 }: Props) => {
   const initialState = useContext(FretboardContext);
 
@@ -47,13 +49,17 @@ const Fretboard = ({
     <FretboardContext.Provider value={modState}>
       <div className={`max-w-full overflow-x-scroll ${styles}`}>
         <svg
+          id={id}
           className={`mx-auto my-0 overflow-visible ${
             small ? 'stroke-[2]' : 'stroke-[4]'
           }`}
+          strokeWidth="2"
           width={fbWidth + stroke}
           height={
             fbHeight + topSpace * 2 + (startFret && startFret > 1 ? 30 : 0)
           }
+          // TODO viewBox should be canculated and width/height inherited
+          // viewBox={`0 0 140 140`}
         >
           <title>{title}</title>
           <rect
@@ -61,6 +67,8 @@ const Fretboard = ({
             y={topSpace}
             width={fretWidth * numFrets}
             height={fbHeight}
+            fill="none"
+            stroke="black"
             className="fill-white	stroke-black"
             // rx="8" // border radius
             // ry="8"
@@ -73,6 +81,7 @@ const Fretboard = ({
               y1={strHeight * (index + 1) + topSpace}
               x2={fretWidth * numFrets + stroke + openFret}
               y2={strHeight * (index + 1) + topSpace}
+              stroke="black"
               className="stroke-black"
             />
           ))}
@@ -84,6 +93,7 @@ const Fretboard = ({
               y1={topSpace}
               x2={fretWidth * (index + 1) + stroke / 2 + openFret}
               y2={fbHeight + topSpace}
+              stroke="black"
               className="stroke-black"
             />
           ))}
@@ -93,6 +103,7 @@ const Fretboard = ({
             <text
               x={fretWidth + openFret / 2 - 5}
               y={strHeight * (5 + 1) + topSpace}
+              fontFamily="Arial"
               fontSize="20" // subract 5 from x to center text
             >
               {startFret}
