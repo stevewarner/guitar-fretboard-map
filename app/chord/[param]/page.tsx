@@ -5,6 +5,11 @@ import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordType } from '@/types';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
+import {
+  Fretboard as FretboardV2,
+  Pattern as PatternV2,
+} from '@/components/FretboardChartV2';
+
 type Props = {
   params: Promise<{ param: string }>;
 };
@@ -114,13 +119,28 @@ const Chord = async ({ params }: Props) => {
       {chords.map((chord) => {
         const chordId = `chord-${chord.id}`;
         return (
-          <div className="flex flex-col items-center gap-4" key={chord.id}>
+          <div className="flex flex-col items-center gap-1" key={chord.id}>
             <span className="flex items-baseline gap-6">
               <h1 className="mb-4">{chord.name}</h1>
               <ChordActionDropdown id={chordId} chord={chord} />
             </span>
 
-            <Fretboard
+            <FretboardV2
+              id={chordId}
+              title={param}
+              numFrets={chord.num_frets}
+              startFret={chord.start_fret}
+              height={400}
+              width={400}
+            >
+              <PatternV2
+                tab={chord.tab}
+                startFret={chord.start_fret}
+                fillColor="#000"
+              />
+            </FretboardV2>
+
+            {/* <Fretboard
               id={chordId}
               numFrets={chord.num_frets}
               small
@@ -143,7 +163,7 @@ const Chord = async ({ params }: Props) => {
                 startFret={chord.start_fret}
                 fillColor="#000"
               />
-            </Fretboard>
+            </Fretboard> */}
           </div>
         );
       })}

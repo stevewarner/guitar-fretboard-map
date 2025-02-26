@@ -5,10 +5,12 @@ import { ChordType } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Chord Database',
-  description: 'Guitar chord chart database',
+  description:
+    'Guitar chord chart database. Look up any chord or add your own.',
   openGraph: {
     title: 'GuitarTheory | Chord Database',
-    description: 'Guitar chord chart database',
+    description:
+      'Guitar chord chart database. Look up any chord or add your own.',
   },
 };
 
