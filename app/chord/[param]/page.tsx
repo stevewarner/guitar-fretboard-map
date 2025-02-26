@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { param } = await params;
 
   return {
-    title: `${param} chord`,
-    description: `How to play ${param} chord on guitar`,
+    title: `${param} Guitar Chord`,
+    description: `How to play ${param} guitar chord in all positions across the fretboard. Share or download ${param} chord diagram svg.`,
     openGraph: {
-      title: `${param} chord`,
-      description: `How to play ${param} chord on guitar`,
+      title: `${param} Guitar Chord`,
+      description: `How to play ${param} guitar chord in all positions across the fretboard. Share or Download ${param} chord diagram svg.`,
     },
   };
 }
@@ -119,9 +119,13 @@ const Chord = async ({ params }: Props) => {
       {chords.map((chord) => {
         const chordId = `chord-${chord.id}`;
         return (
-          <div className="flex flex-col items-center gap-1" key={chord.id}>
+          <div
+            className="flex flex-col items-center gap-1"
+            key={chord.id}
+            id={chord.tab_id}
+          >
             <span className="flex items-baseline gap-6">
-              <h1 className="mb-4">{chord.name}</h1>
+              <h2 className="mb-4">{chord.name}</h2>
               <ChordActionDropdown id={chordId} chord={chord} />
             </span>
 

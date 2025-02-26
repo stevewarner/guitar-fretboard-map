@@ -23,12 +23,18 @@ export async function createNewChord(
   },
   formData: FormData,
 ) {
-  const name = formData.get('name');
-  const tab = formData.get('tab');
-  const startFret = formData.get('startFret');
-  const numFrets = formData.get('numFrets');
+  const rawData = {
+    name: formData.get('name') as string,
+    tab: formData.get('tab') as string,
+    startFret: formData.get('startFret') as string,
+    numFrets: formData.get('numFrets') as string,
+  };
+  const name = formData.get('name') as string;
+  const tab = formData.get('tab') as string;
+  const startFret = formData.get('startFret') as string;
+  const numFrets = formData.get('numFrets') as string;
 
-  const tabArr = createTab(tab as string);
+  const tabArr = createTab(tab);
 
   let isSuccessful = false;
 
@@ -45,7 +51,11 @@ export async function createNewChord(
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error:', e);
-    return { success: false, message: 'Failed to create chord' };
+    return {
+      success: false,
+      message: 'Failed to create chord',
+      inputs: rawData,
+    };
   } finally {
     if (isSuccessful && name) {
       // redirect to new chord page

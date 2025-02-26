@@ -1,9 +1,11 @@
 'use client';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { reportChord } from '@/app/actions';
 import { Modal } from '@/components/Modal';
 import NewChordForm from '@/components/NewChordForm';
 import { DropdownMenu } from '@/components/DropdownMenu';
+import ShareIcon from '@/svgs/share.svg';
 import EditIcon from '@/svgs/edit.svg';
 import FlagIcon from '@/svgs/flag.svg';
 import EllipsisIcon from '@/svgs/more.svg';
@@ -19,6 +21,8 @@ interface ChordActionDropdownProps {
 const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
   const [modalOpen, toggleModalOpen] = useState(false);
 
+  const pathname = usePathname();
+
   return (
     <>
       <DropdownMenu
@@ -30,6 +34,19 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
         }
         menuContents={[
           <button
+            key="share"
+            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
+            onClick={() => {
+              // copy to clipboard
+              navigator.clipboard.writeText(
+                `${window.location.origin}${pathname}#${chord.tab_id}`,
+              );
+            }}
+          >
+            <ShareIcon height={20} width={20} />
+            Share URL
+          </button>,
+          <button
             key="export"
             className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
             onClick={() => {
@@ -40,8 +57,8 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
               downloadSvg({ svgElement, fileName: `${chord.name}.svg` });
             }}
           >
-            <ExportIcon className="" height={20} width={20} />
-            Export SVG
+            <ExportIcon height={20} width={20} />
+            Download SVG
           </button>,
           <button
             key="edit"
@@ -51,7 +68,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
               toggleModalOpen(true);
             }}
           >
-            <EditIcon className="" height={20} width={20} />
+            <EditIcon height={20} width={20} />
             Edit
           </button>,
           <button
@@ -61,7 +78,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
               reportChord({ id: chord.id });
             }}
           >
-            <FlagIcon className="" height={20} width={20} />
+            <FlagIcon height={20} width={20} />
             Incorrect
           </button>,
         ]}
