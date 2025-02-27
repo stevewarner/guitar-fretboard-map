@@ -6,11 +6,11 @@ import { ChordType } from '@/types';
 export const metadata: Metadata = {
   title: 'Chord Database',
   description:
-    'Guitar chord chart database. Look up any chord or add your own.',
+    'Guitar chord diagram database. Learn guitar chords in all positions on the guitar fretboard. Create, Share, and Download chord diagrams.',
   openGraph: {
     title: 'GuitarTheory | Chord Database',
     description:
-      'Guitar chord chart database. Look up any chord or add your own.',
+      'Guitar chord diagram database. Learn guitar chords in all positions on the guitar fretboard. Create, Share, and Download chord diagrams.',
   },
 };
 

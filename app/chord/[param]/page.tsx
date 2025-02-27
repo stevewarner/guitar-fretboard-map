@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordType } from '@/types';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
@@ -27,10 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
-
-const fbHeight = 360 / 2;
-const fbWidth = 400 / 2;
-const stroke = 4 / 2;
 
 const createTab = (val: string) => {
   const newArr: string[] = [];
@@ -81,28 +76,19 @@ const Chord = async ({ params }: Props) => {
       <>
         <div className="flex flex-col items-center">
           {chordExists && <h1 className="mb-4">{chords[0].name}</h1>}
-          <Fretboard
+          <FretboardV2
             numFrets={numFrets}
-            small
-            showOpenNotes
             startFret={startFret}
-            options={{
-              fbHeight: fbHeight,
-              fbWidth: (fbWidth / 4) * numFrets + 100, // TODO fix all this
-              strHeight: fbHeight / 5,
-              fretWidth: fbWidth / 4,
-              stroke: stroke,
-              circRad: fbHeight / 20,
-              topSpace: fbHeight / 20 + stroke / 2,
-            }}
+            height={400}
+            width={400}
           >
-            <Pattern
+            <PatternV2
               tab={tab}
               // get the smallest number in the param
               startFret={startFret}
               fillColor="#000"
             />
-          </Fretboard>
+          </FretboardV2>
         </div>
       </>
     );
@@ -143,31 +129,6 @@ const Chord = async ({ params }: Props) => {
                 fillColor="#000"
               />
             </FretboardV2>
-
-            {/* <Fretboard
-              id={chordId}
-              numFrets={chord.num_frets}
-              small
-              showOpenNotes
-              startFret={chord.start_fret}
-              options={{
-                fbHeight: fbHeight,
-                fbWidth: chord.tab.some((val) => Number(val) >= 4)
-                  ? 250
-                  : fbWidth,
-                strHeight: fbHeight / 5,
-                fretWidth: fbWidth / 4,
-                stroke: stroke,
-                circRad: fbHeight / 20,
-                topSpace: fbHeight / 20 + stroke / 2,
-              }}
-            >
-              <Pattern
-                tab={chord.tab}
-                startFret={chord.start_fret}
-                fillColor="#000"
-              />
-            </Fretboard> */}
           </div>
         );
       })}
