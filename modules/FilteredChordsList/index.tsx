@@ -39,6 +39,7 @@ const FilteredChordsList = ({ chords }: Props) => {
           Add a new chord ➕
         </Link>
       </div>
+      <h3>{`Showing ${chords.length} chords`}</h3>
       <div className="grid grid-cols-2 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4">
         {chords
           .sort((a, b) => {
