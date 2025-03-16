@@ -1,13 +1,12 @@
 'use client';
 import { useState, useActionState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import {
+  Fretboard as FretboardV2,
+  Pattern as PatternV2,
+} from '@/components/FretboardChartV2';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
 import { ChordType } from '@/types';
-
-const fbHeight = 360 / 2;
-const fbWidth = 400 / 2;
-const stroke = 4 / 2;
 
 const initialState = {
   success: false,
@@ -32,23 +31,12 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
 
   const createTab = (val: string) => {
     const newArr: string[] = [];
-    val.split('').map((fretNum: string) => {
+    const splitVal = val.length === 6 ? '' : ',';
+    val.split(splitVal).map((fretNum: string) => {
       !!fretNum && newArr.push(fretNum);
     });
     return newArr;
   };
-
-  const requiredFields = !!chordName && !!chordTab && !!startFret && !!numFrets;
-
-  const noEdits =
-    chordName === initFormValues?.name &&
-    chordTab === initFormValues?.tab_id &&
-    Number(startFret) === initFormValues?.start_fret &&
-    Number(numFrets) === initFormValues?.num_frets;
-
-  const isValidForm = initFormValues
-    ? requiredFields && chordTab.length === 6 && !noEdits
-    : requiredFields && chordTab.length === 6;
 
   return (
     <form action={formAction} className="mx-auto max-w-xl">
@@ -61,8 +49,10 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
               name="name"
               label="Chord name"
               placeholder="Cmaj7"
+              // defaultValue={formState}
               value={chordName}
               onChange={(event) => setChordName(event.target.value)}
+              required
             />
           </div>
           <div className="sm:col-span-2">
@@ -71,15 +61,15 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
               id="tab"
               name="tab"
               label="Chord tab"
-              placeholder="x32000"
+              placeholder="x32000 or x,3,2,0,0,0"
               value={chordTab}
-              pattern="^[0-9x]{6}$"
+              pattern="^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4])(,(x|[0-9]|1\d|2[0-4])){5})$"
               errorText="value must be 6 digits containing only numbers and 'x'"
               onChange={(event) => setChordTab(event.target.value)}
-              helpText="6 numbers (or x for muted string)"
+              helpText="6 numbers (x for muted string) or comma separated values for each string"
+              required
             />
           </div>
-
           {/* start_fret */}
           <div className="sm:col-span-1">
             <Input
@@ -89,12 +79,13 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
               placeholder="1"
               type="text"
               inputMode="decimal" // show numpad on mobile
-              pattern="^[1-9]$"
+              pattern="^(?:[1-9]|1\d|2[0-4])$"
               errorText="value must be a number"
               min={1}
-              max={15}
+              max={24}
               value={startFret}
               onChange={(event) => setStartFret(event.target.value)}
+              required
             />
           </div>
           {/* num_frets */}
@@ -112,38 +103,30 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
               max={6}
               value={numFrets}
               onChange={(event) => setNumFrets(event.target.value)}
+              required
             />
           </div>
         </div>
         <div className="flex flex-auto flex-col items-center">
-          {!!chordName && <h2 className="mb-4">{chordName}</h2>}
-          <Fretboard
+          {!!chordName && <h2>{chordName}</h2>}
+          <FretboardV2
+            title={chordName}
             numFrets={Number(numFrets) || 1}
-            small
-            showOpenNotes
             startFret={Number(startFret)}
-            options={{
-              fbHeight: fbHeight,
-              fbWidth: 250,
-              strHeight: fbHeight / 5,
-              fretWidth: fbWidth / 4,
-              stroke: stroke,
-              circRad: fbHeight / 20,
-              topSpace: fbHeight / 20 + stroke / 2,
-            }}
+            height={250}
+            width={250}
           >
-            <Pattern
+            <PatternV2
               tab={createTab(chordTab)}
-              fillColor="#000"
               startFret={Number(startFret)}
+              fillColor="#000"
             />
-          </Fretboard>
+          </FretboardV2>
         </div>
       </div>
       <div className="mt-10">
         <button
           type="submit"
-          disabled={!isValidForm}
           className="w-full bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:bg-gray-500"
         >
           {initFormValues ? 'Edit Chord' : 'Add Chord'}

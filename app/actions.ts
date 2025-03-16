@@ -8,7 +8,8 @@ import { revalidatePath } from 'next/cache';
 // Array needs to be formatted with each el as a string
 const createTab = (val: string) => {
   const newArr: string[] = [];
-  val.split('').map((fretNum: string) => {
+  const splitVal = val.length === 6 ? '' : ',';
+  val.split(splitVal).map((fretNum: string) => {
     !!fretNum && newArr.push(`'${fretNum}'`);
   });
   return newArr;
