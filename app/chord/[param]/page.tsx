@@ -63,8 +63,6 @@ const Chord = async ({ params }: Props) => {
 
     // TODO what if the same tab has multiple chord names?
 
-    // TODO if it doesn't exist, add CREATE button (opens edit chord modal)
-
     return (
       <>
         <div className="flex flex-col items-center">
