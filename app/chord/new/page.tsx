@@ -1,8 +1,28 @@
+'use client';
+import { Suspense } from 'react';
 import NewChordForm from '@/components/NewChordForm';
-import { Metadata } from 'next';
+import { ChordType } from '@/types';
+import { useSearchParams } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Add a new chord',
+const ChordForm = () => {
+  const searchParams = useSearchParams();
+
+  // get tab startFret and numFrets from query params
+  const tab = searchParams?.get('tab') || '';
+  const startFret = searchParams?.get('startFret') || '';
+  const numFrets = searchParams?.get('numFrets') || '';
+
+  return (
+    <NewChordForm
+      initFormValues={
+        {
+          tab_id: tab,
+          start_fret: Number(startFret),
+          num_frets: Number(numFrets),
+        } as ChordType
+      }
+    />
+  );
 };
 
 const NewChord = () => {
@@ -16,7 +36,9 @@ const NewChord = () => {
           Submit a new chord to the chord database
         </p>
 
-        <NewChordForm />
+        <Suspense>
+          <ChordForm />
+        </Suspense>
       </div>
     </>
   );

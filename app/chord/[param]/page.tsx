@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
 import { ChordType } from '@/types';
+import { createTab } from '@/app/utils';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
 import {
@@ -26,14 +27,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
-
-const createTab = (val: string) => {
-  const newArr: string[] = [];
-  val.split('').map((fretNum: string) => {
-    !!fretNum && newArr.push(fretNum);
-  });
-  return newArr;
-};
 
 const Chord = async ({ params }: Props) => {
   // asynchronous access of `params.param`.
@@ -70,8 +63,6 @@ const Chord = async ({ params }: Props) => {
 
     // TODO what if the same tab has multiple chord names?
 
-    // TODO if it doesn't exist, add CREATE button (opens edit chord modal)
-
     return (
       <>
         <div className="flex flex-col items-center">
@@ -89,6 +80,20 @@ const Chord = async ({ params }: Props) => {
               fillColor="#000"
             />
           </FretboardV2>
+          {chordExists ? (
+            <a
+              href={`/chord/${chords[0].name}`}
+            >{`See full page for ${chords[0].name} chord with all positions`}</a>
+          ) : (
+            <>
+              <p>This chord is not yet in the database</p>
+              <a
+                href={`/chord/new?tab=${param}&startFret=${startFret}&numFrets=${numFrets}`}
+              >
+                Add chord
+              </a>
+            </>
+          )}
         </div>
       </>
     );

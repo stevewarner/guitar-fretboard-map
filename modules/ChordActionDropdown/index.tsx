@@ -87,7 +87,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
         <Modal
           title={`Edit ${chord.name}`}
           onClose={() => toggleModalOpen(false)}
-          content={<NewChordForm initFormValues={chord} />}
+          content={<NewChordForm initFormValues={chord} isEdit />}
         />
       )}
     </>

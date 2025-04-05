@@ -15,12 +15,13 @@ const initialState = {
 
 interface ChordFormProps {
   initFormValues?: ChordType;
+  isEdit?: boolean;
 }
 
-const NewChordForm = ({ initFormValues }: ChordFormProps) => {
+const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   const updateChordWithProps = updateChord.bind(null, initFormValues || null);
   const [formState, formAction, isPending] = useActionState(
-    initFormValues ? updateChordWithProps : createNewChord,
+    isEdit ? updateChordWithProps : createNewChord,
     initialState,
   );
 
@@ -129,7 +130,7 @@ const NewChordForm = ({ initFormValues }: ChordFormProps) => {
           type="submit"
           className="w-full bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:bg-gray-500"
         >
-          {initFormValues ? 'Edit Chord' : 'Add Chord'}
+          {isEdit ? 'Edit Chord' : 'Add Chord'}
         </button>
         <p aria-live="polite" className="sr-only" role="status">
           {formState?.message}
