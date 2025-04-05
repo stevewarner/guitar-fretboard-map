@@ -1,11 +1,16 @@
+'use client';
 import NewChordForm from '@/components/NewChordForm';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Add a new chord',
-};
+import { ChordType } from '@/types';
+import { useSearchParams } from 'next/navigation';
 
 const NewChord = () => {
+  const searchParams = useSearchParams();
+
+  // get tab startFret and numFrets from query params
+  const tab = searchParams?.get('tab') || '';
+  const startFret = searchParams?.get('startFret') || '';
+  const numFrets = searchParams?.get('numFrets') || '';
+
   return (
     <>
       <div className="flex flex-col items-center">
@@ -16,7 +21,15 @@ const NewChord = () => {
           Submit a new chord to the chord database
         </p>
 
-        <NewChordForm />
+        <NewChordForm
+          initFormValues={
+            {
+              tab_id: tab,
+              start_fret: Number(startFret),
+              num_frets: Number(numFrets),
+            } as ChordType
+          }
+        />
       </div>
     </>
   );
