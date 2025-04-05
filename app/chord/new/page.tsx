@@ -1,9 +1,10 @@
 'use client';
+import { Suspense } from 'react';
 import NewChordForm from '@/components/NewChordForm';
 import { ChordType } from '@/types';
 import { useSearchParams } from 'next/navigation';
 
-const NewChord = () => {
+const ChordForm = () => {
   const searchParams = useSearchParams();
 
   // get tab startFret and numFrets from query params
@@ -11,6 +12,20 @@ const NewChord = () => {
   const startFret = searchParams?.get('startFret') || '';
   const numFrets = searchParams?.get('numFrets') || '';
 
+  return (
+    <NewChordForm
+      initFormValues={
+        {
+          tab_id: tab,
+          start_fret: Number(startFret),
+          num_frets: Number(numFrets),
+        } as ChordType
+      }
+    />
+  );
+};
+
+const NewChord = () => {
   return (
     <>
       <div className="flex flex-col items-center">
@@ -21,15 +36,9 @@ const NewChord = () => {
           Submit a new chord to the chord database
         </p>
 
-        <NewChordForm
-          initFormValues={
-            {
-              tab_id: tab,
-              start_fret: Number(startFret),
-              num_frets: Number(numFrets),
-            } as ChordType
-          }
-        />
+        <Suspense>
+          <ChordForm />
+        </Suspense>
       </div>
     </>
   );
