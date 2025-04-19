@@ -6,15 +6,19 @@ import { strHeight, fretWidth, stroke, circRad, topSpace } from './constants';
 
 interface PatternProps {
   tab: (string | number)[] | (string | number)[][];
+  intervals?: string[];
   fillColor: string;
   startFret?: number;
 }
 
 export const Pattern = ({
   tab = [],
+  intervals = [],
   fillColor,
   startFret = 1,
 }: PatternProps) => {
+  const revIntervals = intervals && [...intervals].reverse();
+
   const calcFret = (fretKey: number) => {
     if (fretKey === 0) {
       return fretWidth / 2 + stroke / 2 + fretWidth * Number(fretKey);
@@ -55,17 +59,36 @@ export const Pattern = ({
               />
             </svg>
           ) : (
-            <circle
+            // circle with text
+            <g
               key={`${stringIndex}-${string}`}
-              // fret
-              cx={calcFret(Number(string) || 0)}
-              // string
-              cy={topSpace + strHeight * stringIndex}
-              r={string === '0' ? circRad / 1.5 : circRad}
-              fill={Number(string) === 0 ? 'none' : fillColor}
-              stroke="#000"
-              strokeWidth={stroke}
-            />
+              data-test={`string-${stringIndex}`}
+            >
+              <circle
+                // fret
+                cx={calcFret(Number(string) || 0)}
+                // string
+                cy={topSpace + strHeight * stringIndex}
+                r={string === '0' ? circRad / 1.5 : circRad}
+                fill={Number(string) === 0 ? 'none' : fillColor}
+                stroke="#000"
+                strokeWidth={stroke}
+              />
+              {revIntervals &&
+                revIntervals.length > 0 &&
+                revIntervals[stringIndex] && (
+                  <text
+                    x={calcFret(Number(string) || 0)}
+                    y={topSpace + strHeight * stringIndex + circRad / 4}
+                    fontFamily="Arial"
+                    fontSize={circRad}
+                    textAnchor="middle"
+                    fill={Number(string) === 0 ? '#000' : '#fff'}
+                  >
+                    {revIntervals[stringIndex]}
+                  </text>
+                )}
+            </g>
           )
         ) : (
           // handle nested array

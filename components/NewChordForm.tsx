@@ -29,6 +29,9 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   const [chordTab, setChordTab] = useState(initFormValues?.tab_id || '');
   const [startFret, setStartFret] = useState(initFormValues?.start_fret || '1');
   const [numFrets, setNumFrets] = useState(initFormValues?.num_frets || '4');
+  const [chordIntervals, setChordIntervals] = useState(
+    (initFormValues?.intervals && initFormValues?.intervals.join(',')) || '',
+  );
 
   const createTab = (val: string) => {
     const newArr: string[] = [];
@@ -107,6 +110,20 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               required
             />
           </div>
+          {/* intervals */}
+          <div className="sm:col-span-2">
+            <Input
+              id="intervals"
+              name="intervals"
+              label="Intervals"
+              placeholder=",1,3,5,1,3"
+              value={chordIntervals}
+              pattern="^((b|#)?[1-7]|)(,((b|#)?[1-7]|)){5}$"
+              errorText="value must be 6 comma separated values containing only numbers and 'b' or '#'"
+              onChange={(event) => setChordIntervals(event.target.value)}
+              helpText="6 comma separated values for each note interval. use empty comma for no value"
+            />
+          </div>
         </div>
         <div className="flex flex-auto flex-col items-center">
           {!!chordName && <h2>{chordName}</h2>}
@@ -119,6 +136,7 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
           >
             <PatternV2
               tab={createTab(chordTab)}
+              intervals={chordIntervals.split(',')}
               startFret={Number(startFret)}
               fillColor="#000"
             />
