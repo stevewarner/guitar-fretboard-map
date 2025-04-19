@@ -130,6 +130,7 @@ const Chord = async ({ params }: Props) => {
             >
               <PatternV2
                 tab={chord.tab}
+                intervals={chord.intervals}
                 startFret={chord.start_fret}
                 fillColor="#000"
               />

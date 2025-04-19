@@ -15,6 +15,16 @@ const createTab = (val: string) => {
   return newArr;
 };
 
+// Intervals format
+const createIntervals = (val: string) => {
+  const newArr: string[] = [];
+  const splitVal = val.length === 6 ? '' : ',';
+  val.split(splitVal).map((interval: string) => {
+    newArr.push(`'${interval}'`);
+  });
+  return newArr;
+};
+
 // CREATE NEW
 
 export async function createNewChord(
@@ -34,14 +44,16 @@ export async function createNewChord(
   const tab = formData.get('tab') as string;
   const startFret = formData.get('startFret') as string;
   const numFrets = formData.get('numFrets') as string;
+  const intervals = formData.get('intervals');
 
-  const tabArr = createTab(tab);
+  const tabArr = createTab(tab as string);
+  const intervalsArr = createIntervals(intervals as string);
 
   let isSuccessful = false;
 
   try {
     await sql.query(
-      `INSERT INTO chords (name, tab, tab_id, start_fret, num_frets) VALUES ('${name}', array [${tabArr}], '${tab}', ${startFret}, ${numFrets});`,
+      `INSERT INTO chords (name, tab, tab_id, start_fret, num_frets, intervals) VALUES ('${name}', array [${tabArr}], '${tab}', ${startFret}, ${numFrets}, array [${intervalsArr}]);`,
     );
     isSuccessful = true;
 
@@ -79,14 +91,16 @@ export async function updateChord(
   const tab = formData.get('tab');
   const startFret = formData.get('startFret');
   const numFrets = formData.get('numFrets');
+  const intervals = formData.get('intervals');
 
   const tabArr = createTab(tab as string);
+  const intervalsArr = createIntervals(intervals as string);
 
   let isSuccessful = false;
 
   try {
     await sql.query(
-      `UPDATE chords SET name = '${name}', tab = array [${tabArr}], tab_id = '${tab}', start_fret = ${startFret}, num_frets = ${numFrets} WHERE id = ${chord?.id};`,
+      `UPDATE chords SET name = '${name}', tab = array [${tabArr}], intervals = array [${intervalsArr}], tab_id = '${tab}', start_fret = ${startFret}, num_frets = ${numFrets} WHERE id = ${chord?.id};`,
     );
     isSuccessful = true;
 

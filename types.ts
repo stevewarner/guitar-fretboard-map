@@ -2,6 +2,7 @@ export type ChordType = {
   created_at: Date;
   finger_position: number;
   id: number;
+  intervals: string[];
   name: string;
   notes: string[];
   num_frets: number;
