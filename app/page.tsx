@@ -22,10 +22,10 @@ export default async function Home() {
           </h1>
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <Link
-              href="/scale"
+              href="/chord"
               className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
-              Get started
+              See all chords
             </Link>
             <Link href="/about" className="font-semibold leading-6">
               Learn more <span aria-hidden="true">→</span>

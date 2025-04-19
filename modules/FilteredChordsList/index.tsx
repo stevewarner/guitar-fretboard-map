@@ -26,18 +26,17 @@ const FilteredChordsList = ({ chords }: Props) => {
           value={userSearch}
           onChange={(e) => setUserSearch(e.target.value)}
         />
-        <Link
-          className="w-fit"
-          href="/chord/new"
-          onClick={(e) => {
-            e.preventDefault();
+        <button
+          type="button"
+          className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          onClick={() => {
             // open modal
             toggleModalOpen(true);
-            // push route or query param ?=modalOpen
+            // TODO push route or query param ?=modalOpen
           }}
         >
-          Add a new chord ➕
-        </Link>
+          Add a new chord +
+        </button>
       </div>
       <h3>{`Showing ${chords.length} chords`}</h3>
       <div className="grid grid-cols-2 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4">

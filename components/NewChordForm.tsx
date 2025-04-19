@@ -49,6 +49,7 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
           <div className="sm:col-span-2">
             {/* name */}
             <Input
+              autoFocus
               id="name"
               name="name"
               label="Chord name"
