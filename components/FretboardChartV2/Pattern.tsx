@@ -6,7 +6,7 @@ import { strHeight, fretWidth, stroke, circRad, topSpace } from './constants';
 
 interface PatternProps {
   tab: (string | number)[] | (string | number)[][];
-  intervals?: string[];
+  intervals?: (string | number | undefined)[];
   fillColor: string;
   startFret?: number;
 }
