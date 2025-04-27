@@ -15,6 +15,7 @@ const Lessons = () => {
     <>
       <div className="flex flex-col items-center">
         <h1 className="mb-4">Lessons</h1>
+        <Link href="/lesson/movable-shapes">Movable chord shapes</Link>
         <Link href="/lesson/4-note-voicing">4 note voicing intro</Link>
       </div>
     </>
