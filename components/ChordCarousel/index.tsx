@@ -12,7 +12,7 @@ interface ChordCarouselProps {
 
 export const ChordCarousel = ({ chords }: ChordCarouselProps) => {
   return (
-    <div className="mt-4 flex flex-nowrap gap-4 overflow-x-scroll pb-4">
+    <div className="mt-4 flex flex-nowrap gap-4 overflow-x-scroll p-1 pb-4">
       {chords.map((chord) => (
         <div key={chord.id} className="flex items-center justify-center">
           <Link

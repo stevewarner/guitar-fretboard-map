@@ -31,9 +31,4 @@ module.exports = {
 
   // ...other config
   reactStrictMode: true,
-
-  // Enable experimental features
-  experimental: {
-    serverActions: true, // Required for server actions
-  },
 };
