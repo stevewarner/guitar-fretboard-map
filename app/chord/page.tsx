@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
+
 import { sql } from '@vercel/postgres';
 import FilteredChordsList from '@/modules/FilteredChordsList';
 import { ChordType } from '@/types';
@@ -19,7 +21,9 @@ export default async function Chords(): Promise<JSX.Element> {
 
   return (
     <div className="flex flex-col gap-8">
-      <FilteredChordsList chords={chords} />
+      <Suspense>
+        <FilteredChordsList chords={chords} />
+      </Suspense>
     </div>
   );
 }

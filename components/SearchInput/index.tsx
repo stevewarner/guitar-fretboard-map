@@ -1,11 +1,16 @@
 import SearchIcon from '@/svgs/search.svg';
 
 type SearchInputProps = {
-  value: string;
+  value?: string;
+  defaultValue?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export const SearchInput = ({ value, onChange }: SearchInputProps) => {
+export const SearchInput = ({
+  value,
+  defaultValue,
+  onChange,
+}: SearchInputProps) => {
   return (
     <div className="relative">
       <SearchIcon
@@ -17,6 +22,7 @@ export const SearchInput = ({ value, onChange }: SearchInputProps) => {
         className="h-10 rounded border border-current pl-11 placeholder:text-current"
         placeholder="Search"
         value={value}
+        defaultValue={defaultValue}
         onChange={onChange}
       />
     </div>
