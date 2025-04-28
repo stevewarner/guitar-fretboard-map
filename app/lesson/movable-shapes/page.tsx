@@ -16,7 +16,7 @@ const MovableShapes = () => {
   return (
     <>
       <div className="flex flex-col items-center">
-        <h1 className="mb-4">Moveable Chord Shapes</h1>
+        <h1 className="mb-4">Moveable chord shapes</h1>
 
         <TriadShapes />
       </div>

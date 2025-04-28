@@ -6,7 +6,9 @@ import { strHeight, fretWidth, stroke, circRad, topSpace } from './constants';
 
 interface PatternProps {
   tab: (string | number)[] | (string | number)[][];
-  intervals?: (string | number | undefined)[];
+  intervals?:
+    | (string | number | undefined)[]
+    | (string | number | undefined)[][];
   fillColor: string;
   startFret?: number;
 }
@@ -59,7 +61,6 @@ export const Pattern = ({
               />
             </svg>
           ) : (
-            // circle with text
             <g
               key={`${stringIndex}-${string}`}
               data-test={`string-${stringIndex}`}
@@ -69,7 +70,7 @@ export const Pattern = ({
                 cx={calcFret(Number(string) || 0)}
                 // string
                 cy={topSpace + strHeight * stringIndex}
-                r={string === '0' ? circRad / 1.5 : circRad}
+                r={circRad}
                 fill={Number(string) === 0 ? 'none' : fillColor}
                 stroke="#000"
                 strokeWidth={stroke}
@@ -79,7 +80,7 @@ export const Pattern = ({
                 revIntervals[stringIndex] && (
                   <text
                     x={calcFret(Number(string) || 0)}
-                    y={topSpace + strHeight * stringIndex + circRad / 4}
+                    y={topSpace + strHeight * stringIndex + circRad / 3}
                     fontFamily="Arial"
                     fontSize={circRad}
                     textAnchor="middle"
@@ -94,17 +95,36 @@ export const Pattern = ({
           // handle nested array
           string.map((fret, fretIndex) => {
             return (
-              <circle
+              <g
                 key={`${fretIndex}-${string}`}
-                // fret
-                cx={fretWidth / 2 + stroke / 2 + fretWidth * Number(fret)}
-                // string
-                cy={topSpace + strHeight * stringIndex}
-                r={fret === '0' ? circRad / 1.5 : circRad}
-                fill={fret === '0' ? '#fff' : fillColor}
-                stroke="#000"
-                strokeWidth={stroke}
-              />
+                data-test={`string-${stringIndex}`}
+              >
+                <circle
+                  // fret
+                  cx={fretWidth / 2 + stroke / 2 + fretWidth * Number(fret)}
+                  // string
+                  cy={topSpace + strHeight * stringIndex}
+                  r={fret === '0' ? circRad / 1.5 : circRad}
+                  fill={fret === '0' ? '#fff' : fillColor}
+                  stroke="#000"
+                  strokeWidth={stroke}
+                />
+                {revIntervals &&
+                  revIntervals.length > 0 &&
+                  revIntervals[stringIndex] && (
+                    <text
+                      x={fretWidth / 2 + stroke / 2 + fretWidth * Number(fret)}
+                      y={topSpace + strHeight * stringIndex + circRad / 3}
+                      fontFamily="Arial"
+                      fontSize={circRad}
+                      textAnchor="middle"
+                      fill={Number(string) === 0 ? '#000' : '#fff'}
+                    >
+                      {Array.isArray(revIntervals[stringIndex]) &&
+                        revIntervals[stringIndex][fretIndex]}
+                    </text>
+                  )}
+              </g>
             );
           })
         ),
