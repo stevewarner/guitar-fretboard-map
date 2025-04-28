@@ -6,9 +6,7 @@ import { strHeight, fretWidth, stroke, circRad, topSpace } from './constants';
 
 interface PatternProps {
   tab: (string | number)[] | (string | number)[][];
-  intervals?:
-    | (string | number | undefined)[]
-    | (string | number | undefined)[][];
+  intervals?: (string | number | undefined)[] | (string | number)[][];
   fillColor: string;
   startFret?: number;
 }
@@ -19,7 +17,7 @@ export const Pattern = ({
   fillColor,
   startFret = 1,
 }: PatternProps) => {
-  const revIntervals = intervals && [...intervals].reverse();
+  const revIntervals = intervals ? [...intervals].reverse() : [];
 
   const calcFret = (fretKey: number) => {
     if (fretKey === 0) {
@@ -120,8 +118,11 @@ export const Pattern = ({
                       textAnchor="middle"
                       fill={Number(string) === 0 ? '#000' : '#fff'}
                     >
-                      {Array.isArray(revIntervals[stringIndex]) &&
-                        revIntervals[stringIndex][fretIndex]}
+                      {Array.isArray(revIntervals?.[stringIndex])
+                        ? (revIntervals[stringIndex] as (string | number)[])[
+                            fretIndex
+                          ]
+                        : revIntervals?.[stringIndex]}
                     </text>
                   )}
               </g>
