@@ -1,30 +1,55 @@
 'use client';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
 import { ChordType } from '@/types';
 import { SearchInput } from '@/components/SearchInput';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import {
+  Fretboard as FretboardV2,
+  Pattern as PatternV2,
+} from '@/components/FretboardChartV2';
 import { Modal } from '@/components/Modal';
 import NewChordForm from '@/components/NewChordForm';
-
-const fbHeight = 360 / 2;
-const fbWidth = 400 / 2;
-const stroke = 4 / 2;
 
 type Props = {
   chords: ChordType[];
 };
 
 const FilteredChordsList = ({ chords }: Props) => {
-  const [userSearch, setUserSearch] = useState('');
-  const [modalOpen, toggleModalOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const userSearch = searchParams?.get('query') || '';
+  const modalOpen = searchParams?.get('createNewChord') === 'true';
+
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams || undefined);
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    replace(`${pathname}?${params.toString()}`);
+  };
+
+  const toggleModalOpen = (isOpen: boolean) => {
+    const params = new URLSearchParams(searchParams || undefined);
+    if (isOpen) {
+      params.set('createNewChord', 'true');
+    } else {
+      params.delete('createNewChord');
+    }
+    replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <>
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SearchInput
-          value={userSearch}
-          onChange={(e) => setUserSearch(e.target.value)}
+          defaultValue={searchParams?.get('query')?.toString()}
+          onChange={(e) => {
+            handleSearch(e.target.value);
+          }}
         />
         <button
           type="button"
@@ -32,7 +57,6 @@ const FilteredChordsList = ({ chords }: Props) => {
           onClick={() => {
             // open modal
             toggleModalOpen(true);
-            // TODO push route or query param ?=modalOpen
           }}
         >
           Add a new chord +
@@ -56,37 +80,30 @@ const FilteredChordsList = ({ chords }: Props) => {
           .map((chord) => (
             <div key={chord.id} className="flex items-center justify-center">
               <Link
-                className="flex flex-col gap-4 rounded border border-current px-4 py-2 hover:bg-gray-100"
+                className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
                 href={`/chord/${encodeURIComponent(chord.name)}`}
               >
                 <span>{chord.name}</span>
-                <div className="mb-[-100px] mr-[-120px] origin-top-left scale-50">
-                  <Fretboard
-                    numFrets={chord.num_frets}
-                    small
-                    showOpenNotes
-                    options={{
-                      fbHeight: fbHeight,
-                      fbWidth: 250,
-                      strHeight: fbHeight / 5,
-                      fretWidth: fbWidth / 4,
-                      stroke: stroke,
-                      circRad: fbHeight / 20,
-                      topSpace: fbHeight / 20 + stroke / 2,
-                    }}
-                  >
-                    <Pattern
-                      tab={chord.tab}
-                      startFret={chord.start_fret}
-                      fillColor="#000"
-                    />
-                  </Fretboard>
-                </div>
+
+                <FretboardV2
+                  id={chord.id.toString()}
+                  title={chord.name}
+                  numFrets={chord.num_frets}
+                  startFret={chord.start_fret}
+                  height={150}
+                  width={150}
+                >
+                  <PatternV2
+                    tab={chord.tab}
+                    startFret={chord.start_fret}
+                    fillColor="#000"
+                  />
+                </FretboardV2>
               </Link>
             </div>
           ))}
       </div>
-      {modalOpen && (
+      {!!modalOpen && (
         <Modal
           title="Add a new chord"
           onClose={() => toggleModalOpen(false)}
