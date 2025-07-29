@@ -1,16 +1,12 @@
+import { InputHTMLAttributes } from 'react';
 import SearchIcon from '@/svgs/search.svg';
-
-type SearchInputProps = {
-  value?: string;
-  defaultValue?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
 
 export const SearchInput = ({
   value,
   defaultValue,
   onChange,
-}: SearchInputProps) => {
+  ...props
+}: InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <div className="relative">
       <SearchIcon
@@ -24,6 +20,7 @@ export const SearchInput = ({
         value={value}
         defaultValue={defaultValue}
         onChange={onChange}
+        {...props}
       />
     </div>
   );
