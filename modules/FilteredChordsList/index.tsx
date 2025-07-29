@@ -46,6 +46,7 @@ const FilteredChordsList = ({ chords }: Props) => {
     <>
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SearchInput
+          id="search-chords"
           defaultValue={searchParams?.get('query')?.toString()}
           onChange={(e) => {
             handleSearch(e.target.value);
@@ -81,7 +82,7 @@ const FilteredChordsList = ({ chords }: Props) => {
             <div key={chord.id} className="flex items-center justify-center">
               <Link
                 className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
-                href={`/chord/${encodeURIComponent(chord.name)}`}
+                href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
               >
                 <span>{chord.name}</span>
 

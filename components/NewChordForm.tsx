@@ -54,8 +54,8 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               name="name"
               label="Chord name"
               placeholder="Cmaj7"
-              // defaultValue={formState}
-              value={chordName}
+              defaultValue={initFormValues?.name || ''}
+              // value={chordName}
               onChange={(event) => setChordName(event.target.value)}
               required
             />
@@ -67,9 +67,10 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               name="tab"
               label="Chord tab"
               placeholder="x32000 or x,3,2,0,0,0"
-              value={chordTab}
               pattern="^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4])(,(x|[0-9]|1\d|2[0-4])){5})$"
               errorText="value must be 6 digits containing only numbers and 'x'"
+              defaultValue={initFormValues?.tab_id || ''}
+              // value={chordTab}
               onChange={(event) => setChordTab(event.target.value)}
               helpText="6 numbers (x for muted string) or comma separated values for each string"
               required
@@ -88,7 +89,8 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               errorText="value must be a number"
               min={1}
               max={24}
-              value={startFret}
+              defaultValue={initFormValues?.start_fret || '1'}
+              // value={startFret}
               onChange={(event) => setStartFret(event.target.value)}
               required
             />
@@ -106,7 +108,8 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               errorText="value must be a number"
               min={3}
               max={6}
-              value={numFrets}
+              defaultValue={initFormValues?.num_frets || '4'}
+              // value={numFrets}
               onChange={(event) => setNumFrets(event.target.value)}
               required
             />
@@ -118,9 +121,14 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               name="intervals"
               label="Intervals"
               placeholder=",1,3,5,1,3"
-              value={chordIntervals}
               pattern="^((b|#)?[1-7]|)(,((b|#)?[1-7]|)){5}$"
               errorText="value must be 6 comma separated values containing only numbers and 'b' or '#'"
+              defaultValue={
+                (initFormValues?.intervals &&
+                  initFormValues?.intervals.join(',')) ||
+                ''
+              }
+              // value={chordIntervals}
               onChange={(event) => setChordIntervals(event.target.value)}
               helpText="6 comma separated values for each note interval. use empty comma for no value"
             />

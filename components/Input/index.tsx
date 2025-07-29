@@ -1,10 +1,7 @@
 import { InputHTMLAttributes, useState, useRef } from 'react';
 
 interface InputProps {
-  id: string;
-  required?: boolean;
   label: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   helpText?: string;
   errorText?: string;
 }
@@ -47,7 +44,7 @@ export const Input = ({
               setError(false);
               setShowErrorText(false);
             }
-            onChange(event);
+            onChange?.(event);
           }}
           onFocus={() => {
             if (error) {
