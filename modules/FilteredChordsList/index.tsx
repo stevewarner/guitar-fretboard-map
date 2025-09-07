@@ -3,10 +3,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChordType } from '@/types';
 import { SearchInput } from '@/components/SearchInput';
-import {
-  Fretboard as FretboardV2,
-  Pattern as PatternV2,
-} from '@/components/FretboardChartV2';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 import { Modal } from '@/components/Modal';
 import NewChordForm from '@/components/NewChordForm';
 
@@ -86,7 +83,7 @@ const FilteredChordsList = ({ chords }: Props) => {
               >
                 <span>{chord.name}</span>
 
-                <FretboardV2
+                <Fretboard
                   id={chord.id.toString()}
                   title={chord.name}
                   numFrets={chord.num_frets}
@@ -94,12 +91,12 @@ const FilteredChordsList = ({ chords }: Props) => {
                   height={150}
                   width={150}
                 >
-                  <PatternV2
+                  <Pattern
                     tab={chord.tab}
                     startFret={chord.start_fret}
                     fillColor="#000"
                   />
-                </FretboardV2>
+                </Fretboard>
               </Link>
             </div>
           ))}

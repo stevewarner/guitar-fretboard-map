@@ -5,10 +5,7 @@ import { ChordType } from '@/types';
 import { createTab } from '@/app/utils';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
-import {
-  Fretboard as FretboardV2,
-  Pattern as PatternV2,
-} from '@/components/FretboardChartV2';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 
 type Props = {
   params: Promise<{ param: string }>;
@@ -67,19 +64,19 @@ const Chord = async ({ params }: Props) => {
       <>
         <div className="flex flex-col items-center">
           {chordExists && <h1 className="mb-4">{chords[0].name}</h1>}
-          <FretboardV2
+          <Fretboard
             numFrets={numFrets}
             startFret={startFret}
             height={400}
             width={400}
           >
-            <PatternV2
+            <Pattern
               tab={tab}
               // get the smallest number in the param
               startFret={startFret}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
           {chordExists ? (
             <a
               href={`/chord/${chords[0].name}`}
@@ -119,8 +116,7 @@ const Chord = async ({ params }: Props) => {
               <h2 className="mb-4">{chord.name}</h2>
               <ChordActionDropdown id={chordId} chord={chord} />
             </span>
-
-            <FretboardV2
+            <Fretboard
               id={chordId}
               title={param}
               numFrets={chord.num_frets}
@@ -128,13 +124,13 @@ const Chord = async ({ params }: Props) => {
               height={400}
               width={400}
             >
-              <PatternV2
+              <Pattern
                 tab={chord.tab}
                 intervals={chord.intervals}
                 startFret={chord.start_fret}
                 fillColor="#000"
               />
-            </FretboardV2>
+            </Fretboard>
           </div>
         );
       })}
