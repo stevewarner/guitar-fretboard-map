@@ -1,10 +1,6 @@
 import Link from 'next/link';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 import { ChordType } from '@/types';
-
-const fbHeight = 360 / 2;
-const fbWidth = 400 / 2;
-const stroke = 4 / 2;
 
 interface ChordCarouselProps {
   chords: ChordType[];
@@ -16,24 +12,18 @@ export const ChordCarousel = ({ chords }: ChordCarouselProps) => {
       {chords.map((chord) => (
         <div key={chord.id} className="flex items-center justify-center">
           <Link
-            className="flex flex-col gap-4 rounded border border-current px-4 py-2 hover:bg-gray-100"
+            className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
             href={`/chord/${encodeURIComponent(chord.name)}`}
           >
             <span>{chord.name}</span>
-            <div className="mb-[-100px] mr-[-120px] origin-top-left scale-50">
+            <div>
               <Fretboard
+                id={chord.id.toString()}
+                title={chord.name}
                 numFrets={chord.num_frets}
-                small
-                showOpenNotes
-                options={{
-                  fbHeight: fbHeight,
-                  fbWidth: 250,
-                  strHeight: fbHeight / 5,
-                  fretWidth: fbWidth / 4,
-                  stroke: stroke,
-                  circRad: fbHeight / 20,
-                  topSpace: fbHeight / 20 + stroke / 2,
-                }}
+                startFret={chord.start_fret}
+                height={150}
+                width={150}
               >
                 <Pattern
                   tab={chord.tab}
