@@ -1,9 +1,6 @@
 'use client';
 import { useState, useActionState } from 'react';
-import {
-  Fretboard as FretboardV2,
-  Pattern as PatternV2,
-} from '@/components/FretboardChartV2';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
 import { ChordType } from '@/types';
@@ -136,20 +133,20 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
         </div>
         <div className="flex flex-auto flex-col items-center">
           {!!chordName && <h2>{chordName}</h2>}
-          <FretboardV2
+          <Fretboard
             title={chordName}
             numFrets={Number(numFrets) || 1}
             startFret={Number(startFret)}
             height={250}
             width={250}
           >
-            <PatternV2
+            <Pattern
               tab={createTab(chordTab)}
               intervals={chordIntervals.split(',')}
               startFret={Number(startFret)}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
         </div>
       </div>
       <div className="mt-10">
