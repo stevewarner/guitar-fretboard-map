@@ -1,8 +1,5 @@
 import { Metadata } from 'next';
-import {
-  Fretboard as FretboardV2,
-  Pattern as PatternV2,
-} from '@/components/FretboardChartV2';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 
 export const metadata: Metadata = {
   title: 'Intro to Intervals',
@@ -27,28 +24,28 @@ const Intervals = () => {
           intervals)
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <FretboardV2 numFrets={4} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[[2, 4], [1, 2, 4], [1, 3, 4], [], [], []]}
               intervals={[[1, 2], [3, 4, 5], [6, 7, 1], [], [], []]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
 
-          <FretboardV2 numFrets={5} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[[1, 3, 5], [1, 3, 5], [2, 3], [], [], []]}
               intervals={[[1, 2, 3], [4, 5, 6], [7, 1], [], [], []]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
         </div>
 
         <h2>Chromatic scale</h2>
         <p>The chromatic scale consists of all 12 notes</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <FretboardV2 numFrets={5} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[[2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4], [], [], []]}
               intervals={[
                 [1, 'b2', 2, 'b3'],
@@ -60,10 +57,10 @@ const Intervals = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
 
-          <FretboardV2 numFrets={5} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3], [], [], []]}
               intervals={[
                 [1, 'b2', 2, 'b3', 3],
@@ -75,7 +72,7 @@ const Intervals = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
         </div>
       </div>
     </>

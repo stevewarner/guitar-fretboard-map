@@ -1,8 +1,5 @@
 import { Metadata } from 'next';
-import {
-  Fretboard as FretboardV2,
-  Pattern as PatternV2,
-} from '@/components/FretboardChartV2';
+import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 
 export const metadata: Metadata = {
   title: 'Intro to Pentatonic Scale',
@@ -25,8 +22,8 @@ const IntroPentatonic = () => {
           steps (4th and 7th intervals) of the major scale.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <FretboardV2 numFrets={4} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[
                 [2, 4],
                 [1, 4],
@@ -45,10 +42,10 @@ const IntroPentatonic = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
 
-          <FretboardV2 numFrets={4} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[
                 [1, 4],
                 [1, 3],
@@ -67,7 +64,7 @@ const IntroPentatonic = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
         </div>
 
         <h2>Minor pentatonic scale</h2>
@@ -76,8 +73,8 @@ const IntroPentatonic = () => {
           intervals.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <FretboardV2 numFrets={4} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[
                 [1, 4],
                 [1, 3],
@@ -96,10 +93,10 @@ const IntroPentatonic = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
 
-          <FretboardV2 numFrets={4} startFret={1} height={400} width={400}>
-            <PatternV2
+          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+            <Pattern
               tab={[
                 [2, 4],
                 [2, 4],
@@ -118,7 +115,7 @@ const IntroPentatonic = () => {
               ]}
               fillColor="#000"
             />
-          </FretboardV2>
+          </Fretboard>
         </div>
       </div>
     </>
