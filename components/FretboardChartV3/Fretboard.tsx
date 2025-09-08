@@ -48,7 +48,7 @@ export const Fretboard = ({
           x1={strHeight * (index + 1) + stroke / 2 + topSpace - strHeight}
           y1={topSpace}
           x2={strHeight * (index + 1) + stroke / 2 + topSpace - strHeight}
-          y2={fbHeight + topSpace}
+          y2={topSpace * numFrets + topSpace}
           stroke="black"
         />
       ))}
@@ -59,7 +59,7 @@ export const Fretboard = ({
           key={`fret-${index}`}
           x1={topSpace}
           y1={topSpace * (index + 1)}
-          x2={topSpace * numFrets + stroke + topSpace}
+          x2={fbHeight + stroke + topSpace}
           y2={topSpace * (index + 1)}
           stroke="black"
         />
@@ -72,10 +72,9 @@ export const Fretboard = ({
           x={strHeight * numStrings + stroke / 2 + topSpace / 1.5}
           y={topSpace + topSpace / 2 + fontSize / 3}
           fontFamily="Arial"
-          fontSize={fontSize}
-          textAnchor="middle"
+          fontSize={fontSize * 0.75}
         >
-          {startFret}
+          {`${startFret}fr`}
         </text>
       )}
     </svg>
