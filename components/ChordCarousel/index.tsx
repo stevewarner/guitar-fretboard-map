@@ -13,7 +13,7 @@ export const ChordCarousel = ({ chords }: ChordCarouselProps) => {
         <div key={chord.id} className="flex items-center justify-center">
           <Link
             className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
-            href={`/chord/${encodeURIComponent(chord.name)}`}
+            href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
           >
             <span>{chord.name}</span>
             <div>
