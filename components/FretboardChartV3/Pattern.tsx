@@ -71,7 +71,7 @@ export const Pattern = ({
                 stroke="#000"
                 strokeWidth={stroke}
               />
-              {intervals.length > 0 && intervals[stringIndex] && (
+              {intervals && intervals.length > 0 && intervals[stringIndex] && (
                 <text
                   x={topSpace + stroke / 2 + strHeight * stringIndex}
                   y={calcFret(Number(string) || 0) + circRad / 3}
