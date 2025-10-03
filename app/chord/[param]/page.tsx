@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
 import { ChordType } from '@/types';
-import { createTab } from '@/app/utils';
+import { createTab, getOrdinal } from '@/app/utils';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
 import { Fretboard, Pattern } from '@/components/FretboardChartV3';
@@ -114,8 +114,17 @@ const Chord = async ({ params }: Props) => {
           >
             <span className="flex items-baseline gap-6">
               <h2 className="mb-4">{chord.name}</h2>
+
               <ChordActionDropdown id={chordId} chord={chord} />
             </span>
+            {chord.inversion > 0 && (
+              <p className="text-sm text-gray-600">{`${chord.inversion}${getOrdinal(chord.inversion)} inversion`}</p>
+            )}
+            {chord.description && (
+              <p className="max-w-md text-center text-sm italic text-gray-600">
+                {chord.description}
+              </p>
+            )}
             <Fretboard
               id={chordId}
               title={param}

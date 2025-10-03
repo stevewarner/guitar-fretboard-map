@@ -3,10 +3,12 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Lessons',
-  description: 'Introduction to music theory for guitarists',
+  description:
+    'Introduction to music theory for guitarists. Interactive fretboard charts and diagrams.',
   openGraph: {
     title: 'GuitarTheory | Lessons',
-    description: 'Introduction to music theory for guitarists',
+    description:
+      'Introduction to music theory for guitarists. Interactive fretboard charts and diagrams.',
   },
 };
 
