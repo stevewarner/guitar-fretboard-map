@@ -10,4 +10,6 @@ export type ChordType = {
   string_position: number;
   tab: string[];
   tab_id: string;
+  inversion: number;
+  description: string | null;
 };
