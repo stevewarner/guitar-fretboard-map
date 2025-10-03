@@ -44,10 +44,11 @@ const FilteredChordsList = ({ chords }: Props) => {
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SearchInput
           id="search-chords"
-          defaultValue={searchParams?.get('query')?.toString()}
+          value={searchParams?.get('query')?.toString()}
           onChange={(e) => {
             handleSearch(e.target.value);
           }}
+          onClear={() => handleSearch('')}
         />
         <button
           type="button"
