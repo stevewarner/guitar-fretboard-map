@@ -1,0 +1,19 @@
+.chordsContainer {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.chordChart {
+    width: fit-content;
+    height: auto;
+    display: flex;
+    justify-content: center;
+
+    & svg {
+        width: 100%;
+        height: auto;
+    }
+}
