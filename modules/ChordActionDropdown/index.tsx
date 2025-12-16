@@ -12,6 +12,7 @@ import EllipsisIcon from '@/svgs/more.svg';
 import ExportIcon from '@/svgs/download.svg';
 import { ChordType } from '@/types';
 import { downloadSvg } from '@/app/utils/downloadSvg';
+import { downloadImage } from '@/app/utils/downloadImage';
 
 interface ChordActionDropdownProps {
   id: string;
@@ -59,6 +60,23 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
           >
             <ExportIcon height={20} width={20} />
             Download SVG
+          </button>,
+          <button
+            key="export-png"
+            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
+            onClick={() => {
+              // export PNG
+              const svgElement = document.getElementById(
+                id,
+              ) as unknown as SVGSVGElement;
+              downloadImage({
+                element: svgElement,
+                fileName: `${chord.name}.png`,
+              });
+            }}
+          >
+            <ExportIcon height={20} width={20} />
+            Download PNG
           </button>,
           <button
             key="edit"
