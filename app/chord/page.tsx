@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Chords(): Promise<JSX.Element> {
+export default async function Chords() {
   const { rows: chords } = await sql<ChordType>`SELECT * from CHORDS`;
 
   return (
