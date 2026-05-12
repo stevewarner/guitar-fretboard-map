@@ -3,6 +3,7 @@ import { useState, useActionState } from 'react';
 import { Fretboard, Pattern } from '@/components/FretboardChartV3';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
+import { createTab } from '@/app/utils';
 import { ChordType } from '@/types';
 
 const initialState = {
@@ -30,21 +31,11 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
     (initFormValues?.intervals && initFormValues?.intervals.join(',')) || '',
   );
 
-  const createTab = (val: string) => {
-    const newArr: string[] = [];
-    const splitVal = val.length === 6 ? '' : ',';
-    val.split(splitVal).map((fretNum: string) => {
-      !!fretNum && newArr.push(fretNum);
-    });
-    return newArr;
-  };
-
   return (
     <form action={formAction} className="mx-auto max-w-xl">
       <div className="flex flex-row flex-wrap gap-8 p-4">
         <div className="grid flex-[40%] grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            {/* name */}
             <Input
               autoFocus
               id="name"
@@ -52,13 +43,11 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               label="Chord name"
               placeholder="Cmaj7"
               defaultValue={initFormValues?.name || ''}
-              // value={chordName}
               onChange={(event) => setChordName(event.target.value)}
               required
             />
           </div>
           <div className="sm:col-span-2">
-            {/* tab */}
             <Input
               id="tab"
               name="tab"
@@ -67,13 +56,11 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               pattern="^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4])(,(x|[0-9]|1\d|2[0-4])){5})$"
               errorText="value must be 6 digits containing only numbers and 'x'"
               defaultValue={initFormValues?.tab_id || ''}
-              // value={chordTab}
               onChange={(event) => setChordTab(event.target.value)}
               helpText="6 numbers (x for muted string) or comma separated values for each string"
               required
             />
           </div>
-          {/* start_fret */}
           <div className="sm:col-span-1">
             <Input
               id="startFret"
@@ -81,18 +68,16 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               label="Starting fret"
               placeholder="1"
               type="text"
-              inputMode="decimal" // show numpad on mobile
+              inputMode="decimal"
               pattern="^(?:[1-9]|1\d|2[0-4])$"
               errorText="value must be a number"
               min={1}
               max={24}
               defaultValue={initFormValues?.start_fret || '1'}
-              // value={startFret}
               onChange={(event) => setStartFret(event.target.value)}
               required
             />
           </div>
-          {/* num_frets */}
           <div className="sm:col-span-1">
             <Input
               id="numFrets"
@@ -100,18 +85,16 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               label="# of frets"
               placeholder="1"
               type="text"
-              inputMode="decimal" // show numpad on mobile
+              inputMode="decimal"
               pattern="^[1-9]$"
               errorText="value must be a number"
               min={3}
               max={6}
               defaultValue={initFormValues?.num_frets || '4'}
-              // value={numFrets}
               onChange={(event) => setNumFrets(event.target.value)}
               required
             />
           </div>
-          {/* intervals */}
           <div className="sm:col-span-2">
             <Input
               id="intervals"
@@ -121,11 +104,8 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               pattern="^((b|#)?[1-7]|)(,((b|#)?[1-7]|)){5}$"
               errorText="value must be 6 comma separated values containing only numbers and 'b' or '#'"
               defaultValue={
-                (initFormValues?.intervals &&
-                  initFormValues?.intervals.join(',')) ||
-                ''
+                (initFormValues?.intervals && initFormValues?.intervals.join(',')) || ''
               }
-              // value={chordIntervals}
               onChange={(event) => setChordIntervals(event.target.value)}
               helpText="6 comma separated values for each note interval. use empty comma for no value"
             />
@@ -150,12 +130,17 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
         </div>
       </div>
       <div className="mt-10">
+        {formState.message && !formState.success && (
+          <p className="mb-3 text-sm text-red-600" role="alert">
+            {formState.message}
+          </p>
+        )}
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500 "
+          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500"
         >
-          {isEdit ? 'Edit Chord' : 'Add Chord'}
+          {isPending ? 'Saving...' : isEdit ? 'Edit Chord' : 'Add Chord'}
         </button>
         <p aria-live="polite" className="sr-only" role="status">
           {formState?.message}

@@ -1,10 +1,9 @@
-export const createTab = (val: string) => {
-  const newArr: string[] = [];
-  val.split('').map((fretNum: string) => {
-    !!fretNum && newArr.push(fretNum);
-  });
-  return newArr;
+export const createTab = (val: string): string[] => {
+  const splitVal = val.length === 6 ? '' : ',';
+  return val.split(splitVal).filter(Boolean);
 };
+
+export const createIntervals = (val: string): string[] => val.split(',');
 
 export const getOrdinal = (n: number) => {
   let ord = 'th';
