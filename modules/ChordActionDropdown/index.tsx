@@ -51,10 +51,8 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
             key="export"
             className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
             onClick={() => {
-              // export SVG
-              const svgElement = document.getElementById(
-                id,
-              ) as unknown as SVGSVGElement;
+              const svgElement = document.getElementById(id);
+              if (!(svgElement instanceof SVGSVGElement)) return;
               downloadSvg({ svgElement, fileName: `${chord.name}.svg` });
             }}
           >
@@ -65,10 +63,8 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
             key="export-png"
             className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-gray-100"
             onClick={() => {
-              // export PNG
-              const svgElement = document.getElementById(
-                id,
-              ) as unknown as SVGSVGElement;
+              const svgElement = document.getElementById(id);
+              if (!(svgElement instanceof SVGSVGElement)) return;
               downloadImage({
                 element: svgElement,
                 fileName: `${chord.name}.png`,

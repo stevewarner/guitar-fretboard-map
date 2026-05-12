@@ -1,4 +1,5 @@
 'use client';
+import { useMemo } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChordType } from '@/types';
@@ -39,6 +40,17 @@ const FilteredChordsList = ({ chords }: Props) => {
     replace(`${pathname}?${params.toString()}`);
   };
 
+  const filteredChords = useMemo(
+    () =>
+      chords
+        .slice()
+        .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+        .filter((chord) =>
+          chord.name.toLowerCase().includes(userSearch.toLowerCase()),
+        ),
+    [chords, userSearch],
+  );
+
   return (
     <>
       <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -54,53 +66,39 @@ const FilteredChordsList = ({ chords }: Props) => {
           type="button"
           className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800"
           onClick={() => {
-            // open modal
             toggleModalOpen(true);
           }}
         >
           Add a new chord +
         </button>
       </div>
-      <h3>{`Showing ${chords.length} chords`}</h3>
+      <h3>{`Showing ${filteredChords.length} chords`}</h3>
       <div className="grid grid-cols-2 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4">
-        {chords
-          .sort((a, b) => {
-            if (a.name < b.name) {
-              return -1;
-            }
-            if (a.name > b.name) {
-              return 1;
-            }
-            return 0;
-          })
-          .filter((chord) =>
-            chord.name.toLowerCase().includes(userSearch.toLowerCase()),
-          )
-          .map((chord) => (
-            <div key={chord.id} className="flex items-center justify-center">
-              <Link
-                className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
-                href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
-              >
-                <span>{chord.name}</span>
+        {filteredChords.map((chord) => (
+          <div key={chord.id} className="flex items-center justify-center">
+            <Link
+              className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
+              href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
+            >
+              <span>{chord.name}</span>
 
-                <Fretboard
-                  id={chord.id.toString()}
-                  title={chord.name}
-                  numFrets={chord.num_frets}
+              <Fretboard
+                id={chord.id.toString()}
+                title={chord.name}
+                numFrets={chord.num_frets}
+                startFret={chord.start_fret}
+                height={150}
+                width={150}
+              >
+                <Pattern
+                  tab={chord.tab}
                   startFret={chord.start_fret}
-                  height={150}
-                  width={150}
-                >
-                  <Pattern
-                    tab={chord.tab}
-                    startFret={chord.start_fret}
-                    fillColor="#000"
-                  />
-                </Fretboard>
-              </Link>
-            </div>
-          ))}
+                  fillColor="#000"
+                />
+              </Fretboard>
+            </Link>
+          </div>
+        ))}
       </div>
       {!!modalOpen && (
         <Modal

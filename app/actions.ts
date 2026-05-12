@@ -5,24 +5,14 @@ import { ChordType } from '@/types';
 
 import { revalidatePath } from 'next/cache';
 
-// Array needs to be formatted with each el as a string
-const createTab = (val: string) => {
-  const newArr: string[] = [];
+const createTab = (val: string): string[] => {
   const splitVal = val.length === 6 ? '' : ',';
-  val.split(splitVal).map((fretNum: string) => {
-    !!fretNum && newArr.push(`'${fretNum}'`);
-  });
-  return newArr;
+  return val.split(splitVal).filter(Boolean);
 };
 
-// Intervals format
-const createIntervals = (val: string) => {
-  const newArr: string[] = [];
+const createIntervals = (val: string): string[] => {
   const splitVal = val.length === 6 ? '' : ',';
-  val.split(splitVal).map((interval: string) => {
-    newArr.push(`'${interval}'`);
-  });
-  return newArr;
+  return val.split(splitVal);
 };
 
 // CREATE NEW
@@ -34,30 +24,24 @@ export async function createNewChord(
   },
   formData: FormData,
 ) {
-  const rawData = {
-    name: formData.get('name') as string,
-    tab: formData.get('tab') as string,
-    startFret: formData.get('startFret') as string,
-    numFrets: formData.get('numFrets') as string,
-  };
   const name = formData.get('name') as string;
   const tab = formData.get('tab') as string;
   const startFret = formData.get('startFret') as string;
   const numFrets = formData.get('numFrets') as string;
   const intervals = formData.get('intervals');
 
-  const tabArr = createTab(tab as string);
+  const tabArr = createTab(tab);
   const intervalsArr = createIntervals(intervals as string);
 
   let isSuccessful = false;
 
   try {
     await sql.query(
-      `INSERT INTO chords (name, tab, tab_id, start_fret, num_frets, intervals) VALUES ('${name}', array [${tabArr}], '${tab}', ${startFret}, ${numFrets}, array [${intervalsArr}]);`,
+      'INSERT INTO chords (name, tab, tab_id, start_fret, num_frets, intervals) VALUES ($1, $2, $3, $4, $5, $6)',
+      [name, tabArr, tab, Number(startFret), Number(numFrets), intervalsArr],
     );
     isSuccessful = true;
 
-    // revalidate cache
     revalidatePath('/chord');
 
     return { success: true, message: 'Successfully created new chord' };
@@ -67,12 +51,11 @@ export async function createNewChord(
     return {
       success: false,
       message: 'Failed to create chord',
-      inputs: rawData,
+      inputs: { name, tab, startFret, numFrets },
     };
   } finally {
     if (isSuccessful && name) {
-      // redirect to new chord page
-      redirect(`/chord/${encodeURIComponent(name?.toString())}`);
+      redirect(`/chord/${encodeURIComponent(name)}`);
     }
   }
 }
@@ -87,35 +70,34 @@ export async function updateChord(
   },
   formData: FormData,
 ) {
-  const name = formData.get('name');
-  const tab = formData.get('tab');
-  const startFret = formData.get('startFret');
-  const numFrets = formData.get('numFrets');
+  const name = formData.get('name') as string;
+  const tab = formData.get('tab') as string;
+  const startFret = formData.get('startFret') as string;
+  const numFrets = formData.get('numFrets') as string;
   const intervals = formData.get('intervals');
 
-  const tabArr = createTab(tab as string);
+  const tabArr = createTab(tab);
   const intervalsArr = createIntervals(intervals as string);
 
   let isSuccessful = false;
 
   try {
     await sql.query(
-      `UPDATE chords SET name = '${name}', tab = array [${tabArr}], intervals = array [${intervalsArr}], tab_id = '${tab}', start_fret = ${startFret}, num_frets = ${numFrets} WHERE id = ${chord?.id};`,
+      'UPDATE chords SET name = $1, tab = $2, intervals = $3, tab_id = $4, start_fret = $5, num_frets = $6 WHERE id = $7',
+      [name, tabArr, intervalsArr, tab, Number(startFret), Number(numFrets), chord?.id],
     );
     isSuccessful = true;
 
-    // revalidate cache
     revalidatePath('/chord');
 
-    return { success: true, message: 'Successfully created new chord' };
+    return { success: true, message: 'Successfully updated chord' };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error:', e);
-    return { success: false, message: 'Failed to create chord' };
+    return { success: false, message: 'Failed to update chord' };
   } finally {
     if (isSuccessful && name) {
-      // redirect to new chord page
-      redirect(`/chord/${encodeURIComponent(name?.toString())}`);
+      redirect(`/chord/${encodeURIComponent(name)}`);
     }
   }
 }
@@ -127,9 +109,7 @@ interface ReportChordProps {
 }
 export async function reportChord({ id }: ReportChordProps) {
   try {
-    await sql.query(
-      `UPDATE chords SET report_count = report_count + 1 WHERE id = ${id};`,
-    );
+    await sql.query('UPDATE chords SET report_count = report_count + 1 WHERE id = $1', [id]);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error:', e);

@@ -152,6 +152,7 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
       <div className="mt-10">
         <button
           type="submit"
+          disabled={isPending}
           className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500 "
         >
           {isEdit ? 'Edit Chord' : 'Add Chord'}
