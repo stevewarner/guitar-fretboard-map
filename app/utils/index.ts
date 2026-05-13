@@ -1,6 +1,5 @@
 export const createTab = (val: string): string[] => {
-  const splitVal = val.length === 6 ? '' : ',';
-  return val.split(splitVal).filter(Boolean);
+  return val.includes(',') ? val.split(',') : val.split('');
 };
 
 export const createIntervals = (val: string): string[] => val.split(',');

@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { ChordType } from '@/types';
 import { createTab, createIntervals } from '@/app/utils';
 
-const TAB_PATTERN = /^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4])(,(x|[0-9]|1\d|2[0-4])){5})$/;
+const TAB_PATTERN = /^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4]|)(,(x|[0-9]|1\d|2[0-4]|)){5})$/;
 
 function validateChordInputs(name: string, tab: string, startFret: number, numFrets: number) {
   if (!name?.trim()) return 'Chord name is required';

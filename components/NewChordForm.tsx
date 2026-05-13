@@ -1,6 +1,6 @@
 'use client';
 import { useState, useActionState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { InteractiveFretboard } from '@/components/InteractiveFretboard';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
 import { createTab } from '@/app/utils';
@@ -24,9 +24,21 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   );
 
   const [chordName, setChordName] = useState(initFormValues?.name || '');
-  const [chordTab, setChordTab] = useState(initFormValues?.tab_id || '');
-  const [startFret, setStartFret] = useState(initFormValues?.start_fret || '1');
-  const [numFrets, setNumFrets] = useState(initFormValues?.num_frets || '4');
+  const [tab, setTab] = useState<(string | undefined)[]>(
+    initFormValues?.tab_id ? createTab(initFormValues.tab_id) : Array(6).fill(undefined),
+  );
+  const [tabInput, setTabInput] = useState(
+    initFormValues?.tab_id ?? '',
+  );
+
+  const handleTabChange = (newTab: (string | undefined)[]) => {
+    setTab(newTab);
+    setTabInput(newTab.join(','));
+  };
+  const [startFret, setStartFret] = useState(
+    Number(initFormValues?.start_fret) || 1,
+  );
+  const [numFrets, setNumFrets] = useState(Number(initFormValues?.num_frets) || 4);
   const [chordIntervals, setChordIntervals] = useState(
     (initFormValues?.intervals && initFormValues?.intervals.join(',')) || '',
   );
@@ -53,10 +65,14 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               name="tab"
               label="Chord tab"
               placeholder="x32000 or x,3,2,0,0,0"
-              pattern="^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4])(,(x|[0-9]|1\d|2[0-4])){5})$"
+              pattern="^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4]|)(,(x|[0-9]|1\d|2[0-4]|)){5})$"
               errorText="value must be 6 digits containing only numbers and 'x'"
-              defaultValue={initFormValues?.tab_id || ''}
-              onChange={(event) => setChordTab(event.target.value)}
+              value={tabInput}
+              onChange={(event) => {
+                setTabInput(event.target.value);
+                const parsed = createTab(event.target.value);
+                if (parsed.length === 6) setTab(parsed);
+              }}
               helpText="6 numbers (x for muted string) or comma separated values for each string"
               required
             />
@@ -73,8 +89,10 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               errorText="value must be a number"
               min={1}
               max={24}
-              defaultValue={initFormValues?.start_fret || '1'}
-              onChange={(event) => setStartFret(event.target.value)}
+              value={String(startFret)}
+              onChange={(event) =>
+                setStartFret(Number(event.target.value) || 1)
+              }
               required
             />
           </div>
@@ -83,15 +101,13 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               id="numFrets"
               name="numFrets"
               label="# of frets"
-              placeholder="1"
-              type="text"
-              inputMode="decimal"
-              pattern="^[1-9]$"
-              errorText="value must be a number"
+              placeholder="4"
+              type="number"
+              errorText="value must be between 3 and 6"
               min={3}
               max={6}
-              defaultValue={initFormValues?.num_frets || '4'}
-              onChange={(event) => setNumFrets(event.target.value)}
+              value={String(numFrets)}
+              onChange={(event) => setNumFrets(Number(event.target.value))}
               required
             />
           </div>
@@ -104,31 +120,27 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
               pattern="^((b|#)?[1-7]|)(,((b|#)?[1-7]|)){5}$"
               errorText="value must be 6 comma separated values containing only numbers and 'b' or '#'"
               defaultValue={
-                (initFormValues?.intervals && initFormValues?.intervals.join(',')) || ''
+                (initFormValues?.intervals &&
+                  initFormValues?.intervals.join(',')) ||
+                ''
               }
-              onChange={(event) => setChordIntervals(event.target.value)}
               helpText="6 comma separated values for each note interval. use empty comma for no value"
             />
           </div>
         </div>
-        <div className="flex flex-auto flex-col items-center">
+
+        <div className="flex flex-auto flex-col items-center gap-2">
           {!!chordName && <h2>{chordName}</h2>}
-          <Fretboard
-            title={chordName}
-            numFrets={Number(numFrets) || 1}
-            startFret={Number(startFret)}
-            height={250}
-            width={250}
-          >
-            <Pattern
-              tab={createTab(chordTab)}
-              intervals={chordIntervals.split(',')}
-              startFret={Number(startFret)}
-              fillColor="#000"
-            />
-          </Fretboard>
+          <InteractiveFretboard
+            tab={tab}
+            startFret={startFret}
+            numFrets={numFrets >= 3 && numFrets <= 6 ? numFrets : 4}
+            onTabChange={handleTabChange}
+            size={250}
+          />
         </div>
       </div>
+
       <div className="mt-10">
         {formState.message && !formState.success && (
           <p className="mb-3 text-sm text-red-600" role="alert">
@@ -138,7 +150,7 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500"
+          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500 "
         >
           {isPending ? 'Saving...' : isEdit ? 'Edit Chord' : 'Add Chord'}
         </button>

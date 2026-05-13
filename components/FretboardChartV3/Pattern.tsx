@@ -5,7 +5,7 @@ import { strHeight, topSpace, stroke, circRad } from './constants';
 // </Fretboard>
 
 interface PatternProps {
-  tab: (string | number)[] | (string | number)[][];
+  tab: (string | number | undefined)[] | (string | number | undefined)[][];
   intervals?: (string | number | undefined)[] | (string | number)[][];
   fillColor: string;
   startFret?: number;
@@ -35,6 +35,7 @@ export const Pattern = ({
       {tab.map((string, stringIndex) =>
         // string is not a nested array
         !Array.isArray(string) ? (
+          string === undefined ? null :
           // handle string value 'X'
           string === 'x' ? (
             <svg key={`${stringIndex}-${string}`}>
