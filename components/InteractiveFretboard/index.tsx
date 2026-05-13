@@ -8,11 +8,13 @@ import {
   numStrings,
 } from '@/components/FretboardChartV3/constants';
 
+import { FlatTabValue } from '@/types';
+
 interface Props {
-  tab: (string | undefined)[];
+  tab: FlatTabValue[];
   startFret: number;
   numFrets: number;
-  onTabChange: (tab: (string | undefined)[]) => void;
+  onTabChange: (tab: FlatTabValue[]) => void;
   size?: number;
 }
 
@@ -34,7 +36,7 @@ export const InteractiveFretboard = ({
     const newTab = [...tab];
 
     if (svgY < topSpace) {
-      newTab[si] = tab[si] === '0' ? 'x' : tab[si] === 'x' ? undefined : '0';
+      newTab[si] = tab[si] === 0 ? 'x' : tab[si] === 'x' ? undefined : 0;
       onTabChange(newTab);
       return;
     }
@@ -42,7 +44,7 @@ export const InteractiveFretboard = ({
     const row = Math.floor((svgY - topSpace) / topSpace);
     if (row < 0 || row >= numFrets) return;
 
-    const fret = String(row + startFret);
+    const fret = row + startFret;
     newTab[si] = tab[si] === fret ? undefined : fret;
     onTabChange(newTab);
   };

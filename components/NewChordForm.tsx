@@ -4,7 +4,7 @@ import { InteractiveFretboard } from '@/components/InteractiveFretboard';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
 import { createTab } from '@/app/utils';
-import { ChordType } from '@/types';
+import { ChordType, FlatTabValue } from '@/types';
 
 const initialState = {
   success: false,
@@ -24,14 +24,14 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   );
 
   const [chordName, setChordName] = useState(initFormValues?.name || '');
-  const [tab, setTab] = useState<(string | undefined)[]>(
-    initFormValues?.tab_id ? createTab(initFormValues.tab_id) : Array(6).fill(undefined),
+  const [tab, setTab] = useState<FlatTabValue[]>(
+    initFormValues?.tab_id ? createTab(initFormValues.tab_id) as FlatTabValue[] : Array(6).fill(undefined),
   );
   const [tabInput, setTabInput] = useState(
     initFormValues?.tab_id ?? '',
   );
 
-  const handleTabChange = (newTab: (string | undefined)[]) => {
+  const handleTabChange = (newTab: FlatTabValue[]) => {
     setTab(newTab);
     setTabInput(newTab.join(','));
   };
