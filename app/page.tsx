@@ -107,6 +107,11 @@ export default async function Home() {
         <h3>Recently added</h3>
         <ChordCarousel chords={chords} />
       </section>
+      <footer className="mt-12 border-t py-4 text-center text-sm text-gray-500">
+        <Link href="/feedback" className="underline">
+          Send me a message
+        </Link>
+      </footer>
     </>
   );
 }
