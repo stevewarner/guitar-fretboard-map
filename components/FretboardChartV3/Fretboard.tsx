@@ -1,4 +1,3 @@
-'use client';
 import { SVGProps } from 'react';
 import {
   fontSize,
@@ -42,19 +41,19 @@ export const Fretboard = ({
       </text>
 
       {/* strings */}
-      {[...Array(numStrings)].map((x, index) => (
+      {[...Array(numStrings)].map((_, index) => (
         <line
           key={`string-${index}`}
-          x1={strHeight * (index + 1) + stroke / 2 + topSpace - strHeight}
+          x1={topSpace + stroke / 2 + strHeight * index}
           y1={topSpace}
-          x2={strHeight * (index + 1) + stroke / 2 + topSpace - strHeight}
-          y2={topSpace * numFrets + topSpace}
+          x2={topSpace + stroke / 2 + strHeight * index}
+          y2={topSpace * (numFrets + 1)}
           stroke="black"
         />
       ))}
 
       {/* frets */}
-      {[...Array(numFrets + 1)].map((x, index) => (
+      {[...Array(numFrets + 1)].map((_, index) => (
         <line
           key={`fret-${index}`}
           x1={topSpace}

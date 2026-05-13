@@ -1,4 +1,5 @@
-import { InputHTMLAttributes, useState, useRef } from 'react';
+'use client';
+import { InputHTMLAttributes, useState, useRef, useEffect } from 'react';
 
 interface InputProps {
   label: string;
@@ -22,6 +23,13 @@ export const Input = ({
 
   const ref = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (error && ref.current?.validity.valid) {
+      setError(false);
+      setShowErrorText(false);
+    }
+  }, [value, error]);
+
   return (
     <>
       <label
@@ -39,8 +47,7 @@ export const Input = ({
           pattern={pattern}
           value={value}
           onChange={(event) => {
-            // remove error if valid
-            if (!event.target.validity.patternMismatch) {
+            if (event.target.validity.valid) {
               setError(false);
               setShowErrorText(false);
             }
@@ -53,7 +60,7 @@ export const Input = ({
           }}
           onBlur={(event) => {
             if (!error) {
-              if (event.target.validity.patternMismatch) {
+              if (!event.target.validity.valid) {
                 ref.current?.select();
                 setError(true);
                 setShowErrorText(true);

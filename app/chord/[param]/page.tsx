@@ -47,14 +47,12 @@ const Chord = async ({ params }: Props) => {
 
     const chordExists = chords.length > 0;
 
-    const startFret =
-      Math.min(
-        ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
-      ) || 1;
+    const numericTab = tab
+      .filter((item) => !isNaN(item as unknown as number))
+      .map(Number);
 
-    const endFret = Math.max(
-      ...tab.filter((item) => !isNaN(item as unknown as number)).map(Number),
-    );
+    const startFret = numericTab.length > 0 ? Math.min(...numericTab) || 1 : 1;
+    const endFret = numericTab.length > 0 ? Math.max(...numericTab) : startFret;
 
     const numFrets = endFret - startFret + 1 >= 4 ? endFret - startFret + 1 : 4;
 
