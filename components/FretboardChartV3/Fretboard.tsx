@@ -25,7 +25,7 @@ export const Fretboard = ({
   return (
     <svg
       strokeWidth={stroke}
-      viewBox={`0 0 ${svgDimension} ${svgDimension}`}
+      viewBox={`0 0 ${svgDimension} ${topSpace * (numFrets + 2)}`}
       {...rest}
     >
       <title>{title}</title>

@@ -1,0 +1,31 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+}
+
+.input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+}
+
+.input::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.input::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}

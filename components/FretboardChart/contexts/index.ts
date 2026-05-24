@@ -1,26 +1,18 @@
 import { createContext } from 'react';
+import { DEFAULT_HEIGHT, DEFAULT_FRET_WIDTH, STROKE } from '../constants';
 
-const numFrets = 4;
-const showOpenNotes = true;
-
-const fbHeight = 360;
-const fbWidth = 400; // 1000
-const strHeight = fbHeight / 5;
-const fretWidth = 100; // fbWidth / 10
-const stroke = 4;
-const circRad = fbHeight / 20;
-const topSpace = circRad + stroke / 2;
+const strHeight = DEFAULT_HEIGHT / 5;
+const circRad = DEFAULT_HEIGHT / 20;
 
 export const initialState = {
-  numFrets: numFrets,
-  showOpenNotes: showOpenNotes,
-  fbHeight: fbHeight,
-  fbWidth: fbWidth,
-  strHeight: strHeight,
-  fretWidth: fretWidth,
-  stroke: stroke,
-  circRad: circRad,
-  topSpace: topSpace,
+  showOpenNotes: false,
+  fbHeight: DEFAULT_HEIGHT,
+  fbWidth: DEFAULT_FRET_WIDTH * 4,
+  strHeight,
+  fretWidth: DEFAULT_FRET_WIDTH,
+  stroke: STROKE,
+  circRad,
+  topSpace: circRad + STROKE / 2,
 };
 
 export const FretboardContext = createContext(initialState);

@@ -2,109 +2,110 @@
 import { useContext } from 'react';
 import Pattern from './Pattern';
 import { FretboardContext } from './contexts';
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_FRET_WIDTH,
+  STROKE,
+  NUM_STRINGS,
+} from './constants';
+
+// Old FretboardChart component, only used for homepage hero and some other places
+// Horizontal fretboard, for all other cases use new FretboardChartV2
 
 type Props = {
   numFrets: number;
+  height?: number;
+  fretWidth?: number;
   showOpenNotes?: boolean;
   startFret?: number;
-  small?: boolean;
   styles?: string;
   title?: string;
-  options?: {
-    fbHeight: number;
-    fbWidth: number;
-    fretWidth: number;
-    strHeight: number;
-    stroke: number;
-    topSpace: number;
-    circRad: number;
-  };
-  children?: React.ReactNode;
   id?: string;
+  children?: React.ReactNode;
 };
 
 const Fretboard = ({
   children,
   numFrets,
+  height = DEFAULT_HEIGHT,
+  fretWidth = DEFAULT_FRET_WIDTH,
   showOpenNotes = false,
   startFret,
-  options,
-  small = false,
   styles = '',
   title = '',
   id,
 }: Props) => {
-  const initialState = useContext(FretboardContext);
+  const base = useContext(FretboardContext);
 
-  const modState = { ...initialState, numFrets, showOpenNotes, ...options };
-
-  const { fbHeight, fbWidth, fretWidth, strHeight, stroke, topSpace } =
-    modState;
-
+  const strHeight = height / (NUM_STRINGS - 1);
+  const circRad = height / 20;
+  const topSpace = circRad + STROKE / 2;
+  const fbWidth = fretWidth * numFrets;
   const openFret = showOpenNotes ? fretWidth : 0;
 
-  // if (showOpenNotes) numFrets++;
+  const state = {
+    ...base,
+    numFrets,
+    showOpenNotes,
+    fbHeight: height,
+    fbWidth,
+    strHeight,
+    fretWidth,
+    stroke: STROKE,
+    circRad,
+    topSpace,
+  };
 
   return (
-    <FretboardContext.Provider value={modState}>
+    <FretboardContext.Provider value={state}>
       <div className={`max-w-full overflow-x-scroll ${styles}`} tabIndex={-1}>
         <svg
           id={id}
-          className={`mx-auto my-0 overflow-visible ${
-            small ? 'stroke-[2]' : 'stroke-[4]'
-          }`}
-          strokeWidth="2"
-          width={fbWidth + stroke}
-          height={
-            fbHeight + topSpace * 2 + (startFret && startFret > 1 ? 30 : 0)
-          }
-          // TODO viewBox should be canculated and width/height inherited
-          // viewBox={`0 0 140 140`}
+          className="mx-auto my-0 overflow-visible stroke-[4]"
+          strokeWidth={STROKE}
+          width={fbWidth + STROKE}
+          height={height + topSpace * 2 + (startFret && startFret > 1 ? 30 : 0)}
         >
           <title>{title}</title>
           <rect
-            x={stroke / 2 + openFret}
+            x={STROKE / 2 + openFret}
             y={topSpace}
             width={fretWidth * numFrets}
-            height={fbHeight}
+            height={height}
             fill="none"
-            stroke="black"
-            className="fill-white	stroke-black"
-            // rx="8" // border radius
-            // ry="8"
+            className="fill-white stroke-black"
           />
           {/* strings */}
-          {[...Array(4)].map((x, index) => (
+          {[...Array(NUM_STRINGS - 2)].map((_, index) => (
             <line
               key={`string-${index}`}
               x1={openFret}
               y1={strHeight * (index + 1) + topSpace}
-              x2={fretWidth * numFrets + stroke + openFret}
+              x2={fretWidth * numFrets + STROKE + openFret}
               y2={strHeight * (index + 1) + topSpace}
-              stroke="black"
               className="stroke-black"
             />
           ))}
           {/* frets */}
-          {[...Array(numFrets - 1)].map((x, index) => (
+          {[...Array(numFrets - 1)].map((_, index) => (
             <line
-              key={`string-${index}`}
-              x1={fretWidth * (index + 1) + stroke / 2 + openFret}
+              key={`fret-${index}`}
+              x1={fretWidth * (index + 1) + STROKE / 2 + openFret}
               y1={topSpace}
-              x2={fretWidth * (index + 1) + stroke / 2 + openFret}
-              y2={fbHeight + topSpace}
-              stroke="black"
+              x2={fretWidth * (index + 1) + STROKE / 2 + openFret}
+              y2={height + topSpace}
               className="stroke-black"
             />
           ))}
 
           {children}
+
           {startFret && startFret > 1 && (
             <text
               x={fretWidth + openFret / 2 - 5}
-              y={strHeight * (5 + 1) + topSpace}
+              y={topSpace + height + 24}
               fontFamily="Arial"
-              fontSize="20" // subract 5 from x to center text
+              fontSize="20"
             >
               {startFret}
             </text>
