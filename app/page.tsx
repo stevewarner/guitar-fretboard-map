@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { sql } from '@vercel/postgres';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 import { ChordType } from '@/types';
 import { ChordCarousel } from '@/components/ChordCarousel';
 

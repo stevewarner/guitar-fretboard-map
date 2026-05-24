@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 
 const TriadShapes = () => {
   const [isMajor, toggleIsMajor] = useState(true);

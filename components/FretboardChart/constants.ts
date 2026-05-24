@@ -1,4 +1,8 @@
-export const NUM_STRINGS = 6;
-export const DEFAULT_HEIGHT = 360;
-export const DEFAULT_FRET_WIDTH = 100;
-export const STROKE = 4;
+export const fontSize = 8;
+export const svgDimension = 100;
+export const fbHeight = 64;
+export const strHeight = fbHeight / 5; // distance between strings
+export const stroke = 1;
+export const circRad = fbHeight / 20;
+export const topSpace = 16;
+export const numStrings = 6;

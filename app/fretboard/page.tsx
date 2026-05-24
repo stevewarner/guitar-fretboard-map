@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ColorInput } from '@/components/ColorInput';
 
 const NUM_FRETS = 15;

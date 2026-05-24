@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 
 const numFrets = 15;
 

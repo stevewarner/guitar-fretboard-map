@@ -9,8 +9,7 @@ import {
   NUM_STRINGS,
 } from './constants';
 
-// Old FretboardChart component, only used for homepage hero and some other places
-// Horizontal fretboard, for all other cases use new FretboardChartV2
+// Horizontal fretboard. Use FretboardChart for all new features.
 
 type Props = {
   numFrets: number;

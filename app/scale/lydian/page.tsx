@@ -1,7 +1,7 @@
 'use client';
 // import { Metadata } from 'next';
 import { ChangeEvent, useState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 
 const numFrets = 13;
 

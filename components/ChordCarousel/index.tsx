@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordType } from '@/types';
 
 interface ChordCarouselProps {

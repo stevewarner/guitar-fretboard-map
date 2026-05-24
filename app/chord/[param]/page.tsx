@@ -5,7 +5,7 @@ import { ChordType } from '@/types';
 import { createTab, getOrdinal } from '@/app/utils';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 
 type Props = {
   params: Promise<{ param: string }>;

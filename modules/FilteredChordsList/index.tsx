@@ -4,7 +4,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChordType } from '@/types';
 import { SearchInput } from '@/components/SearchInput';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Modal } from '@/components/Modal';
 import NewChordForm from '@/components/NewChordForm';
 
