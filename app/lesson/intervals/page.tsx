@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 
 export const metadata: Metadata = {
   title: 'Intro to Intervals',

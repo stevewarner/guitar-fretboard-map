@@ -1,11 +1,8 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 
 const numFrets = 13;
-const fbHeight = 360;
-const fbWidth = 400;
-const stroke = 4;
 
 const Phrygian = () => {
   const [highlightRoot, toggleHighlightRoot] = useState(false);
@@ -43,15 +40,6 @@ const Phrygian = () => {
         <Fretboard
           numFrets={numFrets}
           styles="mx-4 md:mx-0 py-8"
-          options={{
-            fbHeight: fbHeight,
-            strHeight: fbHeight / 5,
-            fretWidth: fbWidth / 4,
-            fbWidth: (fbWidth / 4) * numFrets,
-            stroke: stroke,
-            circRad: fbHeight / 20,
-            topSpace: fbHeight / 20 + stroke / 2,
-          }}
         >
           <Pattern
             // full scale

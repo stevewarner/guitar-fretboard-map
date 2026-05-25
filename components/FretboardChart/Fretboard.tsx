@@ -1,13 +1,12 @@
-'use client';
 import { SVGProps } from 'react';
 import {
   fontSize,
   svgDimension,
   fbHeight,
   strHeight,
-  fretWidth,
   stroke,
   topSpace,
+  numStrings,
 } from './constants';
 
 interface FretboardProps {
@@ -26,7 +25,7 @@ export const Fretboard = ({
   return (
     <svg
       strokeWidth={stroke}
-      viewBox={`0 0 ${svgDimension} ${svgDimension}`}
+      viewBox={`0 0 ${svgDimension} ${topSpace * (numFrets + 2)}`}
       {...rest}
     >
       <title>{title}</title>
@@ -40,47 +39,41 @@ export const Fretboard = ({
       >
         {title}
       </text>
-      <rect
-        x={stroke / 2 + fretWidth}
-        y={topSpace}
-        width={fretWidth * numFrets}
-        height={fbHeight}
-        fill="none"
-        stroke="black"
-      />
 
-      {[...Array(4)].map((x, index) => (
+      {/* strings */}
+      {[...Array(numStrings)].map((_, index) => (
         <line
           key={`string-${index}`}
-          x1={fretWidth}
-          y1={strHeight * (index + 1) + topSpace}
-          x2={fretWidth * numFrets + stroke + fretWidth}
-          y2={strHeight * (index + 1) + topSpace}
+          x1={topSpace + stroke / 2 + strHeight * index}
+          y1={topSpace}
+          x2={topSpace + stroke / 2 + strHeight * index}
+          y2={topSpace * (numFrets + 1)}
           stroke="black"
         />
       ))}
 
-      {[...Array(numFrets - 1)].map((x, index) => (
+      {/* frets */}
+      {[...Array(numFrets + 1)].map((_, index) => (
         <line
-          key={`string-${index}`}
-          x1={fretWidth * (index + 1) + stroke / 2 + fretWidth}
-          y1={topSpace}
-          x2={fretWidth * (index + 1) + stroke / 2 + fretWidth}
-          y2={fbHeight + topSpace}
+          key={`fret-${index}`}
+          x1={topSpace}
+          y1={topSpace * (index + 1)}
+          x2={fbHeight + stroke + topSpace}
+          y2={topSpace * (index + 1)}
           stroke="black"
         />
       ))}
 
       {children}
+
       {startFret && startFret > 1 && (
         <text
-          x={fretWidth + fretWidth / 2}
-          y={strHeight * (5 + 1) + topSpace}
+          x={strHeight * numStrings + stroke / 2 + topSpace / 1.5}
+          y={topSpace + topSpace / 2 + fontSize / 3}
           fontFamily="Arial"
-          fontSize={fontSize}
-          textAnchor="middle"
+          fontSize={fontSize * 0.75}
         >
-          {startFret}
+          {`${startFret}fr`}
         </text>
       )}
     </svg>

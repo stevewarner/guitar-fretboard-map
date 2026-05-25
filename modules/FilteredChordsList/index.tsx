@@ -4,7 +4,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChordType } from '@/types';
 import { SearchInput } from '@/components/SearchInput';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Modal } from '@/components/Modal';
 import NewChordForm from '@/components/NewChordForm';
 
@@ -64,7 +64,7 @@ const FilteredChordsList = ({ chords }: Props) => {
         />
         <button
           type="button"
-          className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800"
+          className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
           onClick={() => {
             toggleModalOpen(true);
           }}
@@ -77,7 +77,7 @@ const FilteredChordsList = ({ chords }: Props) => {
         {filteredChords.map((chord) => (
           <div key={chord.id} className="flex items-center justify-center">
             <Link
-              className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
+              className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-surface-sunken"
               href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
             >
               <span>{chord.name}</span>

@@ -1,13 +1,10 @@
 import Link from 'next/link';
 import { sql } from '@vercel/postgres';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 import { ChordType } from '@/types';
 import { ChordCarousel } from '@/components/ChordCarousel';
 
 const numFrets = 13;
-const fbHeight = 360;
-const fbWidth = 400;
-const stroke = 4;
 
 export default async function Home() {
   const { rows: chords } =
@@ -23,7 +20,7 @@ export default async function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <Link
               href="/chord"
-              className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800"
+              className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
             >
               See all chords
             </Link>
@@ -37,15 +34,6 @@ export default async function Home() {
           numFrets={numFrets}
           showOpenNotes={false}
           styles="m-4 md:mx-0"
-          options={{
-            fbHeight: fbHeight,
-            strHeight: fbHeight / 5,
-            fretWidth: fbWidth / 4,
-            fbWidth: (fbWidth / 4) * numFrets,
-            stroke: stroke,
-            circRad: fbHeight / 20,
-            topSpace: fbHeight / 20 + stroke / 2,
-          }}
         >
           <path
             d="M 52 380 C 500 380 500 20 1252 20"
@@ -107,11 +95,6 @@ export default async function Home() {
         <h3>Recently added</h3>
         <ChordCarousel chords={chords} />
       </section>
-      <footer className="mt-12 border-t py-4 text-center text-sm text-gray-500">
-        <Link href="/feedback" className="underline">
-          Send me a message
-        </Link>
-      </footer>
     </>
   );
 }

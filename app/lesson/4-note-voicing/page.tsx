@@ -1,10 +1,7 @@
 import { Metadata } from 'next';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 
 const numFrets = 15;
-const fbHeight = 360;
-const fbWidth = 400;
-const stroke = 4;
 
 export const metadata: Metadata = {
   title: '4 note voicing intro',
@@ -30,19 +27,7 @@ const VoicingIntro = () => {
           <li>vimin7</li>
           <li>viimin7b5</li>
         </ul>
-        <Fretboard
-          numFrets={numFrets}
-          styles="mx-4 md:mx-0 py-8"
-          options={{
-            fbHeight: fbHeight,
-            strHeight: fbHeight / 5,
-            fretWidth: fbWidth / 4,
-            fbWidth: (fbWidth / 4) * numFrets,
-            stroke: stroke,
-            circRad: fbHeight / 20,
-            topSpace: fbHeight / 20 + stroke / 2,
-          }}
-        >
+        <Fretboard numFrets={numFrets} styles="mx-4 md:mx-0 py-8">
           <Pattern
             // I chord
             tab={[0, 2, 2, 2]}
@@ -92,19 +77,7 @@ const VoicingIntro = () => {
           <li>7 3 5 1 (3rd inversion)</li>
         </ul>
 
-        <Fretboard
-          numFrets={numFrets}
-          styles="mx-4 md:mx-0 py-8"
-          options={{
-            fbHeight: fbHeight,
-            strHeight: fbHeight / 5,
-            fretWidth: fbWidth / 4,
-            fbWidth: (fbWidth / 4) * numFrets,
-            stroke: stroke,
-            circRad: fbHeight / 20,
-            topSpace: fbHeight / 20 + stroke / 2,
-          }}
-        >
+        <Fretboard numFrets={numFrets} styles="mx-4 md:mx-0 py-8">
           <Pattern
             // root
             tab={[0, 2, 2, 2]}

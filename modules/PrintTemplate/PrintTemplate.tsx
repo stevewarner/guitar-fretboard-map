@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Fretboard } from '@/components/FretboardChartV3';
+import { Fretboard } from '@/components/FretboardChart';
 import styles from './PrintTemplate.module.scss';
 
 export const PrintTemplate = () => {

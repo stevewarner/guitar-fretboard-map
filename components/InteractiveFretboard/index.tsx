@@ -1,12 +1,12 @@
 'use client';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import {
   svgDimension,
   strHeight,
   stroke,
   topSpace,
   numStrings,
-} from '@/components/FretboardChartV3/constants';
+} from '@/components/FretboardChart/constants';
 
 import { FlatTabValue } from '@/types';
 

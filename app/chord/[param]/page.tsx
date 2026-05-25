@@ -5,7 +5,7 @@ import { ChordType } from '@/types';
 import { createTab, getOrdinal } from '@/app/utils';
 import ChordActionDropdown from '@/modules/ChordActionDropdown';
 
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 
 type Props = {
   params: Promise<{ param: string }>;
@@ -65,8 +65,8 @@ const Chord = async ({ params }: Props) => {
           <Fretboard
             numFrets={numFrets}
             startFret={startFret}
-            height={400}
-            width={400}
+            height={320}
+            width={320}
           >
             <Pattern
               tab={tab}
@@ -116,10 +116,10 @@ const Chord = async ({ params }: Props) => {
               <ChordActionDropdown id={chordId} chord={chord} />
             </span>
             {chord.inversion > 0 && (
-              <p className="text-sm text-gray-600">{`${chord.inversion}${getOrdinal(chord.inversion)} inversion`}</p>
+              <p className="text-sm text-fg-secondary">{`${chord.inversion}${getOrdinal(chord.inversion)} inversion`}</p>
             )}
             {chord.description && (
-              <p className="max-w-md text-center text-sm italic text-gray-600">
+              <p className="max-w-md text-center text-sm italic text-fg-secondary">
                 {chord.description}
               </p>
             )}
@@ -128,8 +128,8 @@ const Chord = async ({ params }: Props) => {
               title={param}
               numFrets={chord.num_frets}
               startFret={chord.start_fret}
-              height={400}
-              width={400}
+              height={320}
+            width={320}
             >
               <Pattern
                 tab={chord.tab}

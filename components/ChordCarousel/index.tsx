@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Fretboard, Pattern } from '@/components/FretboardChartV3';
+import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ChordType } from '@/types';
 
 interface ChordCarouselProps {
@@ -12,7 +12,7 @@ export const ChordCarousel = ({ chords }: ChordCarouselProps) => {
       {chords.map((chord) => (
         <div key={chord.id} className="flex items-center justify-center">
           <Link
-            className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-gray-100"
+            className="flex flex-col gap-1 rounded border border-current px-4 py-2 hover:bg-surface-sunken"
             href={`/chord/${encodeURIComponent(chord.name)}#${chord.tab_id}`}
           >
             <span>{chord.name}</span>
