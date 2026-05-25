@@ -1,5 +1,6 @@
 'use client';
 import { useActionState } from 'react';
+import { Button, ButtonVariant } from '@/components/Button';
 import { submitFeedback } from '@/app/feedbackActions';
 import { SentimentInput } from '@/components/SentimentInput';
 import { TextArea } from '@/components/TextArea';
@@ -28,13 +29,9 @@ export const FeedbackForm = () => {
         required
       />
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-md bg-fg px-4 py-2 font-semibold text-fg-inverted hover:bg-gray-700 disabled:bg-line-strong"
-      >
-        {isPending ? 'Sending...' : 'Send feedback'}
-      </button>
+      <Button type="submit" isLoading={isPending}>
+        Send feedback
+      </Button>
 
       {formState.message && (
         <p

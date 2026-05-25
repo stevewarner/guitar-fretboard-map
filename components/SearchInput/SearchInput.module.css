@@ -1,0 +1,62 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.inputRow {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.input {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  border: 1px solid currentColor;
+  padding-left: 36px;
+  padding-right: 24px;
+}
+
+.input::placeholder {
+  color: currentColor;
+}
+
+.clearButton {
+  position: absolute;
+  display: flex;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.clearButton:hover {
+  opacity: 0.7;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

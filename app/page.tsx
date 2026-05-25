@@ -20,7 +20,7 @@ export default async function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <Link
               href="/chord"
-              className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
+              className="rounded-md bg-accent px-6 py-3 text-lg font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
             >
               See all chords
             </Link>
