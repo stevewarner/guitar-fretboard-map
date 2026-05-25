@@ -20,7 +20,7 @@ export default async function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <Link
               href="/chord"
-              className="rounded-md bg-indigo-600 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-800"
+              className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
             >
               See all chords
             </Link>
@@ -95,11 +95,6 @@ export default async function Home() {
         <h3>Recently added</h3>
         <ChordCarousel chords={chords} />
       </section>
-      <footer className="mt-12 border-t py-4 text-center text-sm text-gray-500">
-        <Link href="/feedback" className="underline">
-          Send me a message
-        </Link>
-      </footer>
     </>
   );
 }

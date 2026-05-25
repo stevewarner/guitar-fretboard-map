@@ -65,7 +65,7 @@ const INTERVAL_SEMITONES: Record<string, number> = {
   '7': 11,
 };
 
-const LABEL_CLASS = 'text-xs font-medium uppercase tracking-wide text-gray-400';
+const LABEL_CLASS = 'text-xs font-medium uppercase tracking-wide text-fg-muted';
 
 function getNoteFrets(pitchClass: number): number[][] {
   return OPEN_STRING_PCS.map((openPc) => {
@@ -99,12 +99,12 @@ const FretboardPage = () => {
   );
 
   return (
-    <div className="flex h-full flex-col gap-4 lg:px-12 xl:px-24">
+    <div className="flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 lg:px-12 xl:px-24">
       <div className="flex justify-center">
         <h1>Fretboard Playground</h1>
       </div>
 
-      <div className="flex min-h-0 flex-1 gap-6">
+      <div className="flex min-h-0 flex-1 gap-6 md:max-h-dvh">
         <div className="flex justify-center min-h-0 basis-1/2">
           <Fretboard numFrets={NUM_FRETS} className="h-full w-auto">
             <Pattern
@@ -154,7 +154,7 @@ const FretboardPage = () => {
             <span className={LABEL_CLASS}>Intervals</span>
             <label className="flex items-center gap-2 text-sm font-medium w-fit">
               <input type="checkbox" checked disabled />1{' '}
-              <span className="text-xs text-gray-400">{root}</span>
+              <span className="text-xs text-fg-muted">{root}</span>
             </label>
             {INTERVAL_KEYS.map((key) => (
               <label
@@ -174,7 +174,7 @@ const FretboardPage = () => {
                       : '#4'
                   : key}
                 {intervals.has(key) && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-fg-muted">
                     {PC_TO_NOTE[(rootPc + INTERVAL_SEMITONES[key]) % 12]}
                   </span>
                 )}

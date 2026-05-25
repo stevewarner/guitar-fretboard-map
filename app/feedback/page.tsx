@@ -9,7 +9,7 @@ const Feedback = () => {
   return (
     <div className="flex flex-col items-center gap-6">
       <h1>Feedback</h1>
-      <p className="text-gray-600">Leave a message</p>
+      <p className="text-fg-secondary">Leave a message</p>
       <FeedbackForm />
     </div>
   );

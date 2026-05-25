@@ -34,13 +34,13 @@ export const Input = ({
     <>
       <label
         htmlFor={id}
-        className={`block text-sm font-semibold leading-6 text-gray-900 ${error && 'text-red-600'}`}
+        className={`block text-sm font-semibold leading-6 text-fg ${error && 'text-error'}`}
       >
         {label}
       </label>
       <div className="mt-2.5">
         <input
-          className={`block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${error && 'ring-red-600'}`}
+          className={`block w-full rounded-md border-0 px-3.5 py-2 text-fg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-fg-muted sm:text-sm sm:leading-6 ${error && 'ring-error'}`}
           id={id}
           ref={ref}
           required={required}
@@ -74,7 +74,7 @@ export const Input = ({
       </div>
       {helpText && <p className="mt-2 text-sm">{helpText}</p>}
       {showErrorText && (
-        <p role="alert" className="mt-2 text-sm text-red-600">
+        <p role="alert" className="mt-2 text-sm text-error">
           {errorText
             ? `Error: ${errorText}`
             : `Error: value must be ${pattern}`}

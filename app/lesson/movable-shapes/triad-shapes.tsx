@@ -10,14 +10,14 @@ const TriadShapes = () => {
       <div className="inline-flex rounded-md" role="group">
         <button
           type="button"
-          className={`${isMajor ? 'bg-gray-900 text-white hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-s-lg border border-gray-900 px-4 py-2 text-sm font-medium text-gray-900 focus:z-10`}
+          className={`${isMajor ? 'bg-fg text-fg-inverted hover:bg-gray-700' : 'hover:bg-surface-sunken'} rounded-s-lg border border-fg px-4 py-2 text-sm font-medium text-fg focus:z-10`}
           onClick={() => toggleIsMajor(true)}
         >
           Major
         </button>
         <button
           type="button"
-          className={`${!isMajor ? 'bg-gray-900 text-white hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-e-lg border border-l-0 border-gray-900 px-4 py-2 text-sm font-medium text-gray-900`}
+          className={`${!isMajor ? 'bg-fg text-fg-inverted hover:bg-gray-700' : 'hover:bg-surface-sunken'} rounded-e-lg border border-l-0 border-fg px-4 py-2 text-sm font-medium text-fg`}
           onClick={() => toggleIsMajor(false)}
         >
           Minor

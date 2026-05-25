@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import '@/styles/globals.css';
 import Navbar from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.guitartheory.app'),
@@ -34,16 +35,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="flex h-full flex-col">
+    <html lang="en">
+      <body className="flex min-h-screen flex-col">
         <Navbar />
-        <div className="my-9 flex flex-1 min-h-0 px-2">
-          <div className="container mx-auto h-full">
+        <main className="flex flex-1 flex-col">
+          <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8 sm:px-6">
             {children}
             <Analytics />
             <SpeedInsights />
           </div>
-        </div>
+        </main>
+        <Footer />
       </body>
     </html>
   );

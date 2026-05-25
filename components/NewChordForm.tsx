@@ -143,14 +143,14 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
 
       <div className="mt-10">
         {formState.message && !formState.success && (
-          <p className="mb-3 text-sm text-red-600" role="alert">
+          <p className="mb-3 text-sm text-error" role="alert">
             {formState.message}
           </p>
         )}
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-500 "
+          className="w-full rounded-md bg-accent px-4 py-2 text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-gray-500"
         >
           {isPending ? 'Saving...' : isEdit ? 'Edit Chord' : 'Add Chord'}
         </button>
