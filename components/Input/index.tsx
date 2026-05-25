@@ -1,5 +1,5 @@
 'use client';
-import { InputHTMLAttributes, useState, useRef, useEffect } from 'react';
+import { InputHTMLAttributes, useState, useRef, useEffect, useId } from 'react';
 
 interface InputProps {
   label: string;
@@ -22,6 +22,12 @@ export const Input = ({
   const [showErrorText, setShowErrorText] = useState(false);
 
   const ref = useRef<HTMLInputElement>(null);
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const helpId = `${inputId}-help`;
+  const errorId = `${inputId}-error`;
+  const describedBy =
+    [helpText && helpId, showErrorText && errorId].filter(Boolean).join(' ') || undefined;
 
   useEffect(() => {
     if (error && ref.current?.validity.valid) {
@@ -33,19 +39,21 @@ export const Input = ({
   return (
     <>
       <label
-        htmlFor={id}
+        htmlFor={inputId}
         className={`block text-sm font-semibold leading-6 text-fg ${error && 'text-error'}`}
       >
         {label}
       </label>
       <div className="mt-2.5">
         <input
-          className={`block w-full rounded-md border-0 px-3.5 py-2 text-fg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-fg-muted sm:text-sm sm:leading-6 ${error && 'ring-error'}`}
-          id={id}
+          className={`block w-full rounded-md border-0 px-3.5 py-2 text-fg shadow-sm ring-1 ring-inset ring-gray-500 placeholder:text-fg-secondary sm:text-sm sm:leading-6 ${error && 'ring-error'}`}
+          id={inputId}
           ref={ref}
           required={required}
           pattern={pattern}
           value={value}
+          aria-invalid={error || undefined}
+          aria-describedby={describedBy}
           onChange={(event) => {
             if (event.target.validity.valid) {
               setError(false);
@@ -72,12 +80,14 @@ export const Input = ({
           {...rest}
         />
       </div>
-      {helpText && <p className="mt-2 text-sm">{helpText}</p>}
+      {helpText && (
+        <p id={helpId} className="mt-2 text-sm">
+          {helpText}
+        </p>
+      )}
       {showErrorText && (
-        <p role="alert" className="mt-2 text-sm text-error">
-          {errorText
-            ? `Error: ${errorText}`
-            : `Error: value must be ${pattern}`}
+        <p id={errorId} role="alert" className="mt-2 text-sm text-error">
+          {errorText ? `Error: ${errorText}` : 'Please enter a valid value.'}
         </p>
       )}
     </>

@@ -39,10 +39,6 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
     Number(initFormValues?.start_fret) || 1,
   );
   const [numFrets, setNumFrets] = useState(Number(initFormValues?.num_frets) || 4);
-  const [chordIntervals, setChordIntervals] = useState(
-    (initFormValues?.intervals && initFormValues?.intervals.join(',')) || '',
-  );
-
   return (
     <form action={formAction} className="mx-auto max-w-xl">
       <div className="flex flex-row flex-wrap gap-8 p-4">
@@ -154,9 +150,6 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
         >
           {isPending ? 'Saving...' : isEdit ? 'Edit Chord' : 'Add Chord'}
         </button>
-        <p aria-live="polite" className="sr-only" role="status">
-          {formState?.message}
-        </p>
       </div>
     </form>
   );

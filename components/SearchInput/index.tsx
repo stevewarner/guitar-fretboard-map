@@ -3,6 +3,7 @@ import SearchIcon from '@/svgs/search.svg';
 import CloseIcon from '@/svgs/close.svg';
 
 interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  id: string;
   label?: string;
   onClear?: () => void;
 }
@@ -18,6 +19,7 @@ export const SearchInput = ({
 }: SearchInputProps) => (
   <div className="relative">
     <SearchIcon
+      aria-hidden="true"
       className="absolute left-4 top-1/2 translate-y-[-50%]"
       height={20}
       width={20}
@@ -36,10 +38,11 @@ export const SearchInput = ({
     {value && onClear && (
       <button
         type="button"
+        aria-label="Clear search"
         className="absolute right-2 top-1/2 translate-y-[-50%] cursor-pointer hover:opacity-70"
         onClick={() => onClear()}
       >
-        <CloseIcon height={16} width={16} />
+        <CloseIcon aria-hidden="true" height={16} width={16} />
       </button>
     )}
   </div>

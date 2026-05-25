@@ -39,7 +39,7 @@ export const SentimentInput = ({
       {options.map(({ value, label: optionLabel, icon }) => (
         <label
           key={value}
-          className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-surface-sunken has-[:checked]:border-line-strong has-[:checked]:bg-line has-[:focus-visible]:[outline:2px_auto_-webkit-focus-ring-color] ${optionClassName ?? ''}`}
+          className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:bg-surface-sunken has-[:checked]:border-line-strong has-[:checked]:bg-line has-[:focus-visible]:[outline:2px_auto_-webkit-focus-ring-color] ${optionClassName ?? ''}`}
         >
           <input
             type="radio"

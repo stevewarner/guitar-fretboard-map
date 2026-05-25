@@ -8,7 +8,7 @@ interface CheckboxProps {
 export const Checkbox = ({ id, label, isChecked, onChange }: CheckboxProps) => (
   <>
     <label
-      htmlFor="isOpenChord"
+      htmlFor={id}
       className="flex items-center justify-between text-sm font-semibold leading-6 text-fg"
     >
       {label}
@@ -18,10 +18,10 @@ export const Checkbox = ({ id, label, isChecked, onChange }: CheckboxProps) => (
           type="checkbox"
           checked={isChecked}
           onChange={onChange}
-          className="sr-only"
+          className="peer sr-only"
         />
         <div
-          className={`block h-8 w-14 rounded-full ${
+          className={`block h-8 w-14 rounded-full peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${
             isChecked ? 'bg-accent' : 'bg-gray-300'
           }`}
         ></div>
