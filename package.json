@@ -1,6 +1,6 @@
 {
   "name": "guitar-chords",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "npx prettier --check pages",
-    "format:fix": "npx prettier --write pages"
+    "format:fix": "npx prettier --write pages",
+    "release": "semantic-release"
   },
   "dependencies": {
     "@types/node": "18.15.11",
@@ -31,12 +32,16 @@
     "ws": "^8.20.1"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.8",
     "@svgr/webpack": "^8.1.0",
     "eslint": "^9.15.0",
     "eslint-config-next": "^16.2.6",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "semantic-release": "^25.0.3"
   }
 }
