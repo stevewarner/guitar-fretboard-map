@@ -1,5 +1,5 @@
-import { SCALE_SYSTEMS } from '@/app/data/modes';
-import { ScalesNav } from '@/modules/ScalesNav';
+import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
+import { ScalesNav } from '@/modules/scale/ScalesNav';
 
 export default function ScalesLayout({ children }: { children: React.ReactNode }) {
   return (

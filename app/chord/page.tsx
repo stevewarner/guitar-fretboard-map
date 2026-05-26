@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { sql } from '@vercel/postgres';
-import FilteredChordsList from '@/modules/FilteredChordsList';
+import FilteredChordsList from '@/modules/chord/FilteredChordsList';
 import { ChordType } from '@/types';
 
 export const metadata: Metadata = {

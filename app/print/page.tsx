@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { PrintTemplate } from '@/modules/PrintTemplate';
+import { PrintTemplate } from '@/modules/print/PrintTemplate';
 
 export const metadata: Metadata = {
   title: 'Print template',

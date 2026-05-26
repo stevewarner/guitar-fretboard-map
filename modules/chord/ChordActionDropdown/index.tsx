@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { reportChord } from '@/app/actions';
 import { Modal } from '@/components/Modal';
-import NewChordForm from '@/components/NewChordForm';
+import NewChordForm from '@/modules/chord/NewChordForm';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import ShareIcon from '@/svgs/share.svg';
 import EditIcon from '@/svgs/edit.svg';
@@ -11,8 +11,8 @@ import FlagIcon from '@/svgs/flag.svg';
 import EllipsisIcon from '@/svgs/more.svg';
 import ExportIcon from '@/svgs/download.svg';
 import { ChordType } from '@/types';
-import { downloadSvg } from '@/app/utils/downloadSvg';
-import { downloadImage } from '@/app/utils/downloadImage';
+import { downloadSvg } from '@/modules/chord/utils/downloadSvg';
+import { downloadImage } from '@/modules/chord/utils/downloadImage';
 
 interface ChordActionDropdownProps {
   id: string;

@@ -1,10 +1,10 @@
 'use client';
 import { useState, useActionState } from 'react';
-import { InteractiveFretboard } from '@/components/InteractiveFretboard';
+import { InteractiveFretboard } from '@/modules/chord/InteractiveFretboard';
 import { Button, ButtonVariant } from '@/components/Button';
-import { Input } from './Input';
+import { Input } from '@/components/Input';
 import { createNewChord, updateChord } from '@/app/actions';
-import { createTab } from '@/app/utils';
+import { createTab } from '@/modules/chord/utils/createTab';
 import { ChordType, FlatTabValue } from '@/types';
 
 const initialState = {

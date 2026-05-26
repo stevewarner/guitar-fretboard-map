@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { notFound } from 'next/navigation';
 import { ChordType } from '@/types';
-import { createTab, getOrdinal } from '@/app/utils';
-import ChordActionDropdown from '@/modules/ChordActionDropdown';
+import { getOrdinal } from '@/app/utils';
+import { createTab } from '@/modules/chord/utils/createTab';
+import ChordActionDropdown from '@/modules/chord/ChordActionDropdown';
 
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 

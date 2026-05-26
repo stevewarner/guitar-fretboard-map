@@ -1,4 +1,4 @@
-import { STANDARD_TUNING_PC, INTERVAL_LABELS } from './constants';
+import { STANDARD_TUNING_PC, INTERVAL_LABELS } from '@/app/utils/constants';
 
 // Rotate parent scale intervals to derive a mode starting at the given degree.
 export function getModeIntervals(parentIntervals: number[], degree: number): number[] {

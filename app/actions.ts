@@ -3,7 +3,7 @@ import { sql } from '@vercel/postgres';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { ChordType } from '@/types';
-import { createTab, createIntervals } from '@/app/utils';
+import { createTab, createIntervals } from '@/modules/chord/utils/createTab';
 
 const TAB_PATTERN = /^(?:[0-9x]{6}|(x|[0-9]|1\d|2[0-4]|)(,(x|[0-9]|1\d|2[0-4]|)){5})$/;
 

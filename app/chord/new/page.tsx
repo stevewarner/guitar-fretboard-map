@@ -1,6 +1,6 @@
 'use client';
 import { Suspense } from 'react';
-import NewChordForm from '@/components/NewChordForm';
+import NewChordForm from '@/modules/chord/NewChordForm';
 import { ChordType } from '@/types';
 import { useSearchParams } from 'next/navigation';
 

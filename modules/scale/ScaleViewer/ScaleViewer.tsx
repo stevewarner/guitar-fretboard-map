@@ -11,7 +11,7 @@ import {
   type ScalePosition,
   type RootString,
   type RootFinger,
-} from '@/app/utils/scaleUtils';
+} from '@/modules/scale/utils/scaleUtils';
 
 const ROOT_STRINGS: RootString[] = [6, 5, 4];
 const ROOT_FINGERS: RootFinger[] = [0, 1, 2, 3, 4];

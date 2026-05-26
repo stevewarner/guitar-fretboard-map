@@ -7,7 +7,7 @@ import { Button, ButtonVariant } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Modal } from '@/components/Modal';
-import NewChordForm from '@/components/NewChordForm';
+import NewChordForm from '@/modules/chord/NewChordForm';
 
 type Props = {
   chords: ChordType[];

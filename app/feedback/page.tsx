@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { FeedbackForm } from '@/modules/FeedbackForm';
+import { FeedbackForm } from '@/modules/feedback/FeedbackForm';
 
 export const metadata: Metadata = {
   title: 'Feedback',

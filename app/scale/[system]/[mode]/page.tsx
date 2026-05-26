@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
-import { SCALE_SYSTEMS } from '@/app/data/modes';
+import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { INTERVAL_LABELS } from '@/app/utils/constants';
-import { getModeIntervals } from '@/app/utils/scaleUtils';
-import { ScaleViewer } from '@/modules/ScaleViewer';
+import { getModeIntervals } from '@/modules/scale/utils/scaleUtils';
+import { ScaleViewer } from '@/modules/scale/ScaleViewer';
 
 function ordinal(n: number): string {
   const v = n % 100;

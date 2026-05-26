@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ScaleSystem } from '@/app/data/modes';
+import { ScaleSystem } from '@/modules/scale/data/systems';
 
 export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
   const pathname = usePathname();
