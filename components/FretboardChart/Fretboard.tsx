@@ -13,6 +13,7 @@ interface FretboardProps {
   numFrets: number;
   startFret?: number;
   title?: string;
+  fingerLabels?: string[];
 }
 
 export const Fretboard = ({
@@ -20,6 +21,7 @@ export const Fretboard = ({
   numFrets,
   startFret,
   title = '',
+  fingerLabels,
   ...rest
 }: FretboardProps & SVGProps<SVGSVGElement>) => {
   return (
@@ -65,6 +67,21 @@ export const Fretboard = ({
       ))}
 
       {children}
+
+      {fingerLabels?.map((label, i) =>
+        label ? (
+          <text
+            key={`finger-${i}`}
+            x={topSpace / 2}
+            y={topSpace * (i + 1.5) + fontSize / 3}
+            fontFamily="Arial"
+            fontSize={fontSize * 0.75}
+            textAnchor="middle"
+          >
+            {label}
+          </text>
+        ) : null,
+      )}
 
       {startFret && startFret > 1 && (
         <text
