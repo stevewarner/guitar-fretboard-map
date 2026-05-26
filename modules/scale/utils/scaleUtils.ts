@@ -1,4 +1,5 @@
 import { STANDARD_TUNING_PC, INTERVAL_LABELS } from '@/app/utils/constants';
+import { spellScale } from '@/app/utils/noteSpelling';
 
 // Rotate parent scale intervals to derive a mode starting at the given degree.
 export function getModeIntervals(parentIntervals: number[], degree: number): number[] {
@@ -207,4 +208,65 @@ export function deriveScaleRender(
     scaleIntervalTab,
     rootIntervalTab,
   };
+}
+
+export interface DiatonicChord {
+  degree: number;        // 1–7
+  romanNumeral: string;  // 'I', 'ii', 'III', etc. — case reflects chord quality
+  quality: string;       // 'maj7', 'm7', '7', 'm7b5', 'dim7', 'mMaj7', 'maj7#5', '7#5'
+  rootNote: string;      // 'C', 'C#', etc.
+  name: string;          // rootNote + quality, e.g. 'Cmaj7'
+}
+
+const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+// Classify a 7th chord from semitone intervals (3rd, 5th, 7th) above the root.
+// Returns null for combinations that don't match a common 7th-chord quality.
+function classify7thChord(
+  third: number,
+  fifth: number,
+  seventh: number,
+): { quality: string; isMajor: boolean } | null {
+  if (third === 4 && fifth === 7 && seventh === 11) return { quality: 'maj7', isMajor: true };
+  if (third === 4 && fifth === 7 && seventh === 10) return { quality: '7', isMajor: true };
+  if (third === 3 && fifth === 7 && seventh === 10) return { quality: 'm7', isMajor: false };
+  if (third === 3 && fifth === 6 && seventh === 10) return { quality: 'm7b5', isMajor: false };
+  if (third === 3 && fifth === 6 && seventh === 9) return { quality: 'dim7', isMajor: false };
+  if (third === 3 && fifth === 7 && seventh === 11) return { quality: 'mMaj7', isMajor: false };
+  if (third === 4 && fifth === 8 && seventh === 11) return { quality: 'maj7#5', isMajor: true };
+  if (third === 4 && fifth === 8 && seventh === 10) return { quality: '7#5', isMajor: true };
+  return null;
+}
+
+// Build the diatonic 7th-chord sequence for the given mode + tonic. Returns null
+// for scales that aren't 7-note (e.g. pentatonic). Chord roots are spelled so each
+// letter A–G appears once across the scale.
+export function getDiatonicChords(
+  modeIntervals: number[],
+  tonicNote: string,
+): DiatonicChord[] | null {
+  if (modeIntervals.length !== 7) return null;
+
+  const spelled = spellScale(tonicNote, modeIntervals);
+
+  return modeIntervals.map((rootInterval, i): DiatonicChord => {
+    const third = (modeIntervals[(i + 2) % 7] - rootInterval + 12) % 12;
+    const fifth = (modeIntervals[(i + 4) % 7] - rootInterval + 12) % 12;
+    const seventh = (modeIntervals[(i + 6) % 7] - rootInterval + 12) % 12;
+
+    const classified = classify7thChord(third, fifth, seventh);
+    const quality = classified?.quality ?? '?';
+    const isMajor = classified?.isMajor ?? false;
+
+    const numeral = isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase();
+    const rootNote = spelled[i];
+
+    return {
+      degree: i + 1,
+      romanNumeral: numeral,
+      quality,
+      rootNote,
+      name: `${rootNote}${quality}`,
+    };
+  });
 }

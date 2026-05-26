@@ -7,6 +7,7 @@ import {
   getModeIntervals,
   isValidPosition,
   getValidFingersForString,
+  getDiatonicChords,
   ROOT_STRINGS,
   ROOT_FINGERS,
   DEFAULT_POSITION,
@@ -16,6 +17,8 @@ import {
 } from '@/modules/scale/utils/scaleUtils';
 import { getOrdinal } from '@/app/utils';
 import { ScaleViewer } from '@/modules/scale/ScaleViewer';
+import { ModeChords } from '@/modules/scale/ModeChords';
+import { ChordType } from '@/types';
 
 type Props = {
   params: Promise<{ system: string; mode: string }>;
@@ -92,6 +95,17 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   const position = parsePosition(sp.string, sp.position, rootPc);
   const degree = modeData.degree + 1;
 
+  const diatonicChords = getDiatonicChords(modeIntervals, rootNote);
+  let chordData: ChordType[] = [];
+  if (diatonicChords) {
+    const lowerNames = diatonicChords.map((c) => c.name.toLowerCase());
+    const { rows: chordRows } = await sql.query<ChordType>(
+      'SELECT * FROM chords WHERE LOWER(name) = ANY($1::text[])',
+      [lowerNames],
+    );
+    chordData = chordRows;
+  }
+
   return (
     <div>
       <h1 className={system.showModeInfo ? 'mb-1' : 'mb-4'}>{modeData.pageTitle ?? modeData.displayName}</h1>
@@ -111,6 +125,9 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
         rootPc={rootPc}
         position={position}
       />
+      {diatonicChords && (
+        <ModeChords chords={diatonicChords} chordData={chordData} />
+      )}
     </div>
   );
 }
