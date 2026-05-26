@@ -36,7 +36,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
         menuContents={[
           <button
             key="share"
-            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-surface-sunken"
+            className="flex w-full items-center gap-2 border-none p-2"
             onClick={() => {
               // copy to clipboard
               navigator.clipboard.writeText(
@@ -49,7 +49,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
           </button>,
           <button
             key="export"
-            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-surface-sunken"
+            className="flex w-full items-center gap-2 border-none p-2"
             onClick={() => {
               const svgElement = document.getElementById(id);
               if (!(svgElement instanceof SVGSVGElement)) return;
@@ -61,7 +61,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
           </button>,
           <button
             key="export-png"
-            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-surface-sunken"
+            className="flex w-full items-center gap-2 border-none p-2"
             onClick={() => {
               const svgElement = document.getElementById(id);
               if (!(svgElement instanceof SVGSVGElement)) return;
@@ -76,7 +76,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
           </button>,
           <button
             key="edit"
-            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-surface-sunken"
+            className="flex w-full items-center gap-2 border-none p-2"
             onClick={() => {
               // open modal
               toggleModalOpen(true);
@@ -87,7 +87,7 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
           </button>,
           <button
             key="report"
-            className="flex w-full items-center gap-2 border-none p-2 data-[focus]:bg-surface-sunken"
+            className="flex w-full items-center gap-2 border-none p-2"
             onClick={() => {
               reportChord({ id: chord.id });
             }}

@@ -3,6 +3,7 @@ import { sql } from '@vercel/postgres';
 import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 import { ChordType } from '@/types';
 import { ChordCarousel } from '@/components/ChordCarousel';
+import ChevronRightIcon from '@/svgs/chevron-right.svg';
 
 const numFrets = 13;
 
@@ -20,12 +21,15 @@ export default async function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <Link
               href="/chord"
-              className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
+              className="rounded-md bg-accent px-6 py-3 text-lg font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
             >
               See all chords
             </Link>
             <Link href="/about" className="font-semibold leading-6">
-              Learn more <span aria-hidden="true">→</span>
+              <span className="flex items-center gap-1">
+                Learn more
+                <ChevronRightIcon height={16} width={16} aria-hidden="true" />
+              </span>
             </Link>
           </div>
         </div>

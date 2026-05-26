@@ -18,10 +18,7 @@
   h4 {
     @apply text-lg font-medium;
   }
-  input {
-    @apply border rounded px-2;
-  }
-  a:hover {
+a:hover {
     @apply underline;
   }
 }

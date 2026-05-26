@@ -2,40 +2,11 @@
 import { useState } from 'react';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { ColorInput } from '@/components/ColorInput';
+import { NOTE_TO_PC, PC_TO_NOTE, NOTE_OPTIONS } from '@/app/utils/constants';
 
 const NUM_FRETS = 15;
 
 const OPEN_STRING_PCS = [4, 9, 2, 7, 11, 4]; // low E, A, D, G, B, high e
-
-const NOTE_TO_PC: Record<string, number> = {
-  C: 0,
-  'C#': 1,
-  D: 2,
-  'D#': 3,
-  E: 4,
-  F: 5,
-  'F#': 6,
-  G: 7,
-  'G#': 8,
-  A: 9,
-  'A#': 10,
-  B: 11,
-};
-
-const PC_TO_NOTE = [
-  'C',
-  'C#',
-  'D',
-  'D#',
-  'E',
-  'F',
-  'F#',
-  'G',
-  'G#',
-  'A',
-  'A#',
-  'B',
-];
 
 const INTERVAL_KEYS = [
   'b2',
@@ -129,18 +100,9 @@ const FretboardPage = () => {
             <label className={LABEL_CLASS}>Root</label>
             <div className="flex items-center gap-2">
               <select value={root} onChange={(e) => setRoot(e.target.value)}>
-                <option value="C">C</option>
-                <option value="C#">C#/Db</option>
-                <option value="D">D</option>
-                <option value="D#">D#/Eb</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="F#">F#/Gb</option>
-                <option value="G">G</option>
-                <option value="G#">G#/Ab</option>
-                <option value="A">A</option>
-                <option value="A#">A#/Bb</option>
-                <option value="B">B</option>
+                {NOTE_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
               </select>
               <ColorInput
                 value={rootColor}

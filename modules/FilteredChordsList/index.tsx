@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChordType } from '@/types';
+import { Button, ButtonVariant } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Modal } from '@/components/Modal';
@@ -62,15 +63,13 @@ const FilteredChordsList = ({ chords }: Props) => {
           }}
           onClear={() => handleSearch('')}
         />
-        <button
+        <Button
           type="button"
-          className="rounded-md bg-accent px-3.5 py-2.5 font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
-          onClick={() => {
-            toggleModalOpen(true);
-          }}
+          variant={ButtonVariant.TERTIARY}
+          onClick={() => toggleModalOpen(true)}
         >
           Add a new chord +
-        </button>
+        </Button>
       </div>
       <h3>{`Showing ${filteredChords.length} chords`}</h3>
       <div className="grid grid-cols-2 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4">

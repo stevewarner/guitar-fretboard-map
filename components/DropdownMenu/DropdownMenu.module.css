@@ -1,0 +1,31 @@
+.container {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+  margin-top: 0.5rem;
+  width: 14rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menu [role='menuitem']:hover,
+.menu [role='menuitem']:focus-visible {
+  background-color: #f3f4f6; /* surface-sunken */
+}
+
+.menu [role='menuitem']:hover {
+  outline: none;
+}

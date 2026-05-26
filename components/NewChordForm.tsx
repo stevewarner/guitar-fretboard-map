@@ -1,6 +1,7 @@
 'use client';
 import { useState, useActionState } from 'react';
 import { InteractiveFretboard } from '@/components/InteractiveFretboard';
+import { Button, ButtonVariant } from '@/components/Button';
 import { Input } from './Input';
 import { createNewChord, updateChord } from '@/app/actions';
 import { createTab } from '@/app/utils';
@@ -25,11 +26,11 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
 
   const [chordName, setChordName] = useState(initFormValues?.name || '');
   const [tab, setTab] = useState<FlatTabValue[]>(
-    initFormValues?.tab_id ? createTab(initFormValues.tab_id) as FlatTabValue[] : Array(6).fill(undefined),
+    initFormValues?.tab_id
+      ? (createTab(initFormValues.tab_id) as FlatTabValue[])
+      : Array(6).fill(undefined),
   );
-  const [tabInput, setTabInput] = useState(
-    initFormValues?.tab_id ?? '',
-  );
+  const [tabInput, setTabInput] = useState(initFormValues?.tab_id ?? '');
 
   const handleTabChange = (newTab: FlatTabValue[]) => {
     setTab(newTab);
@@ -38,7 +39,9 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   const [startFret, setStartFret] = useState(
     Number(initFormValues?.start_fret) || 1,
   );
-  const [numFrets, setNumFrets] = useState(Number(initFormValues?.num_frets) || 4);
+  const [numFrets, setNumFrets] = useState(
+    Number(initFormValues?.num_frets) || 4,
+  );
   return (
     <form action={formAction} className="mx-auto max-w-xl">
       <div className="flex flex-row flex-wrap gap-8 p-4">
@@ -137,19 +140,15 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="flex flex-col mt-10">
         {formState.message && !formState.success && (
           <p className="mb-3 text-sm text-error" role="alert">
             {formState.message}
           </p>
         )}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full rounded-md bg-accent px-4 py-2 text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-gray-500"
-        >
-          {isPending ? 'Saving...' : isEdit ? 'Edit Chord' : 'Add Chord'}
-        </button>
+        <Button type="submit" isLoading={isPending}>
+          {isEdit ? 'Edit Chord' : 'Add Chord'}
+        </Button>
       </div>
     </form>
   );

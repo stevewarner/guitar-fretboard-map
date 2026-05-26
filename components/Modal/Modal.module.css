@@ -1,0 +1,61 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(107, 114, 128, 0.75);
+}
+
+.modal {
+  max-height: 80vh;
+  width: 91.6667%;
+  max-width: 48rem;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  padding: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .modal {
+    width: 60%;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  padding: 0.5rem;
+  background: none;
+  cursor: pointer;
+}
+
+.divider {
+  margin: 2rem 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
