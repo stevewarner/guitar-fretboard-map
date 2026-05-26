@@ -1,1 +1,1 @@
-export { default } from './NewChordForm';
+export * from './NewChordForm';

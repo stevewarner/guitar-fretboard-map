@@ -2,18 +2,24 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { sql } from '@vercel/postgres';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
-import { INTERVAL_LABELS } from '@/app/utils/constants';
-import { getModeIntervals } from '@/modules/scale/utils/scaleUtils';
+import { INTERVAL_LABELS, NOTE_TO_PC } from '@/app/utils/constants';
+import {
+  getModeIntervals,
+  isValidPosition,
+  getValidFingersForString,
+  ROOT_STRINGS,
+  ROOT_FINGERS,
+  DEFAULT_POSITION,
+  type RootString,
+  type RootFinger,
+  type ScalePosition,
+} from '@/modules/scale/utils/scaleUtils';
+import { getOrdinal } from '@/app/utils';
 import { ScaleViewer } from '@/modules/scale/ScaleViewer';
-
-function ordinal(n: number): string {
-  const v = n % 100;
-  const suffix = v >= 11 && v <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
-  return `${n}${suffix}`;
-}
 
 type Props = {
   params: Promise<{ system: string; mode: string }>;
+  searchParams: Promise<{ key?: string; string?: string; position?: string }>;
 };
 
 export function generateStaticParams() {
@@ -32,8 +38,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 type ScaleRow = { intervals: number[] };
 
-export default async function ScaleModePage({ params }: Props) {
+function parseRootNote(raw: string | undefined): string {
+  return raw && raw in NOTE_TO_PC ? raw : 'A';
+}
+
+function parsePosition(
+  stringParam: string | undefined,
+  positionParam: string | undefined,
+  rootPc: number,
+): ScalePosition {
+  const rs = Number(stringParam);
+  const rf = Number(positionParam);
+  const rootString: RootString = (ROOT_STRINGS as number[]).includes(rs)
+    ? (rs as RootString)
+    : DEFAULT_POSITION.rootString;
+  const requestedFinger: RootFinger = (ROOT_FINGERS as number[]).includes(rf)
+    ? (rf as RootFinger)
+    : DEFAULT_POSITION.rootFinger;
+
+  const requested: ScalePosition = { rootString, rootFinger: requestedFinger };
+  if (isValidPosition(requested, rootPc)) return requested;
+
+  const validFingers = getValidFingersForString(rootString, rootPc);
+  if (validFingers.length > 0) return { rootString, rootFinger: validFingers[0] };
+  return DEFAULT_POSITION;
+}
+
+export default async function ScaleModePage({ params, searchParams }: Props) {
   const { system: systemSlug, mode: modeSlug } = await params;
+  const sp = await searchParams;
 
   const system = SCALE_SYSTEMS.find((s) => s.slug === systemSlug);
   const modeData = system?.modes.find((m) => m.slug === modeSlug);
@@ -54,20 +87,30 @@ export default async function ScaleModePage({ params }: Props) {
     ? 'Minor'
     : null;
 
+  const rootNote = parseRootNote(sp.key);
+  const rootPc = NOTE_TO_PC[rootNote];
+  const position = parsePosition(sp.string, sp.position, rootPc);
+  const degree = modeData.degree + 1;
+
   return (
     <div>
       <h1 className={system.showModeInfo ? 'mb-1' : 'mb-4'}>{modeData.pageTitle ?? modeData.displayName}</h1>
       {system.showModeInfo && (
         <>
           <p className="text-sm text-gray-500">
-            {ordinal(modeData.degree + 1)} mode of the {system.displayName} scale
+            {degree}{getOrdinal(degree)} mode of the {system.displayName} scale
           </p>
           <p className="text-sm text-gray-500 mb-4">{quality}</p>
         </>
       )}
       <p className="text-sm font-medium mb-1">Intervals</p>
       <p className="font-mono text-sm mb-6 tracking-wider">{intervalFormula}</p>
-      <ScaleViewer modeIntervals={modeIntervals} />
+      <ScaleViewer
+        modeIntervals={modeIntervals}
+        rootNote={rootNote}
+        rootPc={rootPc}
+        position={position}
+      />
     </div>
   );
 }

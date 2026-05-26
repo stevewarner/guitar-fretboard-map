@@ -66,16 +66,28 @@ export function computePositionWindow(
 ): { startFret: number; numFrets: number } | null {
   const openPc = STANDARD_TUNING_PC[STRING_TO_INDEX[position.rootString]];
   const rawRootFret = (rootPc - openPc + 12) % 12;
-  // Use fret 12 rather than fret 0 so every position is fingered (no open-string root).
-  const rootFret = rawRootFret === 0 ? 12 : rawRootFret;
+  // For fingered positions (1–4) the root must be fretted, so bump open roots up an octave.
+  // Stretch (finger 0) is exempt: the 1st finger sits on fret 1, the open string is the root.
+  let rootFret =
+    rawRootFret === 0 && position.rootFinger !== 0 ? 12 : rawRootFret;
 
   const numFrets = 5;
-  const startFret =
+  const computeStart = (rf: number) =>
     position.rootFinger === 0 || position.rootFinger === 1
-      ? rootFret
-      : rootFret - position.rootFinger;
+      ? rf
+      : rf - position.rootFinger;
 
-  if (startFret < 0) return null;
+  // If the position runs off the low end of the neck, shift the root up an octave
+  // (e.g. F on the 6th string with 4th-finger position lives at fret 13, not fret 1).
+  let startFret = computeStart(rootFret);
+  if (startFret < 0) {
+    rootFret += 12;
+    startFret = computeStart(rootFret);
+  }
+
+  // Cap at a 22-fret neck (window of 5 frets → highest start = 18).
+  if (startFret + numFrets - 1 > 22) return null;
+
   return { startFret, numFrets };
 }
 
@@ -120,4 +132,79 @@ export function computeRootTab(
     }
     return frets;
   });
+}
+
+export const ROOT_STRINGS: RootString[] = [6, 5, 4];
+export const ROOT_FINGERS: RootFinger[] = [0, 1, 2, 3, 4];
+export const DEFAULT_POSITION: ScalePosition = { rootString: 6, rootFinger: 1 };
+
+export function isValidPosition(position: ScalePosition, rootPc: number): boolean {
+  return computePositionWindow(position, rootPc) !== null;
+}
+
+export function getValidFingersForString(
+  rootString: RootString,
+  rootPc: number,
+): RootFinger[] {
+  return ROOT_FINGERS.filter((f) =>
+    isValidPosition({ rootString, rootFinger: f }, rootPc),
+  );
+}
+
+// Derive everything needed to render the chart for a given mode/key/position.
+// Position must be valid for this key (use isValidPosition first).
+export function deriveScaleRender(
+  modeIntervals: number[],
+  rootPc: number,
+  position: ScalePosition,
+) {
+  const { startFret: rawStartFret, numFrets } = computePositionWindow(position, rootPc)!;
+
+  // If the window starts at 0 but no notes land on open strings, shift up to 1
+  // so the chart doesn't show an empty open-string area above the nut.
+  const rawScaleTab = computeScaleTab(modeIntervals, rootPc, rawStartFret, numFrets);
+  const hasOpenNotes = rawStartFret === 0 && rawScaleTab.some((frets) => frets.includes(0));
+  const startFret = rawStartFret === 0 && !hasOpenNotes ? 1 : rawStartFret;
+  const patternStartFret = Math.max(1, startFret);
+
+  // When startFret is 0, the open area above the nut replaces the first fret space
+  // in the displayed window. Render one fewer fretted space and shift labels accordingly
+  // (no leading empty slot — the open string is the unfingered root).
+  const isOpenPosition = startFret === 0;
+  const fingerLabels: string[] = isOpenPosition
+    ? ['1', '2', '3', '4']
+    : position.rootFinger === 0
+      ? ['', '1', '2', '3', '4']
+      : position.rootFinger === 1
+        ? ['1', '2', '3', '4', '']
+        : ['', '1', '2', '3', '4'];
+  const displayNumFrets = isOpenPosition ? numFrets - 1 : numFrets;
+
+  const scaleTab = deduplicateGBStrings(
+    startFret === rawStartFret
+      ? rawScaleTab
+      : computeScaleTab(modeIntervals, rootPc, startFret, numFrets),
+    position.rootFinger,
+    startFret,
+    numFrets,
+  );
+  const rootTab = deduplicateGBStrings(
+    computeRootTab(rootPc, startFret, numFrets),
+    position.rootFinger,
+    startFret,
+    numFrets,
+  );
+  const scaleIntervalTab = computeIntervalTab(scaleTab, rootPc);
+  const rootIntervalTab = rootTab.map((frets) => frets.map(() => '1'));
+
+  return {
+    numFrets: displayNumFrets,
+    startFret,
+    patternStartFret,
+    fingerLabels,
+    scaleTab,
+    rootTab,
+    scaleIntervalTab,
+    rootIntervalTab,
+  };
 }

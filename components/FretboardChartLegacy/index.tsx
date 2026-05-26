@@ -1,6 +1,6 @@
 'use client';
 import { useContext } from 'react';
-import Pattern from './Pattern';
+import { Pattern } from './Pattern';
 import { FretboardContext } from './contexts';
 import {
   DEFAULT_HEIGHT,

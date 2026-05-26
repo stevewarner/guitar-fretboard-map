@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import TriadShapes from './triad-shapes';
+import { TriadShapes } from './triad-shapes';
 
 export const metadata: Metadata = {
   title: 'Movable Chord Shapes',

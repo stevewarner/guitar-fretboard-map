@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { ChordType } from '@/types';
 import { getOrdinal } from '@/app/utils';
 import { createTab } from '@/modules/chord/utils/createTab';
-import ChordActionDropdown from '@/modules/chord/ChordActionDropdown';
+import { ChordActionDropdown } from '@/modules/chord/ChordActionDropdown';
 
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 

@@ -7,13 +7,13 @@ import { Button, ButtonVariant } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Modal } from '@/components/Modal';
-import NewChordForm from '@/modules/chord/NewChordForm';
+import { NewChordForm } from '@/modules/chord/NewChordForm';
 
 type Props = {
   chords: ChordType[];
 };
 
-const FilteredChordsList = ({ chords }: Props) => {
+export const FilteredChordsList = ({ chords }: Props) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -110,4 +110,3 @@ const FilteredChordsList = ({ chords }: Props) => {
   );
 };
 
-export default FilteredChordsList;

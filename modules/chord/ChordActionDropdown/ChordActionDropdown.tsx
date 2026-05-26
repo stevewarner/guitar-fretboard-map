@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { reportChord } from '@/app/actions';
 import { Modal } from '@/components/Modal';
-import NewChordForm from '@/modules/chord/NewChordForm';
+import { NewChordForm } from '@/modules/chord/NewChordForm';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import ShareIcon from '@/svgs/share.svg';
 import EditIcon from '@/svgs/edit.svg';
@@ -19,7 +19,7 @@ interface ChordActionDropdownProps {
   chord: ChordType;
 }
 
-const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
+export const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
   const [modalOpen, toggleModalOpen] = useState(false);
 
   const pathname = usePathname();
@@ -108,4 +108,3 @@ const ChordActionDropdown = ({ id, chord }: ChordActionDropdownProps) => {
   );
 };
 
-export default ChordActionDropdown;

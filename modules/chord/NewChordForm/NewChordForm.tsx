@@ -17,7 +17,7 @@ interface ChordFormProps {
   isEdit?: boolean;
 }
 
-const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
+export const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   const updateChordWithProps = updateChord.bind(null, initFormValues || null);
   const [formState, formAction, isPending] = useActionState(
     isEdit ? updateChordWithProps : createNewChord,
@@ -154,4 +154,3 @@ const NewChordForm = ({ initFormValues, isEdit = false }: ChordFormProps) => {
   );
 };
 
-export default NewChordForm;

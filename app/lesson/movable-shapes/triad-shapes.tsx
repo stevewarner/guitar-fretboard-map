@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 
-const TriadShapes = () => {
+export const TriadShapes = () => {
   const [isMajor, toggleIsMajor] = useState(true);
 
   return (
@@ -81,4 +81,3 @@ const TriadShapes = () => {
   );
 };
 
-export default TriadShapes;

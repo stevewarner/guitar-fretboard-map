@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { href: '/lesson', label: 'Lessons' },
 ];
 
-const Navbar: React.FC = () => {
+export const Navbar: React.FC = () => {
   const [navOpen, setNavOpen] = useState(false);
   const close = () => setNavOpen(false);
 
@@ -63,4 +63,3 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;

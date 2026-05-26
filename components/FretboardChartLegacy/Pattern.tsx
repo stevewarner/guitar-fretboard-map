@@ -8,7 +8,7 @@ type Props = {
   startFret?: number;
 };
 
-const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
+export const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
   const { fretWidth, strHeight, stroke, topSpace, circRad, showOpenNotes } =
     useContext(FretboardContext);
 
@@ -77,4 +77,3 @@ const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
   );
 };
 
-export default Pattern;
