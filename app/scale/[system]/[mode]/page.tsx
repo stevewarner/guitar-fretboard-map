@@ -16,6 +16,12 @@ type Props = {
   params: Promise<{ system: string; mode: string }>;
 };
 
+export function generateStaticParams() {
+  return SCALE_SYSTEMS.flatMap((s) =>
+    s.modes.map((m) => ({ system: s.slug, mode: m.slug })),
+  );
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { system: systemSlug, mode: modeSlug } = await params;
   const system = SCALE_SYSTEMS.find((s) => s.slug === systemSlug);
