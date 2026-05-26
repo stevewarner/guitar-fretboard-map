@@ -19,8 +19,17 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
           <div key={system.slug} className="mb-4">
             {system.showModes ? (
               <>
-                <p className="text-sm font-medium mb-1">{system.displayName}</p>
-                <ul className="space-y-0.5">
+                <Link
+                  href={firstModeHref}
+                  className="text-sm font-medium block mb-1"
+                >
+                  {system.displayName}
+                </Link>
+                <ul
+                  className={`space-y-0.5 ${
+                    isSystemActive ? '' : 'hidden md:block'
+                  }`}
+                >
                   {system.modes.map((mode) => {
                     const href = `/scale/${system.slug}/${mode.slug}`;
                     const isActive = pathname === href;
