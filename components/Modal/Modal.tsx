@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import CloseIcon from '@/svgs/close.svg';
 import styles from './Modal.module.css';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface ModalProps {
   title: string;
@@ -30,23 +31,16 @@ export const Modal = ({ title, onClose, content }: ModalProps) => {
   }, []);
 
   useFocusTrap(modalRef, true);
+  useClickOutside(modalRef, onClose);
 
   return (
-    <div
-      className={styles.overlay}
-      onClick={() => {
-        onClose();
-      }}
-    >
+    <div className={styles.overlay}>
       <div
         ref={modalRef}
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
       >
         <div className={styles.header}>
           <h2 id="modal-title" className={styles.title}>

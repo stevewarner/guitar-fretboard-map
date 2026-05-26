@@ -11,7 +11,6 @@
     "format:fix": "npx prettier --write pages"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.10",
     "@types/node": "18.15.11",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -21,12 +20,15 @@
     "autoprefixer": "^10.5.0",
     "eslint-plugin-tailwindcss": "^3.18.3",
     "next": "^16.2.6",
-    "postcss": "^8.4.49",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "sass": "^1.62.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
