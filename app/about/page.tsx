@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'About',
+  alternates: { canonical: '/about' },
 };
 
 const About = () => {

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     description:
       'Guitar chord diagram database. Learn guitar chords in all positions on the guitar fretboard. Create, Share, and Download chord diagrams.',
   },
+  alternates: { canonical: '/chord' },
 };
 
 export default async function Chords() {

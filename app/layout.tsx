@@ -24,9 +24,6 @@ export const metadata: Metadata = {
     title: 'GuitarTheory | Music Theory for Guitarists',
     description: 'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
   },
-  alternates: {
-    canonical: 'https://www.guitartheory.app',
-  },
 };
 
 export default function RootLayout({

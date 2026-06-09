@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${param} Guitar Chord`,
+    alternates: { canonical: `/chord/${param}` },
     description: `How to play ${param} guitar chord in all positions across the fretboard. Share or download ${param} chord diagram svg.`,
     openGraph: {
       title: `${param} Guitar Chord`,

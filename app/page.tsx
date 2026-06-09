@@ -1,9 +1,14 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { sql } from '@vercel/postgres';
 import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
 import { ChordType } from '@/types';
 import { ChordCarousel } from '@/components/ChordCarousel';
 import ChevronRightIcon from '@/svgs/chevron-right.svg';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 const numFrets = 13;
 

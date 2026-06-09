@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     description:
       'Introduction to music theory for guitarists. Interactive fretboard charts and diagrams.',
   },
+  alternates: { canonical: '/lesson' },
 };
 
 const Lessons = () => {

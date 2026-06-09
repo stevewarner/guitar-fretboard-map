@@ -36,7 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const system = SCALE_SYSTEMS.find((s) => s.slug === systemSlug);
   const mode = system?.modes.find((m) => m.slug === modeSlug);
   if (!system || !mode) return {};
-  return { title: `${mode.displayName} — ${system.displayName}` };
+  return {
+    title: `${mode.displayName} — ${system.displayName}`,
+    alternates: { canonical: `/scale/${system.slug}/${mode.slug}` },
+  };
 }
 
 type ScaleRow = { intervals: number[] };
