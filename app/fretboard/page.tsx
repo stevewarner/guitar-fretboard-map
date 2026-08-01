@@ -70,13 +70,13 @@ const FretboardPage = () => {
   );
 
   return (
-    <div className="flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 lg:px-12 xl:px-24">
+    <div className="flex flex-1 flex-col gap-4 p-4 sm:px-6 lg:px-12 xl:px-24">
       <div className="flex justify-center">
         <h1>Fretboard Playground</h1>
       </div>
 
       <div className="flex min-h-0 flex-1 gap-6 md:max-h-dvh">
-        <div className="flex justify-center min-h-0 basis-1/2">
+        <div className="flex min-h-0 basis-1/2 justify-center">
           <Fretboard numFrets={NUM_FRETS} className="h-full w-auto">
             <Pattern
               tab={rootTab}
@@ -95,13 +95,15 @@ const FretboardPage = () => {
           </Fretboard>
         </div>
 
-        <div className="flex basis-1/2 flex-col gap-6 pt-2 px-8">
+        <div className="flex basis-1/2 flex-col gap-6 px-8 pt-2">
           <div className="flex flex-col gap-1">
             <label className={LABEL_CLASS}>Root</label>
             <div className="flex items-center gap-2">
               <select value={root} onChange={(e) => setRoot(e.target.value)}>
                 {NOTE_OPTIONS.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
               <ColorInput
@@ -114,14 +116,14 @@ const FretboardPage = () => {
 
           <div className="flex flex-col gap-2">
             <span className={LABEL_CLASS}>Intervals</span>
-            <label className="flex items-center gap-2 text-sm font-medium w-fit">
+            <label className="flex w-fit items-center gap-2 text-sm font-medium">
               <input type="checkbox" checked disabled />1{' '}
               <span className="text-xs text-fg-muted">{root}</span>
             </label>
             {INTERVAL_KEYS.map((key) => (
               <label
                 key={key}
-                className="flex items-center gap-2 text-sm w-fit"
+                className="flex w-fit items-center gap-2 text-sm"
               >
                 <input
                   type="checkbox"

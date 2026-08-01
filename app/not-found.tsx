@@ -10,7 +10,7 @@ const PageNotFound: NextPage = () => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="h-32 w-32"
+          className="size-32"
           aria-hidden="true"
         >
           <path

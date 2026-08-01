@@ -8,7 +8,7 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
 
   return (
     <nav>
-      <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-gray-400">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-400">
         Scale Systems
       </p>
       {systems.map((system) => {
@@ -21,7 +21,7 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
               <>
                 <Link
                   href={firstModeHref}
-                  className="text-sm font-medium block mb-1"
+                  className="mb-1 block text-sm font-medium"
                 >
                   {system.displayName}
                 </Link>
@@ -37,10 +37,10 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
                       <li key={mode.slug}>
                         <Link
                           href={href}
-                          className={`text-sm block py-1 pl-3 border-l-2 transition-colors ${
+                          className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
                             isActive
                               ? 'border-current font-medium'
-                              : 'border-transparent text-gray-500 hover:text-current hover:border-gray-300'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'
                           }`}
                         >
                           {mode.displayName.toLowerCase()}
@@ -53,10 +53,10 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
             ) : (
               <Link
                 href={firstModeHref}
-                className={`text-sm font-medium block py-1 pl-3 border-l-2 transition-colors ${
+                className={`block border-l-2 py-1 pl-3 text-sm font-medium transition-colors ${
                   isSystemActive
                     ? 'border-current'
-                    : 'border-transparent text-gray-500 hover:text-current hover:border-gray-300'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'
                 }`}
               >
                 {system.displayName}

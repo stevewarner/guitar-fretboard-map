@@ -8,11 +8,22 @@ export interface SentimentOption {
 }
 
 const DEFAULT_OPTIONS: SentimentOption[] = [
-  { value: 'positive', label: 'Thumbs up', icon: <ThumbsUpIcon height="20" width="20" /> },
-  { value: 'negative', label: 'Thumbs down', icon: <ThumbsUpIcon className="rotate-180" height="20" width="20" /> },
+  {
+    value: 'positive',
+    label: 'Thumbs up',
+    icon: <ThumbsUpIcon height="20" width="20" />,
+  },
+  {
+    value: 'negative',
+    label: 'Thumbs down',
+    icon: <ThumbsUpIcon className="rotate-180" height="20" width="20" />,
+  },
 ];
 
-interface SentimentInputProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, 'defaultValue'> {
+interface SentimentInputProps extends Omit<
+  React.FieldsetHTMLAttributes<HTMLFieldSetElement>,
+  'defaultValue'
+> {
   name: string;
   label: string;
   options?: SentimentOption[];
@@ -39,7 +50,7 @@ export const SentimentInput = ({
       {options.map(({ value, label: optionLabel, icon }) => (
         <label
           key={value}
-          className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:bg-surface-sunken has-[:checked]:bg-fg has-[:checked]:text-fg-inverted has-[:focus-visible]:[outline:2px_auto_-webkit-focus-ring-color] ${optionClassName ?? ''}`}
+          className={`flex size-10 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:bg-surface-sunken has-[:checked]:bg-fg has-[:checked]:text-fg-inverted has-[:focus-visible]:[outline:2px_auto_-webkit-focus-ring-color] ${optionClassName ?? ''}`}
         >
           <input
             type="radio"

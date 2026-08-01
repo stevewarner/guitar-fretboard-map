@@ -73,15 +73,31 @@ export const Pattern = ({
             const r = circRad / 1.8;
             return (
               <g key={`${stringIndex}-x`}>
-                <line x1={cx + r} y1={y - r} x2={cx - r} y2={y + r} stroke="#000" strokeWidth={stroke} />
-                <line x1={cx - r} y1={y - r} x2={cx + r} y2={y + r} stroke="#000" strokeWidth={stroke} />
+                <line
+                  x1={cx + r}
+                  y1={y - r}
+                  x2={cx - r}
+                  y2={y + r}
+                  stroke="#000"
+                  strokeWidth={stroke}
+                />
+                <line
+                  x1={cx - r}
+                  y1={y - r}
+                  x2={cx + r}
+                  y2={y + r}
+                  stroke="#000"
+                  strokeWidth={stroke}
+                />
               </g>
             );
           }
 
           const fretNum = Number(string);
           const intervalVal = intervals?.[stringIndex];
-          const label = Array.isArray(intervalVal) ? intervalVal[0] : intervalVal;
+          const label = Array.isArray(intervalVal)
+            ? intervalVal[0]
+            : intervalVal;
           return renderDot(
             `${stringIndex}-${string}`,
             cx,
@@ -94,7 +110,9 @@ export const Pattern = ({
 
         return string.map((fret, fretIndex) => {
           const intervalVal = intervals?.[stringIndex];
-          const label = Array.isArray(intervalVal) ? intervalVal[fretIndex] : intervalVal;
+          const label = Array.isArray(intervalVal)
+            ? intervalVal[fretIndex]
+            : intervalVal;
           return renderDot(
             `${stringIndex}-${fretIndex}`,
             cx,

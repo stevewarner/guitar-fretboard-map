@@ -27,7 +27,12 @@ export const SearchInput = ({
       </label>
     )}
     <div className={styles.inputRow}>
-      <SearchIcon aria-hidden="true" className={styles.searchIcon} height={20} width={20} />
+      <SearchIcon
+        aria-hidden="true"
+        className={styles.searchIcon}
+        height={20}
+        width={20}
+      />
       {!showLabel && (
         <label htmlFor={id} className={styles.srOnly}>
           {label}

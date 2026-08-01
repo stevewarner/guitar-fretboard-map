@@ -17,4 +17,3 @@ export const ColorInput = ({ value, onChange, label }: Props) => (
     />
   </label>
 );
-

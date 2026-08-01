@@ -11,10 +11,12 @@ export const metadata: Metadata = {
     default: 'GuitarTheory | Music Theory for Guitarists',
     template: '%s | GuitarTheory',
   },
-  description: 'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
+  description:
+    'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
   openGraph: {
     title: 'GuitarTheory | Music Theory for Guitarists',
-    description: 'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
+    description:
+      'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
     url: 'https://www.guitartheory.app',
     siteName: 'GuitarTheory',
     type: 'website',
@@ -22,7 +24,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'GuitarTheory | Music Theory for Guitarists',
-    description: 'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
+    description:
+      'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
   },
 };
 

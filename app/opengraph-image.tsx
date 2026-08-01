@@ -11,23 +11,21 @@ export const contentType = 'image/png';
 // Image generation
 export default async function Image() {
   return new ImageResponse(
-    (
-      // ImageResponse JSX element
-      <div
-        style={{
-          background: '#4F46E5',
-          color: '#fff',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          fontSize: '1rem',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Chord width="100vh" height="100vh" />
-      </div>
-    ),
+    // ImageResponse JSX element
+    <div
+      style={{
+        background: '#4F46E5',
+        color: '#fff',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        fontSize: '1rem',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Chord width="100vh" height="100vh" />
+    </div>,
     {},
   );
 }

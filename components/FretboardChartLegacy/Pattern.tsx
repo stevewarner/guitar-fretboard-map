@@ -76,4 +76,3 @@ export const Pattern = ({ tab = [], fillColor, startFret = 1 }: Props) => {
     </>
   );
 };
-

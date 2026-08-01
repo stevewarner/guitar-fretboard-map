@@ -5,7 +5,7 @@ const FOCUSABLE_SELECTORS =
 
 export function useFocusTrap<T extends HTMLElement>(
   containerRef: React.RefObject<T | null>,
-  active: boolean = true
+  active: boolean = true,
 ) {
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
@@ -22,26 +22,24 @@ export function useFocusTrap<T extends HTMLElement>(
       if (event.key !== 'Tab') return;
 
       const focusableElements = Array.from(
-        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
+        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS),
       ).filter(
         (el) =>
           !el.hasAttribute('disabled') &&
-          el.getAttribute('aria-hidden') !== 'true'
+          el.getAttribute('aria-hidden') !== 'true',
       );
 
       if (focusableElements.length === 0) return;
 
       const currentIndex = focusableElements.indexOf(
-        document.activeElement as HTMLElement
+        document.activeElement as HTMLElement,
       );
 
       let nextIndex = currentIndex;
 
       if (event.shiftKey) {
         nextIndex =
-          currentIndex <= 0
-            ? focusableElements.length - 1
-            : currentIndex - 1;
+          currentIndex <= 0 ? focusableElements.length - 1 : currentIndex - 1;
       } else {
         nextIndex =
           currentIndex === -1 || currentIndex === focusableElements.length - 1

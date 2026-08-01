@@ -2,10 +2,29 @@ const LETTER_ORDER = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
 type Letter = (typeof LETTER_ORDER)[number];
 
 const NATURAL_PC: Record<Letter, number> = {
-  C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11,
+  C: 0,
+  D: 2,
+  E: 4,
+  F: 5,
+  G: 7,
+  A: 9,
+  B: 11,
 };
 
-const SHARP_FALLBACK = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const SHARP_FALLBACK = [
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+  'A',
+  'A#',
+  'B',
+];
 
 interface ParsedNote {
   letter: Letter;

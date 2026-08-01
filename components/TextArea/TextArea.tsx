@@ -28,7 +28,10 @@ export const TextArea = ({
 
   return (
     <div className={`flex flex-col gap-2 ${wrapperClassName ?? ''}`}>
-      <label htmlFor={textareaId} className={`text-sm font-semibold text-fg ${labelClassName ?? ''}`}>
+      <label
+        htmlFor={textareaId}
+        className={`text-sm font-semibold text-fg ${labelClassName ?? ''}`}
+      >
         {label}
       </label>
       <textarea
@@ -43,7 +46,12 @@ export const TextArea = ({
         {...props}
       />
       {maxLength != null && (
-        <span role="status" aria-live="polite" aria-atomic="true" className="mt-1 block text-right text-xs text-fg-secondary">
+        <span
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="mt-1 block text-right text-xs text-fg-secondary"
+        >
           {length}/{maxLength}
         </span>
       )}
