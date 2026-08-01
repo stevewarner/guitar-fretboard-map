@@ -1,11 +1,14 @@
 import { Metadata } from 'next';
 import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList } from '@/app/utils/structuredData';
 
 const numFrets = 15;
 
 export const metadata: Metadata = {
   title: '4 note voicing intro',
   description: 'Introduction to four note voicings and inversions',
+  alternates: { canonical: '/lesson/4-note-voicing' },
   openGraph: {
     title: 'GuitarTheory | 4 note voicing intro',
     description: 'Introduction to four note voicings and inversions',
@@ -15,6 +18,13 @@ export const metadata: Metadata = {
 const VoicingIntro = () => {
   return (
     <>
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Lessons', path: '/lesson' },
+          { name: '4 Note Voicing Intro', path: '/lesson/4-note-voicing' },
+        ])}
+      />
       <div className="flex flex-col items-center">
         <h1 className="mb-4">4 note voicing intro</h1>
         <p>Major scale 4 note (1,5,7,3) example</p>
@@ -27,7 +37,11 @@ const VoicingIntro = () => {
           <li>vimin7</li>
           <li>viimin7b5</li>
         </ul>
-        <Fretboard numFrets={numFrets} styles="mx-4 md:mx-0 py-8">
+        <Fretboard
+          numFrets={numFrets}
+          styles="mx-4 md:mx-0 py-8"
+          title="Diatonic 4-note chords across the major scale"
+        >
           <Pattern
             // I chord
             tab={[0, 2, 2, 2]}
@@ -77,7 +91,11 @@ const VoicingIntro = () => {
           <li>7 3 5 1 (3rd inversion)</li>
         </ul>
 
-        <Fretboard numFrets={numFrets} styles="mx-4 md:mx-0 py-8">
+        <Fretboard
+          numFrets={numFrets}
+          styles="mx-4 md:mx-0 py-8"
+          title="Imaj7 chord inversions across the fretboard"
+        >
           <Pattern
             // root
             tab={[0, 2, 2, 2]}

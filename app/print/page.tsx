@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: 'GuitarTheory | Print template',
     description: 'Guitar chord charts print template',
   },
+  robots: { index: false, follow: false },
 };
 
 const Print = () => {

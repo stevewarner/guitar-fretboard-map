@@ -4,9 +4,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import '@/styles/globals.css';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { JsonLd } from '@/components/JsonLd';
+import { SITE_URL } from '@/app/utils/site';
+import { websiteSchema } from '@/app/utils/structuredData';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.guitartheory.app'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'GuitarTheory | Music Theory for Guitarists',
     template: '%s | GuitarTheory',
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
     title: 'GuitarTheory | Music Theory for Guitarists',
     description:
       'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
-    url: 'https://www.guitartheory.app',
+    url: SITE_URL,
     siteName: 'GuitarTheory',
     type: 'website',
   },
@@ -37,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col">
+        <JsonLd data={websiteSchema()} />
         <Navbar />
         <main className="flex flex-1 flex-col">
           <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8 sm:px-6">

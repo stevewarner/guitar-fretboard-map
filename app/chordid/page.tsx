@@ -5,6 +5,7 @@ export const metadata = {
   title: 'What chord is this?',
   description:
     'Build a chord shape on the fretboard and identify what it is called.',
+  alternates: { canonical: '/chordid' },
 };
 
 export default function ChordIdPage() {

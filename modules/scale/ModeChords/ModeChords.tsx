@@ -126,6 +126,7 @@ function ChordGrid({
                 startFret={transposed.startFret}
                 height={110}
                 width={110}
+                title={`${chord.name} chord diagram`}
               >
                 <Pattern
                   tab={transposed.tab}

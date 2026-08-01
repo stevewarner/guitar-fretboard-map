@@ -7,6 +7,13 @@ import {
 
 interface ScaleViewerProps {
   modeIntervals: number[];
+  modeTitle: string;
+  // Pentatonic entries are genuinely scales, not modes of one another —
+  // "pentatonic mode" isn't a term anyone uses. Everything else here (Lydian,
+  // Phrygian Dominant, even the tonic Harmonic/Melodic Minor entries) is
+  // conventionally called a mode. Passed in rather than hardcoded so this
+  // stays correct as systems are added.
+  patternKind: 'scale' | 'mode';
   rootNote: string;
   rootPc: number;
   position: ScalePosition;
@@ -14,6 +21,8 @@ interface ScaleViewerProps {
 
 export function ScaleViewer({
   modeIntervals,
+  modeTitle,
+  patternKind,
   rootNote,
   rootPc,
   position,
@@ -33,6 +42,7 @@ export function ScaleViewer({
           numFrets={render.numFrets}
           startFret={render.startFret > 1 ? render.startFret : undefined}
           fingerLabels={render.fingerLabels}
+          title={`${modeTitle} ${patternKind} in ${rootNote} — guitar fretboard diagram`}
         >
           <Pattern
             tab={render.scaleTab}

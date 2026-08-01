@@ -148,6 +148,7 @@ export default async function Home() {
           numFrets={numFrets}
           showOpenNotes={false}
           styles="m-4 md:mx-0"
+          title="Guitar fretboard diagram highlighting the minor pentatonic scale pattern"
         >
           <path
             d="M 52 380 C 500 380 500 20 1252 20"

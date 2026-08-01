@@ -3,6 +3,7 @@ import { FeedbackForm } from '@/modules/feedback/FeedbackForm';
 
 export const metadata: Metadata = {
   title: 'Feedback',
+  alternates: { canonical: '/feedback' },
 };
 
 const Feedback = () => {

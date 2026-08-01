@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 export default function ScalesPage() {
-  redirect('/scale/major-scale/ionian');
+  permanentRedirect('/scale/major-scale/ionian');
 }

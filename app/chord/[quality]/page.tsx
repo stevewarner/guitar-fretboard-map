@@ -14,6 +14,8 @@ import { getMissingIntervalPcs } from '@/modules/chordv2/utils/droppedIntervals'
 import { PositionControls } from '@/components/PositionControls';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Tags, type Tag } from '@/components/Tags';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
 import { INTERVAL_LABELS, STANDARD_TUNING_PC } from '@/app/utils/constants';
 import { computeRootFret, computeFingerLabels } from '@/app/utils/musicUtils';
 import { parseNote } from '@/app/utils/noteSpelling';
@@ -67,9 +69,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const symbol = decodeURIComponent(quality);
   const qualityMeta = await getQualityBySymbol(symbol);
   if (!qualityMeta) return {};
+  const title = qualityMeta.full_name;
+  const description = `Guitar chord shapes for ${qualityMeta.full_name} (${symbol}) in all keys and positions.`;
   return {
-    title: qualityMeta.full_name,
-    description: `Guitar chord shapes for ${qualityMeta.full_name} (${symbol}) in all keys and positions.`,
+    title,
+    description,
+    alternates: { canonical: `/chord/${encodeURIComponent(symbol)}` },
+    openGraph: {
+      title: `GuitarTheory | ${title}`,
+      description,
+    },
   };
 }
 
@@ -360,6 +369,21 @@ export default async function ChordQualityPage({
 
   return (
     <div className="flex flex-col gap-6">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Chords', path: '/chord' },
+          { name: fullName, path: `/chord/${encodeURIComponent(symbol)}` },
+        ])}
+      />
+      <JsonLd
+        data={definedTerm({
+          name: fullName,
+          description: `Guitar chord shapes for ${fullName} (${symbol}) in all keys and positions.`,
+          termSetName: 'Guitar Chords',
+          termSetPath: '/chord',
+        })}
+      />
       <div>
         <div>
           <h1 className="text-2xl font-bold">{fullName}</h1>

@@ -6,6 +6,8 @@ import {
   type ChordCard,
 } from '@/modules/chordv2/FilteredChordShapesList';
 import { PositionControls } from '@/components/PositionControls';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList } from '@/app/utils/structuredData';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import {
   classifyFamily,
@@ -69,16 +71,55 @@ function buildInversionCard(
   };
 }
 
-export const metadata: Metadata = {
-  title: 'Chord Database',
-  description:
-    'Guitar chord database. Browse chord qualities and explore shapes in any key and position.',
-  openGraph: {
-    title: 'GuitarTheory | Chord Database',
+type MetadataProps = {
+  searchParams: Promise<{ mode?: string }>;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: MetadataProps): Promise<Metadata> {
+  const { mode } = await searchParams;
+
+  if (mode === 'open') {
+    return {
+      title: 'Open Chords',
+      description:
+        'Open position guitar chords in their real keys, with alternate fingerings and inversions.',
+      alternates: { canonical: '/chord?mode=open' },
+      openGraph: {
+        title: 'GuitarTheory | Open Chords',
+        description:
+          'Open position guitar chords in their real keys, with alternate fingerings and inversions.',
+      },
+    };
+  }
+
+  if (mode === 'slash') {
+    return {
+      title: 'Slash Chords',
+      description:
+        'Slash chords (inversions) in their real keys, with the bass note fretted on the lowest strings.',
+      alternates: { canonical: '/chord?mode=slash' },
+      openGraph: {
+        title: 'GuitarTheory | Slash Chords',
+        description:
+          'Slash chords (inversions) in their real keys, with the bass note fretted on the lowest strings.',
+      },
+    };
+  }
+
+  return {
+    title: 'Chord Database',
     description:
       'Guitar chord database. Browse chord qualities and explore shapes in any key and position.',
-  },
-};
+    alternates: { canonical: '/chord' },
+    openGraph: {
+      title: 'GuitarTheory | Chord Database',
+      description:
+        'Guitar chord database. Browse chord qualities and explore shapes in any key and position.',
+    },
+  };
+}
 
 // C wasn't enough: avoiding the literal open notes (E/A/D on strings 6/5/4)
 // only prevents finger=0 shapes from landing on fret 0 — shapes with negative
@@ -198,6 +239,13 @@ export default async function ChordsV2({ searchParams }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Chords', path: '/chord' },
+        ])}
+      />
+      <h1 className="text-2xl font-bold">Chord Database</h1>
       <Suspense>
         <FilteredChordShapesList
           cards={cards}
@@ -276,6 +324,14 @@ async function OpenChordsView() {
 
   return (
     <div className="flex flex-col gap-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Chords', path: '/chord' },
+          { name: 'Open Chords', path: '/chord?mode=open' },
+        ])}
+      />
+      <h1 className="text-2xl font-bold">Open Chords</h1>
       <Suspense>
         <FilteredChordShapesList cards={cards} showFretLabels />
       </Suspense>
@@ -311,6 +367,14 @@ async function SlashChordsView() {
 
   return (
     <div className="flex flex-col gap-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Chords', path: '/chord' },
+          { name: 'Slash Chords', path: '/chord?mode=slash' },
+        ])}
+      />
+      <h1 className="text-2xl font-bold">Slash Chords</h1>
       <Suspense>
         <FilteredChordShapesList cards={cards} showFretLabels />
       </Suspense>

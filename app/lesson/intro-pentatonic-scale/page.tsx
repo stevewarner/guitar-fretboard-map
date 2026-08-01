@@ -1,9 +1,12 @@
 import { Metadata } from 'next';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList } from '@/app/utils/structuredData';
 
 export const metadata: Metadata = {
   title: 'Intro to Pentatonic Scale',
   description: 'Introduction to the pentatonic scale',
+  alternates: { canonical: '/lesson/intro-pentatonic-scale' },
   openGraph: {
     title: 'GuitarTheory | Intro to Pentatonic Scale',
     description: 'Introduction to the pentatonic scale',
@@ -13,6 +16,16 @@ export const metadata: Metadata = {
 const IntroPentatonic = () => {
   return (
     <>
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Lessons', path: '/lesson' },
+          {
+            name: 'Intro to Pentatonic Scale',
+            path: '/lesson/intro-pentatonic-scale',
+          },
+        ])}
+      />
       <div className="flex flex-col items-center">
         <h1 className="mb-4">Intro to pentatonic scale</h1>
 
@@ -22,7 +35,13 @@ const IntroPentatonic = () => {
           steps (4th and 7th intervals) of the major scale.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={4}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Major pentatonic scale, position 1"
+          >
             <Pattern
               tab={[
                 [2, 4],
@@ -44,7 +63,13 @@ const IntroPentatonic = () => {
             />
           </Fretboard>
 
-          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={4}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Major pentatonic scale, position 2"
+          >
             <Pattern
               tab={[
                 [1, 4],
@@ -73,7 +98,13 @@ const IntroPentatonic = () => {
           intervals.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={4}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Minor pentatonic scale, position 1"
+          >
             <Pattern
               tab={[
                 [1, 4],
@@ -95,7 +126,13 @@ const IntroPentatonic = () => {
             />
           </Fretboard>
 
-          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={4}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Minor pentatonic scale, position 2"
+          >
             <Pattern
               tab={[
                 [2, 4],

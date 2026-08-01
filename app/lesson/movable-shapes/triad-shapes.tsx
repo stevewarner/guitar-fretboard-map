@@ -25,7 +25,13 @@ export const TriadShapes = () => {
       </div>
 
       <p>6th string / 1st finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 6th string root, 1st finger`}
+      >
         <Pattern
           tab={isMajor ? [1, 3, 3, 2, 1, 1] : [1, 3, 3, 1, 1, 1]}
           intervals={isMajor ? [1, 5, 1, 3, 5, 1] : [1, 5, 1, 'b3', 5, 1]}
@@ -34,7 +40,13 @@ export const TriadShapes = () => {
       </Fretboard>
 
       <p>4th string / 1st finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 4th string root, 1st finger`}
+      >
         <Pattern
           tab={isMajor ? ['x', 'x', 1, 3, 4, 3] : ['x', 'x', 1, 3, 4, 2]}
           intervals={isMajor ? [, , 1, 5, 1, 3] : [, , 1, 5, 1, 'b3']}
@@ -43,7 +55,13 @@ export const TriadShapes = () => {
       </Fretboard>
 
       <p>5th string / 4th finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 5th string root, 4th finger`}
+      >
         <Pattern
           tab={isMajor ? ['x', 4, 3, 1, 2, 1] : ['x', 4, 2, 1, 2, 'x']}
           intervals={isMajor ? [, 1, 3, 5, 1, 3] : [, 1, 'b3', 5, 1, '']}
@@ -52,7 +70,13 @@ export const TriadShapes = () => {
       </Fretboard>
 
       <p>5th string / 1st finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 5th string root, 1st finger`}
+      >
         <Pattern
           tab={isMajor ? ['x', 1, 3, 3, 3, 1] : ['x', 1, 3, 3, 2, 1]}
           intervals={isMajor ? [, 1, 5, 1, 3, 5] : [, 1, 5, 1, 'b3', 5]}
@@ -61,7 +85,13 @@ export const TriadShapes = () => {
       </Fretboard>
 
       <p>1st string / 4th finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 1st string root, 4th finger`}
+      >
         <Pattern
           tab={isMajor ? ['x', 'x', 1, 1, 1, 4] : ['x', 'x', 1, 4, 4, 4]}
           intervals={isMajor ? [, , 5, 1, 3, 1] : [, , 5, 'b3', 5, 1]}
@@ -70,7 +100,13 @@ export const TriadShapes = () => {
       </Fretboard>
 
       <p>6th string / 4th finger</p>
-      <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+      <Fretboard
+        numFrets={4}
+        startFret={1}
+        height={400}
+        width={400}
+        title={`${isMajor ? 'Major' : 'Minor'} triad shape, 6th string root, 4th finger`}
+      >
         <Pattern
           tab={isMajor ? [4, 3, 1, 1, 1, 'x'] : [4, 2, 1, 1, 'x', 'x']}
           intervals={isMajor ? [1, 3, 5, 1, 3, ''] : [1, 'b3', 5, 1, '', '']}

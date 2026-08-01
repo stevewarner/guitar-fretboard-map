@@ -20,6 +20,8 @@ import { getOrdinal } from '@/app/utils';
 import { ScaleViewer } from '@/modules/scale/ScaleViewer';
 import { ModeChords } from '@/modules/scale/ModeChords';
 import { PentatonicBoxChart } from '@/modules/scale/PentatonicBoxChart';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
 
 type Props = {
   params: Promise<{ system: string; mode: string }>;
@@ -37,9 +39,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const system = SCALE_SYSTEMS.find((s) => s.slug === systemSlug);
   const mode = system?.modes.find((m) => m.slug === modeSlug);
   if (!system || !mode) return {};
+  const title = `${mode.displayName} — ${system.displayName}`;
+  const description = mode.description;
   return {
-    title: `${mode.displayName} — ${system.displayName}`,
+    title,
+    description,
     alternates: { canonical: `/scale/${system.slug}/${mode.slug}` },
+    openGraph: {
+      title: `GuitarTheory | ${title}`,
+      description,
+    },
   };
 }
 
@@ -106,11 +115,32 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   const diatonicChords = getDiatonicChords(modeIntervals, rootNote);
   const diatonicTriads = getDiatonicTriads(modeIntervals, rootNote);
 
+  const modeTitle = modeData.pageTitle ?? modeData.displayName;
+
   return (
     <div>
-      <h1 className={system.showModeInfo ? 'mb-1' : 'mb-4'}>
-        {modeData.pageTitle ?? modeData.displayName}
-      </h1>
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Scales', path: '/scale' },
+          {
+            name: modeTitle,
+            path: `/scale/${system.slug}/${modeData.slug}`,
+          },
+        ])}
+      />
+      <JsonLd
+        data={definedTerm({
+          name: `${modeTitle} — ${system.displayName}`,
+          description: modeData.description,
+          termSetName: 'Guitar Scales',
+          termSetPath: '/scale',
+        })}
+      />
+      <h1 className="mb-2">{modeTitle}</h1>
+      <p className="mb-4 max-w-2xl text-sm text-fg-secondary">
+        {modeData.description}
+      </p>
       {system.showModeInfo && (
         <>
           <p className="text-sm text-gray-500">
@@ -124,6 +154,8 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
       <p className="mb-6 font-mono text-sm tracking-wider">{intervalFormula}</p>
       <ScaleViewer
         modeIntervals={modeIntervals}
+        modeTitle={modeTitle}
+        patternKind={system.slug === 'pentatonic' ? 'scale' : 'mode'}
         rootNote={rootNote}
         rootPc={rootPc}
         position={position}

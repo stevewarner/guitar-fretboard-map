@@ -1,10 +1,13 @@
 import { Metadata } from 'next';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbList } from '@/app/utils/structuredData';
 
 export const metadata: Metadata = {
   title: 'Intro to Intervals',
   description:
     'Introduction to the intervals of the major scale and chromatic scale',
+  alternates: { canonical: '/lesson/intervals' },
   openGraph: {
     title: 'GuitarTheory | Intro to Intervals',
     description:
@@ -15,6 +18,13 @@ export const metadata: Metadata = {
 const Intervals = () => {
   return (
     <>
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Lessons', path: '/lesson' },
+          { name: 'Intro to Intervals', path: '/lesson/intervals' },
+        ])}
+      />
       <div className="flex flex-col items-center">
         <h1 className="mb-4">Intro to intervals</h1>
 
@@ -24,7 +34,13 @@ const Intervals = () => {
           intervals)
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Fretboard numFrets={4} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={4}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Major scale intervals, position 1"
+          >
             <Pattern
               tab={[[2, 4], [1, 2, 4], [1, 3, 4], [], [], []]}
               intervals={[[1, 2], [3, 4, 5], [6, 7, 1], [], [], []]}
@@ -32,7 +48,13 @@ const Intervals = () => {
             />
           </Fretboard>
 
-          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={5}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Major scale intervals, position 2"
+          >
             <Pattern
               tab={[[1, 3, 5], [1, 3, 5], [2, 3], [], [], []]}
               intervals={[[1, 2, 3], [4, 5, 6], [7, 1], [], [], []]}
@@ -44,7 +66,13 @@ const Intervals = () => {
         <h2>Chromatic scale</h2>
         <p>The chromatic scale consists of all 12 notes</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={5}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Chromatic scale intervals, position 1"
+          >
             <Pattern
               tab={[[2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4], [], [], []]}
               intervals={[
@@ -59,7 +87,13 @@ const Intervals = () => {
             />
           </Fretboard>
 
-          <Fretboard numFrets={5} startFret={1} height={400} width={400}>
+          <Fretboard
+            numFrets={5}
+            startFret={1}
+            height={400}
+            width={400}
+            title="Chromatic scale intervals, position 2"
+          >
             <Pattern
               tab={[[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3], [], [], []]}
               intervals={[
