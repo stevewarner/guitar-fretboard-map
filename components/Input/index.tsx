@@ -20,6 +20,7 @@ export const Input = ({
 }: InputProps & InputHTMLAttributes<HTMLInputElement>) => {
   const [error, setError] = useState(false);
   const [showErrorText, setShowErrorText] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const ref = useRef<HTMLInputElement>(null);
   const generatedId = useId();
@@ -27,7 +28,8 @@ export const Input = ({
   const helpId = `${inputId}-help`;
   const errorId = `${inputId}-error`;
   const describedBy =
-    [helpText && helpId, showErrorText && errorId].filter(Boolean).join(' ') || undefined;
+    [helpText && helpId, showErrorText && errorId].filter(Boolean).join(' ') ||
+    undefined;
 
   useEffect(() => {
     if (error && ref.current?.validity.valid) {
@@ -55,6 +57,7 @@ export const Input = ({
           aria-invalid={error || undefined}
           aria-describedby={describedBy}
           onChange={(event) => {
+            setIsDirty(true);
             if (event.target.validity.valid) {
               setError(false);
               setShowErrorText(false);
@@ -67,6 +70,7 @@ export const Input = ({
             }
           }}
           onBlur={(event) => {
+            if (!isDirty) return;
             if (!error) {
               if (!event.target.validity.valid) {
                 ref.current?.select();
@@ -87,7 +91,11 @@ export const Input = ({
       )}
       {showErrorText && (
         <p id={errorId} role="alert" className="mt-2 text-sm text-error">
-          {errorText ? `Error: ${errorText}` : 'Please enter a valid value.'}
+          {errorText
+            ? `Error: ${errorText}`
+            : required
+              ? `${label} is required`
+              : 'Please enter a valid value.'}
         </p>
       )}
     </>

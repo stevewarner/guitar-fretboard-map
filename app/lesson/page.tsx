@@ -1,32 +1,5 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Lessons',
-  description:
-    'Introduction to music theory for guitarists. Interactive fretboard charts and diagrams.',
-  openGraph: {
-    title: 'GuitarTheory | Lessons',
-    description:
-      'Introduction to music theory for guitarists. Interactive fretboard charts and diagrams.',
-  },
-  alternates: { canonical: '/lesson' },
-};
-
-const Lessons = () => {
-  return (
-    <>
-      <div className="flex flex-col items-center">
-        <h1 className="mb-4">Lessons</h1>
-        <Link href="/lesson/intervals">Intro to intervals</Link>
-        <Link href="/lesson/movable-shapes">Movable chord shapes</Link>
-        <Link href="/lesson/intro-pentatonic-scale">
-          Intro to pentatonic scale
-        </Link>
-        <Link href="/lesson/4-note-voicing">4 note voicing intro</Link>
-      </div>
-    </>
-  );
-};
-
-export default Lessons;
+export default function LessonsPage() {
+  redirect('/lesson/intervals');
+}

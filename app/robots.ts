@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/chord/new', '/print'],
+      disallow: ['/print'],
     },
     sitemap: 'https://www.guitartheory.app/sitemap.xml',
   };

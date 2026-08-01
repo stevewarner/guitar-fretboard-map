@@ -2,7 +2,10 @@ import { STANDARD_TUNING_PC, INTERVAL_LABELS } from '@/app/utils/constants';
 import { spellScale } from '@/app/utils/noteSpelling';
 
 // Rotate parent scale intervals to derive a mode starting at the given degree.
-export function getModeIntervals(parentIntervals: number[], degree: number): number[] {
+export function getModeIntervals(
+  parentIntervals: number[],
+  degree: number,
+): number[] {
   const offset = parentIntervals[degree];
   return parentIntervals
     .map((i) => (i - offset + 12) % 12)
@@ -10,9 +13,14 @@ export function getModeIntervals(parentIntervals: number[], degree: number): num
 }
 
 // For each string, return interval labels matching the positions in scaleTab.
-export function computeIntervalTab(scaleTab: number[][], rootPc: number): string[][] {
+export function computeIntervalTab(
+  scaleTab: number[][],
+  rootPc: number,
+): string[][] {
   return STANDARD_TUNING_PC.map((openPc, stringIndex) =>
-    scaleTab[stringIndex].map((fret) => INTERVAL_LABELS[(openPc + fret - rootPc + 12) % 12])
+    scaleTab[stringIndex].map(
+      (fret) => INTERVAL_LABELS[(openPc + fret - rootPc + 12) % 12],
+    ),
   );
 }
 
@@ -139,7 +147,10 @@ export const ROOT_STRINGS: RootString[] = [6, 5, 4];
 export const ROOT_FINGERS: RootFinger[] = [0, 1, 2, 3, 4];
 export const DEFAULT_POSITION: ScalePosition = { rootString: 6, rootFinger: 1 };
 
-export function isValidPosition(position: ScalePosition, rootPc: number): boolean {
+export function isValidPosition(
+  position: ScalePosition,
+  rootPc: number,
+): boolean {
   return computePositionWindow(position, rootPc) !== null;
 }
 
@@ -159,12 +170,21 @@ export function deriveScaleRender(
   rootPc: number,
   position: ScalePosition,
 ) {
-  const { startFret: rawStartFret, numFrets } = computePositionWindow(position, rootPc)!;
+  const { startFret: rawStartFret, numFrets } = computePositionWindow(
+    position,
+    rootPc,
+  )!;
 
   // If the window starts at 0 but no notes land on open strings, shift up to 1
   // so the chart doesn't show an empty open-string area above the nut.
-  const rawScaleTab = computeScaleTab(modeIntervals, rootPc, rawStartFret, numFrets);
-  const hasOpenNotes = rawStartFret === 0 && rawScaleTab.some((frets) => frets.includes(0));
+  const rawScaleTab = computeScaleTab(
+    modeIntervals,
+    rootPc,
+    rawStartFret,
+    numFrets,
+  );
+  const hasOpenNotes =
+    rawStartFret === 0 && rawScaleTab.some((frets) => frets.includes(0));
   const startFret = rawStartFret === 0 && !hasOpenNotes ? 1 : rawStartFret;
   const patternStartFret = Math.max(1, startFret);
 
@@ -211,14 +231,56 @@ export function deriveScaleRender(
 }
 
 export interface DiatonicChord {
-  degree: number;        // 1–7
-  romanNumeral: string;  // 'I', 'ii', 'III', etc. — case reflects chord quality
-  quality: string;       // 'maj7', 'm7', '7', 'm7b5', 'dim7', 'mMaj7', 'maj7#5', '7#5'
-  rootNote: string;      // 'C', 'C#', etc.
-  name: string;          // rootNote + quality, e.g. 'Cmaj7'
+  degree: number; // 1–7
+  romanNumeral: string; // 'I', 'ii', 'III', etc. — case reflects chord quality
+  quality: string; // 'maj7', 'm7', '7', 'm7b5', 'dim7', 'mMaj7', 'maj7#5', '7#5'
+  rootNote: string; // 'C', 'C#', etc.
+  name: string; // rootNote + quality, e.g. 'Cmaj7'
 }
 
 const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+function classifyTriad(
+  third: number,
+  fifth: number,
+): { quality: string; isMajor: boolean } | null {
+  if (third === 4 && fifth === 7) return { quality: 'maj', isMajor: true };
+  if (third === 3 && fifth === 7) return { quality: 'm', isMajor: false };
+  if (third === 3 && fifth === 6) return { quality: 'mb5', isMajor: false };
+  if (third === 4 && fifth === 8) return { quality: 'aug', isMajor: true };
+  return null;
+}
+
+export function getDiatonicTriads(
+  modeIntervals: number[],
+  tonicNote: string,
+): DiatonicChord[] | null {
+  if (modeIntervals.length !== 7) return null;
+
+  const spelled = spellScale(tonicNote, modeIntervals);
+
+  return modeIntervals.map((rootInterval, i): DiatonicChord => {
+    const third = (modeIntervals[(i + 2) % 7] - rootInterval + 12) % 12;
+    const fifth = (modeIntervals[(i + 4) % 7] - rootInterval + 12) % 12;
+
+    const classified = classifyTriad(third, fifth);
+    const quality = classified?.quality ?? '?';
+    const isMajor = classified?.isMajor ?? false;
+
+    const numeral = isMajor
+      ? ROMAN_NUMERALS[i]
+      : ROMAN_NUMERALS[i].toLowerCase();
+    const rootNote = spelled[i];
+
+    return {
+      degree: i + 1,
+      romanNumeral: numeral,
+      quality,
+      rootNote,
+      name: `${rootNote}${quality === 'maj' ? '' : quality}`,
+    };
+  });
+}
 
 // Classify a 7th chord from semitone intervals (3rd, 5th, 7th) above the root.
 // Returns null for combinations that don't match a common 7th-chord quality.
@@ -227,14 +289,22 @@ function classify7thChord(
   fifth: number,
   seventh: number,
 ): { quality: string; isMajor: boolean } | null {
-  if (third === 4 && fifth === 7 && seventh === 11) return { quality: 'maj7', isMajor: true };
-  if (third === 4 && fifth === 7 && seventh === 10) return { quality: '7', isMajor: true };
-  if (third === 3 && fifth === 7 && seventh === 10) return { quality: 'm7', isMajor: false };
-  if (third === 3 && fifth === 6 && seventh === 10) return { quality: 'm7b5', isMajor: false };
-  if (third === 3 && fifth === 6 && seventh === 9) return { quality: 'dim7', isMajor: false };
-  if (third === 3 && fifth === 7 && seventh === 11) return { quality: 'mMaj7', isMajor: false };
-  if (third === 4 && fifth === 8 && seventh === 11) return { quality: 'maj7#5', isMajor: true };
-  if (third === 4 && fifth === 8 && seventh === 10) return { quality: '7#5', isMajor: true };
+  if (third === 4 && fifth === 7 && seventh === 11)
+    return { quality: 'maj7', isMajor: true };
+  if (third === 4 && fifth === 7 && seventh === 10)
+    return { quality: '7', isMajor: true };
+  if (third === 3 && fifth === 7 && seventh === 10)
+    return { quality: 'm7', isMajor: false };
+  if (third === 3 && fifth === 6 && seventh === 10)
+    return { quality: 'm7b5', isMajor: false };
+  if (third === 3 && fifth === 6 && seventh === 9)
+    return { quality: 'dim7', isMajor: false };
+  if (third === 3 && fifth === 7 && seventh === 11)
+    return { quality: 'mMaj7', isMajor: false };
+  if (third === 4 && fifth === 8 && seventh === 11)
+    return { quality: 'maj7#5', isMajor: true };
+  if (third === 4 && fifth === 8 && seventh === 10)
+    return { quality: '7#5', isMajor: true };
   return null;
 }
 
@@ -258,7 +328,9 @@ export function getDiatonicChords(
     const quality = classified?.quality ?? '?';
     const isMajor = classified?.isMajor ?? false;
 
-    const numeral = isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase();
+    const numeral = isMajor
+      ? ROMAN_NUMERALS[i]
+      : ROMAN_NUMERALS[i].toLowerCase();
     const rootNote = spelled[i];
 
     return {

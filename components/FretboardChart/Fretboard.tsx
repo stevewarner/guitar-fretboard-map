@@ -14,6 +14,7 @@ interface FretboardProps {
   startFret?: number;
   title?: string;
   fingerLabels?: string[];
+  showFretLabel?: boolean;
 }
 
 export const Fretboard = ({
@@ -22,6 +23,7 @@ export const Fretboard = ({
   startFret,
   title = '',
   fingerLabels,
+  showFretLabel = true,
   ...rest
 }: FretboardProps & SVGProps<SVGSVGElement>) => {
   return (
@@ -83,7 +85,7 @@ export const Fretboard = ({
         ) : null,
       )}
 
-      {startFret && startFret > 1 && (
+      {showFretLabel && startFret && startFret > 1 && (
         <text
           x={strHeight * numStrings + stroke / 2 + topSpace / 1.5}
           y={topSpace + topSpace / 2 + fontSize / 3}

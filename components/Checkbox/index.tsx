@@ -3,9 +3,19 @@ interface CheckboxProps {
   label: string;
   isChecked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // Include when the checkbox needs to participate in native form submission
+  // (e.g. a `useActionState` form action reading FormData). Without a name,
+  // a checkbox's checked state never appears in FormData at all.
+  name?: string;
 }
 
-export const Checkbox = ({ id, label, isChecked, onChange }: CheckboxProps) => (
+export const Checkbox = ({
+  id,
+  label,
+  isChecked,
+  onChange,
+  name,
+}: CheckboxProps) => (
   <>
     <label
       htmlFor={id}
@@ -15,7 +25,9 @@ export const Checkbox = ({ id, label, isChecked, onChange }: CheckboxProps) => (
       <div className="relative">
         <input
           id={id}
+          name={name}
           type="checkbox"
+          value="true"
           checked={isChecked}
           onChange={onChange}
           className="peer sr-only"
@@ -26,7 +38,7 @@ export const Checkbox = ({ id, label, isChecked, onChange }: CheckboxProps) => (
           }`}
         ></div>
         <div
-          className={`absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface transition ${
+          className={`absolute left-1 top-1 flex size-6 items-center justify-center rounded-full bg-surface transition ${
             isChecked ? 'translate-x-full' : ''
           }`}
         ></div>

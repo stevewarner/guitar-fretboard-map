@@ -8,6 +8,7 @@ import {
   isValidPosition,
   getValidFingersForString,
   getDiatonicChords,
+  getDiatonicTriads,
   ROOT_STRINGS,
   ROOT_FINGERS,
   DEFAULT_POSITION,
@@ -18,11 +19,11 @@ import {
 import { getOrdinal } from '@/app/utils';
 import { ScaleViewer } from '@/modules/scale/ScaleViewer';
 import { ModeChords } from '@/modules/scale/ModeChords';
-import { ChordType } from '@/types';
+import { PentatonicBoxChart } from '@/modules/scale/PentatonicBoxChart';
 
 type Props = {
   params: Promise<{ system: string; mode: string }>;
-  searchParams: Promise<{ key?: string; string?: string; position?: string }>;
+  searchParams: Promise<{ root?: string; string?: string; position?: string }>;
 };
 
 export function generateStaticParams() {
@@ -66,7 +67,8 @@ function parsePosition(
   if (isValidPosition(requested, rootPc)) return requested;
 
   const validFingers = getValidFingersForString(rootString, rootPc);
-  if (validFingers.length > 0) return { rootString, rootFinger: validFingers[0] };
+  if (validFingers.length > 0)
+    return { rootString, rootFinger: validFingers[0] };
   return DEFAULT_POSITION;
 }
 
@@ -86,50 +88,59 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
 
   const parentIntervals = rows[0].intervals as number[];
   const modeIntervals = getModeIntervals(parentIntervals, modeData.degree);
-  const intervalFormula = modeIntervals.map((i) => INTERVAL_LABELS[i]).join('  ');
-  const quality = modeIntervals.includes(4) && !modeIntervals.includes(3)
-    ? 'Major'
-    : modeIntervals.includes(3)
-    ? 'Minor'
-    : null;
+  const intervalFormula = modeIntervals
+    .map((i) => INTERVAL_LABELS[i])
+    .join('  ');
+  const quality =
+    modeIntervals.includes(4) && !modeIntervals.includes(3)
+      ? 'Major'
+      : modeIntervals.includes(3)
+        ? 'Minor'
+        : null;
 
-  const rootNote = parseRootNote(sp.key);
+  const rootNote = parseRootNote(sp.root);
   const rootPc = NOTE_TO_PC[rootNote];
   const position = parsePosition(sp.string, sp.position, rootPc);
   const degree = modeData.degree + 1;
 
   const diatonicChords = getDiatonicChords(modeIntervals, rootNote);
-  let chordData: ChordType[] = [];
-  if (diatonicChords) {
-    const lowerNames = diatonicChords.map((c) => c.name.toLowerCase());
-    const { rows: chordRows } = await sql.query<ChordType>(
-      'SELECT * FROM chords WHERE LOWER(name) = ANY($1::text[])',
-      [lowerNames],
-    );
-    chordData = chordRows;
-  }
+  const diatonicTriads = getDiatonicTriads(modeIntervals, rootNote);
 
   return (
     <div>
-      <h1 className={system.showModeInfo ? 'mb-1' : 'mb-4'}>{modeData.pageTitle ?? modeData.displayName}</h1>
+      <h1 className={system.showModeInfo ? 'mb-1' : 'mb-4'}>
+        {modeData.pageTitle ?? modeData.displayName}
+      </h1>
       {system.showModeInfo && (
         <>
           <p className="text-sm text-gray-500">
-            {degree}{getOrdinal(degree)} mode of the {system.displayName} scale
+            {degree}
+            {getOrdinal(degree)} mode of the {system.displayName} scale
           </p>
-          <p className="text-sm text-gray-500 mb-4">{quality}</p>
+          <p className="mb-4 text-sm text-gray-500">{quality}</p>
         </>
       )}
-      <p className="text-sm font-medium mb-1">Intervals</p>
-      <p className="font-mono text-sm mb-6 tracking-wider">{intervalFormula}</p>
+      <p className="mb-1 text-sm font-medium">Intervals</p>
+      <p className="mb-6 font-mono text-sm tracking-wider">{intervalFormula}</p>
       <ScaleViewer
         modeIntervals={modeIntervals}
         rootNote={rootNote}
         rootPc={rootPc}
         position={position}
       />
-      {diatonicChords && (
-        <ModeChords chords={diatonicChords} chordData={chordData} />
+      {system.slug === 'pentatonic' && (
+        <PentatonicBoxChart
+          rootPc={rootPc}
+          modeIntervals={modeIntervals}
+          rootString={position.rootString}
+        />
+      )}
+      {diatonicChords && diatonicTriads && (
+        <ModeChords
+          triads={diatonicTriads}
+          sevenths={diatonicChords}
+          rootPc={rootPc}
+        />
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { Fretboard, Pattern } from '@/components/FretboardChart';
-import { ScaleControls } from '@/modules/scale/ScaleControls';
+import { PositionControls } from '@/components/PositionControls';
 import {
   deriveScaleRender,
   type ScalePosition,
@@ -12,12 +12,21 @@ interface ScaleViewerProps {
   position: ScalePosition;
 }
 
-export function ScaleViewer({ modeIntervals, rootNote, rootPc, position }: ScaleViewerProps) {
+export function ScaleViewer({
+  modeIntervals,
+  rootNote,
+  rootPc,
+  position,
+}: ScaleViewerProps) {
   const render = deriveScaleRender(modeIntervals, rootPc, position);
 
   return (
     <div>
-      <ScaleControls rootNote={rootNote} rootPc={rootPc} position={position} />
+      <PositionControls
+        rootNote={rootNote}
+        rootPc={rootPc}
+        position={position}
+      />
 
       <div className="w-64">
         <Fretboard
