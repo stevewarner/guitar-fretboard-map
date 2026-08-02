@@ -64,17 +64,45 @@ type Props = {
   }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// "Cmaj7" is the dominant real search form (guitartheory.app GSC data shows
+// it beats "C maj7" / "C major 7" by roughly 250:1) but "C Major 7th" still
+// matters for semantic/voice-search variants — pairing both in one string
+// covers each without reading as keyword stuffing.
+function buildChordDisplayNames(
+  rootNote: string,
+  symbol: string,
+  fullName: string,
+): { compactName: string; title: string; description: string } {
+  const compactName = `${rootNote}${symbol}`;
+  const spelledName = `${rootNote} ${fullName}`;
+  return {
+    compactName,
+    title: `${compactName} (${spelledName})`,
+    description: `${compactName} guitar chord shapes — ${spelledName}, in every position on the fretboard.`,
+  };
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Props): Promise<Metadata> {
   const { quality } = await params;
+  const sp = await searchParams;
   const symbol = decodeURIComponent(quality);
   const qualityMeta = await getQualityBySymbol(symbol);
   if (!qualityMeta) return {};
-  const title = qualityMeta.full_name;
-  const description = `Guitar chord shapes for ${qualityMeta.full_name} (${symbol}) in all keys and positions.`;
+  const rootNote = parseRootNote(sp.root);
+  const { title, description } = buildChordDisplayNames(
+    rootNote,
+    symbol,
+    qualityMeta.full_name,
+  );
   return {
     title,
     description,
-    alternates: { canonical: `/chord/${encodeURIComponent(symbol)}` },
+    alternates: {
+      canonical: `/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(rootNote)}`,
+    },
     openGraph: {
       title: `GuitarTheory | ${title}`,
       description,
@@ -162,6 +190,11 @@ export default async function ChordQualityPage({
   const rootNote = parseRootNote(sp.root);
   const rootPc = parseNote(rootNote).pc;
   const position = parsePosition(sp.string, sp.position, rootPc);
+  const {
+    compactName,
+    title: rootAwareTitle,
+    description: chordDescription,
+  } = buildChordDisplayNames(rootNote, symbol, fullName);
 
   // A moveable shape is valid at a given root unless it's root-restricted:
   //   - it has its own open_chords entries → valid ONLY at those roots (an
@@ -336,9 +369,7 @@ export default async function ChordQualityPage({
 
   const droppedFifth = missingPcs.has(7);
   const droppedSeventh = missingPcs.has(10) || missingPcs.has(11);
-  const displayName = bassNote
-    ? `${rootNote}${symbol}/${bassNote}`
-    : `${rootNote}${symbol}`;
+  const displayName = bassNote ? `${compactName}/${bassNote}` : compactName;
   // A fixed inversion (open-position slash chord) is a variant of a specific
   // root-position shape (e.g. C/G is "open C, string 5, 3rd finger" with G
   // added in the bass) — root_string/root_finger on the inversion row are set
@@ -378,15 +409,15 @@ export default async function ChordQualityPage({
       />
       <JsonLd
         data={definedTerm({
-          name: fullName,
-          description: `Guitar chord shapes for ${fullName} (${symbol}) in all keys and positions.`,
+          name: rootAwareTitle,
+          description: chordDescription,
           termSetName: 'Guitar Chords',
           termSetPath: '/chord',
         })}
       />
       <div>
         <div>
-          <h1 className="text-2xl font-bold">{fullName}</h1>
+          <h1 className="text-2xl font-bold">{rootAwareTitle}</h1>
         </div>
         {degrees.length > 0 && qualityMeta && (
           <>
