@@ -88,7 +88,7 @@ export async function Inversions({
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium">Inversions</p>
-      <CardRow>{cards}</CardRow>
+      <CardRow label="Inversions">{cards}</CardRow>
     </div>
   );
 }

@@ -2,12 +2,20 @@ import type { ReactNode } from 'react';
 
 interface CardRowProps {
   children: ReactNode;
+  label?: string;
 }
 
-export const CardRow = ({ children }: CardRowProps) => {
+export const CardRow = ({
+  children,
+  label = 'Scrollable list',
+}: CardRowProps) => {
   return (
-    <div className="flex flex-nowrap gap-4 overflow-x-auto p-1 pb-4">
+    <section
+      className="flex flex-nowrap gap-4 overflow-x-auto p-1 pb-4"
+      tabIndex={0}
+      aria-label={label}
+    >
       {children}
-    </div>
+    </section>
   );
 };

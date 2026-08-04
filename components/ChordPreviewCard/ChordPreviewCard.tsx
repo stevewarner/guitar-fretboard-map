@@ -45,6 +45,7 @@ export function ChordPreviewCard({
         title={label}
         showFretLabel={showFretLabel}
         className="mt-1 w-full"
+        aria-hidden="true"
       >
         <Pattern tab={tab} startFret={startFret} fillColor="#000" />
       </Fretboard>

@@ -199,9 +199,18 @@ export default async function ChordQualityPage({
   // A moveable shape is valid at a given root unless it's root-restricted:
   //   - it has its own open_chords entries → valid ONLY at those roots (an
   //     alternate fingering that only makes sense open, e.g. finger=1 here).
-  //   - it has none, but a sibling (same quality + string) claims this root
-  //     via open_chords → excluded, so the two fingerings don't both show up
-  //     as selectable positions at the same root.
+  //   - it has none, but a MOVEABLE sibling at the SAME finger claims this
+  //     root via open_chords → excluded, so the two fingerings don't both
+  //     show up as selectable positions at the same root/finger. Scoped to
+  //     the same finger (not just the same string) because a shape claiming
+  //     a root at, say, finger 3 has nothing to do with an unrelated finger 1
+  //     shape — they're different positions entirely, and one ringing open
+  //     at this root must not blind-exclude the other. A FIXED sibling's
+  //     open_chords claim (e.g. a curated "open Cmaj7" shape at finger=3)
+  //     must not exclude the generic moveable shapes on other fingers either
+  //     — it only ever applies at its own root anyway — matching the
+  //     `WHERE cs.moveable = true` restriction on the sibling_claims CTE in
+  //     getShapesAtPosition/getCanonicalShapePerQuality/getAvailableFingersForRoot.
   const openRootsByShapeId = await getOpenRootsByShapeId(
     shapes.map((s) => s.id),
   );
@@ -215,8 +224,10 @@ export default async function ChordQualityPage({
       return ownOpenRoots.includes(targetRootPc);
     return !shapes.some(
       (sib) =>
+        sib.moveable &&
         sib.quality_id === s.quality_id &&
         sib.root_string === s.root_string &&
+        sib.root_finger === s.root_finger &&
         (openRootsByShapeId.get(sib.id) ?? []).includes(targetRootPc),
     );
   };

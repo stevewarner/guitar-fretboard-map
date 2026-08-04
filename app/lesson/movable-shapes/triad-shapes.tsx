@@ -7,9 +7,14 @@ export const TriadShapes = () => {
 
   return (
     <>
-      <div className="inline-flex rounded-md" role="group">
+      <div
+        className="inline-flex rounded-md"
+        role="group"
+        aria-label="Chord quality"
+      >
         <button
           type="button"
+          aria-pressed={isMajor}
           className={`${isMajor ? 'bg-fg text-fg-inverted hover:bg-gray-700' : 'hover:bg-surface-sunken'} rounded-s-lg border border-fg px-4 py-2 text-sm font-medium text-fg focus:z-10`}
           onClick={() => toggleIsMajor(true)}
         >
@@ -17,6 +22,7 @@ export const TriadShapes = () => {
         </button>
         <button
           type="button"
+          aria-pressed={!isMajor}
           className={`${!isMajor ? 'bg-fg text-fg-inverted hover:bg-gray-700' : 'hover:bg-surface-sunken'} rounded-e-lg border border-l-0 border-fg px-4 py-2 text-sm font-medium text-fg`}
           onClick={() => toggleIsMajor(false)}
         >

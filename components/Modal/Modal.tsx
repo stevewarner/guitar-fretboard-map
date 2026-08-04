@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import CloseIcon from '@/svgs/close.svg';
 import styles from './Modal.module.css';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -14,6 +14,8 @@ interface ModalProps {
 export const Modal = ({ title, onClose, content }: ModalProps) => {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -30,20 +32,50 @@ export const Modal = ({ title, onClose, content }: ModalProps) => {
     closeButtonRef.current?.focus();
   }, []);
 
+  // Hide the rest of the page from assistive technology while the modal is
+  // open — the overlay visually covers everything, but without this a
+  // screen reader's virtual cursor can still reach content underneath it.
+  // The modal isn't portaled, so instead of diffing document.body's direct
+  // children we walk up from the overlay to <body>, inert-ing siblings at
+  // every level of ancestry.
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    const hidden: Element[] = [];
+    let node: Element | null = overlay;
+    while (node && node !== document.body) {
+      const parent: Element | null = node.parentElement;
+      if (parent) {
+        Array.from(parent.children).forEach((sibling) => {
+          if (sibling !== node && !sibling.hasAttribute('inert')) {
+            sibling.setAttribute('inert', '');
+            hidden.push(sibling);
+          }
+        });
+      }
+      node = parent;
+    }
+
+    return () => {
+      hidden.forEach((el) => el.removeAttribute('inert'));
+    };
+  }, []);
+
   useFocusTrap(modalRef, true);
   useClickOutside(modalRef, onClose);
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} ref={overlayRef}>
       <div
         ref={modalRef}
         className={styles.modal}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modal-title"
+        aria-labelledby={titleId}
       >
         <div className={styles.header}>
-          <h2 id="modal-title" className={styles.title}>
+          <h2 id={titleId} className={styles.title}>
             {title}
           </h2>
 

@@ -50,7 +50,7 @@ export const SentimentInput = ({
       {options.map(({ value, label: optionLabel, icon }) => (
         <label
           key={value}
-          className={`flex size-10 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:bg-surface-sunken has-[:checked]:bg-fg has-[:checked]:text-fg-inverted has-[:focus-visible]:[outline:2px_auto_-webkit-focus-ring-color] ${optionClassName ?? ''}`}
+          className={`flex size-10 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:bg-surface-sunken has-[:checked]:bg-fg has-[:checked]:text-fg-inverted has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${optionClassName ?? ''}`}
         >
           <input
             type="radio"

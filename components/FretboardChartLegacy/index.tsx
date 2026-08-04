@@ -1,5 +1,5 @@
 'use client';
-import { useContext } from 'react';
+import { useContext, useId } from 'react';
 import { Pattern } from './Pattern';
 import { FretboardContext } from './contexts';
 import {
@@ -35,6 +35,7 @@ const Fretboard = ({
   id,
 }: Props) => {
   const base = useContext(FretboardContext);
+  const titleId = useId();
 
   const strHeight = height / (NUM_STRINGS - 1);
   const circRad = height / 20;
@@ -60,12 +61,14 @@ const Fretboard = ({
       <div className={`max-w-full overflow-x-scroll ${styles}`} tabIndex={-1}>
         <svg
           id={id}
+          role="img"
+          aria-labelledby={titleId}
           className="mx-auto my-0 overflow-visible stroke-[4]"
           strokeWidth={STROKE}
           width={fbWidth + STROKE}
           height={height + topSpace * 2 + (startFret && startFret > 1 ? 30 : 0)}
         >
-          <title>{title}</title>
+          <title id={titleId}>{title}</title>
           <rect
             x={STROKE / 2 + openFret}
             y={topSpace}

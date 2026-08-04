@@ -23,6 +23,8 @@ export const Navbar: React.FC = () => {
           <button
             className="p-2 md:hidden"
             onClick={() => setNavOpen((prev) => !prev)}
+            aria-expanded={navOpen}
+            aria-controls="nav-menu"
           >
             {navOpen ? (
               <>
@@ -67,6 +69,7 @@ export const Navbar: React.FC = () => {
         </div>
 
         <div
+          id="nav-menu"
           className={`border-t border-line-subtle pb-4 md:border-none md:pb-0 ${navOpen ? 'block' : 'hidden'} md:block`}
         >
           <ul className="space-y-1 md:flex md:items-center md:space-x-6 md:space-y-0">

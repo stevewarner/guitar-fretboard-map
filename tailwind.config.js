@@ -36,7 +36,7 @@ module.exports = {
           inverted: '#ffffff', // text-fg-inverted
         },
         // Feedback
-        success: '#16a34a',
+        success: '#15803d', // ~5:1 against white (was #16a34a at ~3.3:1, failed AA)
         error: '#dc2626',
       },
     },

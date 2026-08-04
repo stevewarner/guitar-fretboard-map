@@ -19,7 +19,7 @@ export function LessonPager() {
           href={prev.href}
           className="group flex max-w-[45%] flex-col gap-1"
         >
-          <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-widest text-fg-secondary">
             Previous
           </span>
           <span className="text-sm font-medium group-hover:underline">
@@ -34,7 +34,7 @@ export function LessonPager() {
           href={next.href}
           className="group flex max-w-[45%] flex-col items-end gap-1"
         >
-          <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-widest text-fg-secondary">
             Next
           </span>
           <span className="text-sm font-medium group-hover:underline">

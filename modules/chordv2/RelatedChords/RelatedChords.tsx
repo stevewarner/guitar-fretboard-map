@@ -114,7 +114,7 @@ export async function RelatedChords({
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium">Related chords</p>
-      <CardRow>{cards}</CardRow>
+      <CardRow label="Related chords">{cards}</CardRow>
     </div>
   );
 }

@@ -1,12 +1,12 @@
-import { SVGProps } from 'react';
+import { SVGProps, useId } from 'react';
 import {
-  fontSize,
   svgDimension,
   fbHeight,
   strHeight,
   stroke,
   topSpace,
   numStrings,
+  fontSize,
 } from './constants';
 
 interface FretboardProps {
@@ -26,23 +26,17 @@ export const Fretboard = ({
   showFretLabel = true,
   ...rest
 }: FretboardProps & SVGProps<SVGSVGElement>) => {
+  const titleId = useId();
+
   return (
     <svg
       strokeWidth={stroke}
       viewBox={`0 0 ${svgDimension} ${topSpace * (numFrets + 2)}`}
+      role="img"
+      aria-labelledby={titleId}
       {...rest}
     >
-      <title>{title}</title>
-      <text
-        x="50%"
-        y={fontSize}
-        fontFamily="Arial"
-        fontSize={fontSize}
-        textAnchor="middle"
-        className="hidden"
-      >
-        {title}
-      </text>
+      <title id={titleId}>{title}</title>
 
       {/* strings */}
       {[...Array(numStrings)].map((_, index) => (

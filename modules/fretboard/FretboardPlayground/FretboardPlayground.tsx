@@ -36,7 +36,8 @@ const INTERVAL_SEMITONES: Record<string, number> = {
   '7': 11,
 };
 
-const LABEL_CLASS = 'text-xs font-medium uppercase tracking-wide text-fg-muted';
+const LABEL_CLASS =
+  'text-xs font-medium uppercase tracking-wide text-fg-secondary';
 
 function getNoteFrets(pitchClass: number): number[][] {
   return OPEN_STRING_PCS.map((openPc) => {
@@ -101,9 +102,15 @@ export const FretboardPlayground = () => {
 
         <div className="flex basis-1/2 flex-col gap-6 px-8 pt-2">
           <div className="flex flex-col gap-1">
-            <label className={LABEL_CLASS}>Root</label>
+            <label className={LABEL_CLASS} htmlFor="root-select">
+              Root
+            </label>
             <div className="flex items-center gap-2">
-              <select value={root} onChange={(e) => setRoot(e.target.value)}>
+              <select
+                id="root-select"
+                value={root}
+                onChange={(e) => setRoot(e.target.value)}
+              >
                 {NOTE_OPTIONS.map(({ value, label }) => (
                   <option key={value} value={value}>
                     {label}
@@ -122,7 +129,7 @@ export const FretboardPlayground = () => {
             <span className={LABEL_CLASS}>Intervals</span>
             <label className="flex w-fit items-center gap-2 text-sm font-medium">
               <input type="checkbox" checked disabled />1{' '}
-              <span className="text-xs text-fg-muted">{root}</span>
+              <span className="text-xs text-fg-secondary">{root}</span>
             </label>
             {INTERVAL_KEYS.map((key) => (
               <label
@@ -142,7 +149,7 @@ export const FretboardPlayground = () => {
                       : '#4'
                   : key}
                 {intervals.has(key) && (
-                  <span className="text-xs text-fg-muted">
+                  <span className="text-xs text-fg-secondary">
                     {PC_TO_NOTE[(rootPc + INTERVAL_SEMITONES[key]) % 12]}
                   </span>
                 )}

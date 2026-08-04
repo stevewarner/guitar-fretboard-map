@@ -18,7 +18,7 @@ export function LessonsNav() {
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
       >
-        <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+        <span className="text-xs font-semibold uppercase tracking-widest text-fg-secondary">
           Lessons
         </span>
         <span className="text-xs text-gray-500">
@@ -42,7 +42,7 @@ export function LessonsNav() {
       </button>
 
       {/* Desktop label */}
-      <p className="mb-3 hidden text-xs font-semibold uppercase tracking-widest text-gray-400 md:block">
+      <p className="mb-3 hidden text-xs font-semibold uppercase tracking-widest text-fg-secondary md:block">
         Lessons
       </p>
 
@@ -54,6 +54,7 @@ export function LessonsNav() {
               <Link
                 href={href}
                 onClick={() => setOpen(false)}
+                aria-current={isActive ? 'page' : undefined}
                 className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
                   isActive
                     ? 'border-current font-medium'

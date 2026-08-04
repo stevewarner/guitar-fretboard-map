@@ -117,7 +117,7 @@ export async function getCanonicalShapePerQuality(
        FROM open_chords GROUP BY chord_shape_id
      ),
      sibling_claims AS (
-       SELECT cs.quality_id, cs.root_string, oc.root_pc
+       SELECT cs.quality_id, cs.root_string, cs.root_finger, oc.root_pc
        FROM chord_shapes cs
        JOIN open_chords oc ON oc.chord_shape_id = cs.id
        WHERE cs.moveable = true
@@ -136,7 +136,8 @@ export async function getCanonicalShapePerQuality(
                     WHEN cs.moveable = true AND so.open_roots IS NOT NULL AND $3 = ANY(so.open_roots) THEN 0
                     WHEN cs.moveable = true AND so.open_roots IS NULL AND NOT EXISTS (
                            SELECT 1 FROM sibling_claims sc
-                           WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string AND sc.root_pc = $3
+                           WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string
+                             AND sc.root_finger = cs.root_finger AND sc.root_pc = $3
                          ) THEN 0
                     ELSE 1
                   END,
@@ -165,7 +166,7 @@ export async function getCanonicalShapePerQuality(
 // getAvailableFingersForRoot: fixed shapes must match their own root_pc; a
 // moveable shape with its own open_chords entries is valid only at those
 // roots; a moveable shape with none is excluded at any root a sibling shape
-// (same quality + string) has claimed via open_chords.
+// (same quality + string + finger) has claimed via open_chords.
 export async function getShapesAtPosition(
   rootString: number,
   rootFinger: number | null,
@@ -179,7 +180,7 @@ export async function getShapesAtPosition(
        FROM open_chords GROUP BY chord_shape_id
      ),
      sibling_claims AS (
-       SELECT cs.quality_id, cs.root_string, oc.root_pc
+       SELECT cs.quality_id, cs.root_string, cs.root_finger, oc.root_pc
        FROM chord_shapes cs
        JOIN open_chords oc ON oc.chord_shape_id = cs.id
        WHERE cs.moveable = true
@@ -200,7 +201,8 @@ export async function getShapesAtPosition(
            OR (cs.moveable = true AND so.open_roots IS NOT NULL AND $3 = ANY(so.open_roots))
            OR (cs.moveable = true AND so.open_roots IS NULL AND NOT EXISTS (
                  SELECT 1 FROM sibling_claims sc
-                 WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string AND sc.root_pc = $3
+                 WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string
+                   AND sc.root_finger = cs.root_finger AND sc.root_pc = $3
                ))
          )
      )
@@ -248,9 +250,12 @@ export async function getFixedInversionsForRoot(
 //     alternate fingering (e.g. an open-position voicing that only makes
 //     sense at one root) — valid ONLY at those open roots, not everywhere.
 //   - moveable with NO open_chords entries: the general-purpose fingering —
-//     valid everywhere EXCEPT roots a sibling shape (same quality + string)
-//     has claimed via its own open_chords entry, so the two don't both
-//     appear as selectable positions at the same root.
+//     valid everywhere EXCEPT roots a sibling shape (same quality + string +
+//     finger) has claimed via its own open_chords entry, so the two don't
+//     both appear as selectable positions at the same root/finger. Sibling
+//     claims are scoped to the same finger, not just the same string — a
+//     shape claiming a root at finger 3 must not exclude an unrelated finger
+//     1 shape at that same root (they're different positions entirely).
 export async function getAvailableFingersForRoot(
   rootString: number,
   rootPc: number,
@@ -261,7 +266,7 @@ export async function getAvailableFingersForRoot(
        FROM open_chords GROUP BY chord_shape_id
      ),
      sibling_claims AS (
-       SELECT cs.quality_id, cs.root_string, oc.root_pc
+       SELECT cs.quality_id, cs.root_string, cs.root_finger, oc.root_pc
        FROM chord_shapes cs
        JOIN open_chords oc ON oc.chord_shape_id = cs.id
        WHERE cs.moveable = true
@@ -276,7 +281,8 @@ export async function getAvailableFingersForRoot(
          OR (cs.moveable = true AND so.open_roots IS NOT NULL AND $2 = ANY(so.open_roots))
          OR (cs.moveable = true AND so.open_roots IS NULL AND NOT EXISTS (
                SELECT 1 FROM sibling_claims sc
-               WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string AND sc.root_pc = $2
+               WHERE sc.quality_id = cs.quality_id AND sc.root_string = cs.root_string
+                 AND sc.root_finger = cs.root_finger AND sc.root_pc = $2
              ))
        )
      ORDER BY cs.root_finger`,

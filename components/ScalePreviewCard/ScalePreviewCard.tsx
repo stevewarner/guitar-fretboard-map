@@ -35,6 +35,7 @@ export function ScalePreviewCard({
         numFrets={render.numFrets}
         title={label}
         className="mt-1 w-full"
+        aria-hidden="true"
       >
         <Pattern
           tab={render.scaleTab}

@@ -94,7 +94,7 @@ const About = () => {
       </ul>
 
       <p className="text-sm text-fg-secondary">
-        <Link href="/feedback" className="hover:text-fg">
+        <Link href="/feedback" className="underline hover:text-fg">
           Send me a message
         </Link>{' '}
         if you have questions or feedback.

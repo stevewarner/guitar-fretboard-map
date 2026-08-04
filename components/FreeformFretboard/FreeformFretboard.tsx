@@ -74,6 +74,7 @@ export const FreeformFretboard = ({
           role="button"
           tabIndex={0}
           aria-label={`String ${6 - si}, open`}
+          aria-pressed={tab[si] === 0}
           onClick={() => onToggle(si, 0)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -100,6 +101,7 @@ export const FreeformFretboard = ({
             role="button"
             tabIndex={0}
             aria-label={`String ${6 - si}, fret ${fret}`}
+            aria-pressed={tab[si] === fret}
             onClick={() => onToggle(si, fret)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {

@@ -48,6 +48,7 @@
 .secondary {
   background-color: #f3f4f6; /* surface-sunken */
   color: #000;
+  border: 1px solid #6b7280; /* ~4.4:1 against surface-sunken, ~4.8:1 against white */
 }
 
 .secondary:not(:disabled):hover {
@@ -57,6 +58,7 @@
 .tertiary {
   background-color: #ffffff;
   color: #000;
+  border: 1px solid #6b7280; /* ~4.8:1 against white */
 }
 
 .tertiary:not(:disabled):hover {

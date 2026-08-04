@@ -44,7 +44,9 @@ export const DropdownMenu = ({
 
   const handleMenuKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
+      e.preventDefault();
       setIsOpen(false);
+      focusTrigger();
       return;
     }
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
@@ -94,7 +96,19 @@ export const DropdownMenu = ({
                     item as React.ReactElement<
                       React.HTMLAttributes<HTMLElement>
                     >,
-                    { role: 'menuitem', tabIndex: -1 },
+                    {
+                      role: 'menuitem',
+                      tabIndex: -1,
+                      onClick: (e: React.MouseEvent<HTMLElement>) => {
+                        (
+                          item as React.ReactElement<
+                            React.HTMLAttributes<HTMLElement>
+                          >
+                        ).props.onClick?.(e);
+                        setIsOpen(false);
+                        focusTrigger();
+                      },
+                    },
                   )
                 : item}
             </li>

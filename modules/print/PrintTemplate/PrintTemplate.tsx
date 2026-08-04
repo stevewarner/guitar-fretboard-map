@@ -11,7 +11,7 @@ export const PrintTemplate = () => {
   return (
     <>
       <span className="printHidden">
-        Number of chord charts:{' '}
+        <label htmlFor="numChords">Number of chord charts:</label>{' '}
         <input
           id="numChords"
           name="numChords"
