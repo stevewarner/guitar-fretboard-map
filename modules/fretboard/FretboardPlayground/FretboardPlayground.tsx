@@ -76,8 +76,8 @@ export const FretboardPlayground = () => {
         <h1>Fretboard Playground</h1>
       </div>
 
-      <div className="flex min-h-0 flex-1 gap-6 md:max-h-dvh">
-        <div className="flex min-h-0 basis-1/2 justify-center">
+      <div className="flex min-h-0 flex-1 flex-col gap-6 md:max-h-dvh md:flex-row">
+        <div className="flex min-h-0 basis-auto justify-center md:basis-1/2">
           <Fretboard
             numFrets={NUM_FRETS}
             className="h-full w-auto"
@@ -100,7 +100,7 @@ export const FretboardPlayground = () => {
           </Fretboard>
         </div>
 
-        <div className="flex basis-1/2 flex-col gap-6 px-8 pt-2">
+        <div className="flex basis-auto flex-col gap-6 px-8 pt-2 md:basis-1/2">
           <div className="flex flex-col gap-1">
             <label className={LABEL_CLASS} htmlFor="root-select">
               Root
@@ -125,11 +125,16 @@ export const FretboardPlayground = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className={LABEL_CLASS}>Intervals</span>
+          <fieldset className="flex flex-col gap-2 border-0 p-0">
+            <legend className={LABEL_CLASS}>Intervals</legend>
             <label className="flex w-fit items-center gap-2 text-sm font-medium">
-              <input type="checkbox" checked disabled />1{' '}
-              <span className="text-xs text-fg-secondary">{root}</span>
+              <input
+                type="checkbox"
+                checked
+                disabled
+                aria-label={`Root note (always included): ${root}`}
+              />
+              1 <span className="text-xs text-fg-secondary">{root}</span>
             </label>
             {INTERVAL_KEYS.map((key) => (
               <label
@@ -155,7 +160,7 @@ export const FretboardPlayground = () => {
                 )}
               </label>
             ))}
-          </div>
+          </fieldset>
         </div>
       </div>
     </div>

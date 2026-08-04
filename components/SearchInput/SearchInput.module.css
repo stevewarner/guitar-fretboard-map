@@ -36,13 +36,17 @@
 .clearButton {
   position: absolute;
   display: flex;
-  right: 8px;
+  align-items: center;
+  justify-content: center;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   background: none;
   border: none;
   padding: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
 }
 
 .clearButton:hover {

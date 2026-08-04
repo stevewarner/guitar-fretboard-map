@@ -31,7 +31,7 @@ const About = () => {
         the neck.
       </p>
 
-      <p className="mb-2 text-sm font-medium">Learn</p>
+      <h2 className="mb-2 text-sm font-medium">Learn</h2>
       <ul className="mb-6 flex flex-col gap-1">
         <li>
           <Link
@@ -62,7 +62,7 @@ const About = () => {
         </li>
       </ul>
 
-      <p className="mb-2 text-sm font-medium">Tools</p>
+      <h2 className="mb-2 text-sm font-medium">Tools</h2>
       <ul className="mb-8 flex flex-col gap-1">
         <li>
           <Link

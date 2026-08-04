@@ -165,10 +165,18 @@ export function FreeformChordIdentifier() {
         {isPending ? 'Checking…' : 'Check'}
       </button>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       {checked && (
-        <div className="mt-6 flex flex-col gap-4">
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-6 flex flex-col gap-4"
+        >
           {exactMatches.length === 0 && suggestMatches.length === 0 && (
             <p className="text-sm text-fg-secondary">No match found</p>
           )}

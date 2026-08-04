@@ -150,8 +150,9 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
           <p className="mb-4 text-sm text-gray-500">{quality}</p>
         </>
       )}
-      <p className="mb-1 text-sm font-medium">Intervals</p>
+      <h2 className="mb-1 text-sm font-medium">Intervals</h2>
       <p className="mb-6 font-mono text-sm tracking-wider">{intervalFormula}</p>
+      <h2 className="mb-1 text-sm font-medium">Diagram</h2>
       <ScaleViewer
         modeIntervals={modeIntervals}
         modeTitle={modeTitle}
@@ -161,11 +162,14 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
         position={position}
       />
       {system.slug === 'pentatonic' && (
-        <PentatonicBoxChart
-          rootPc={rootPc}
-          modeIntervals={modeIntervals}
-          rootString={position.rootString}
-        />
+        <>
+          <h2 className="mb-1 mt-4 text-sm font-medium">Pentatonic Pattern</h2>
+          <PentatonicBoxChart
+            rootPc={rootPc}
+            modeIntervals={modeIntervals}
+            rootString={position.rootString}
+          />
+        </>
       )}
       {diatonicChords && diatonicTriads && (
         <ModeChords

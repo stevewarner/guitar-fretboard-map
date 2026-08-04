@@ -1,6 +1,6 @@
 import { strHeight, topSpace, stroke, circRad } from './constants';
 import { TabProp } from '@/types';
-import { getContrastColor } from '@/app/utils';
+import { getContrastColor, needsContrastFallback } from '@/app/utils';
 
 interface PatternProps {
   tab: TabProp;
@@ -28,6 +28,16 @@ export const Pattern = ({
   const textFill = (isOpen: boolean) =>
     isOpen && !fillOpen ? '#000' : getContrastColor(fillColor);
 
+  // When the fill color is a mid-tone that can't reach 4.5:1 contrast with
+  // either black or white text, add a thin opposite-color outline so the
+  // label stays legible regardless (e.g. user-chosen colors in the
+  // fretboard playground).
+  const textOutline = (isOpen: boolean) => {
+    if (isOpen && !fillOpen) return undefined;
+    if (!needsContrastFallback(fillColor)) return undefined;
+    return getContrastColor(fillColor) === '#fff' ? '#000' : '#fff';
+  };
+
   const renderDot = (
     key: string,
     cx: number,
@@ -50,9 +60,12 @@ export const Pattern = ({
           x={cx}
           y={cy + circRad / 3}
           fontFamily="Arial"
-          fontSize={circRad}
+          fontSize={circRad * 1.3}
           textAnchor="middle"
           fill={textFill(isOpen)}
+          stroke={textOutline(isOpen)}
+          strokeWidth={textOutline(isOpen) ? 0.4 : undefined}
+          paintOrder="stroke"
         >
           {label}
         </text>

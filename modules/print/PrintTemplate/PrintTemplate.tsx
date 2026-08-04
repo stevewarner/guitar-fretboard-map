@@ -30,7 +30,13 @@ export const PrintTemplate = () => {
       >
         {[...Array(numChords)].map((_, index) => (
           <div key={index} className={styles.chordChart}>
-            <Fretboard numFrets={4} startFret={0} height={200} width={200} />
+            <Fretboard
+              numFrets={4}
+              startFret={0}
+              height={200}
+              width={200}
+              title={`Blank chord chart ${index + 1}`}
+            />
           </div>
         ))}
       </div>

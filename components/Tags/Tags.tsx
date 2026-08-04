@@ -13,12 +13,12 @@ export function Tags({ tags }: Props) {
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-3">
       {tags.map((tag) => (
         <Link
           key={tag.label}
           href={tag.href}
-          className="rounded-full bg-black px-3 py-1 text-xs font-bold text-white"
+          className="rounded-full bg-black px-3 py-1.5 text-xs font-bold text-white"
         >
           {tag.label}
         </Link>

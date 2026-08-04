@@ -13,6 +13,7 @@ export const DropdownMenu = ({
   menuContents,
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [focusOnOpen, setFocusOnOpen] = useState<'first' | 'last'>('first');
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerWrapperRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -39,8 +40,11 @@ export const DropdownMenu = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [isOpen]);
+    const items =
+      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
+    if (!items || items.length === 0) return;
+    (focusOnOpen === 'last' ? items[items.length - 1] : items[0]).focus();
+  }, [isOpen, focusOnOpen]);
 
   const handleMenuKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
@@ -49,12 +53,24 @@ export const DropdownMenu = ({
       focusTrigger();
       return;
     }
-    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
 
-    e.preventDefault();
     const items = Array.from(
       menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
     );
+
+    if (e.key === 'Home') {
+      e.preventDefault();
+      items[0]?.focus();
+      return;
+    }
+    if (e.key === 'End') {
+      e.preventDefault();
+      items[items.length - 1]?.focus();
+      return;
+    }
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+
+    e.preventDefault();
     const currentIndex = items.indexOf(document.activeElement as HTMLElement);
 
     if (e.key === 'ArrowDown') {
@@ -71,6 +87,17 @@ export const DropdownMenu = ({
         >,
         {
           onClick: () => setIsOpen((prev) => !prev),
+          onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setFocusOnOpen('first');
+              setIsOpen(true);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setFocusOnOpen('last');
+              setIsOpen(true);
+            }
+          },
           'aria-haspopup': 'menu' as const,
           'aria-expanded': isOpen,
           'aria-controls': menuId,
@@ -107,6 +134,24 @@ export const DropdownMenu = ({
                         ).props.onClick?.(e);
                         setIsOpen(false);
                         focusTrigger();
+                      },
+                      onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                        const typedItem = item as React.ReactElement<
+                          React.HTMLAttributes<HTMLElement>
+                        >;
+                        const isNativelyActivatable =
+                          typedItem.type === 'button' || typedItem.type === 'a';
+                        if (
+                          !isNativelyActivatable &&
+                          (e.key === 'Enter' || e.key === ' ')
+                        ) {
+                          e.preventDefault();
+                          typedItem.props.onClick?.(
+                            e as unknown as React.MouseEvent<HTMLElement>,
+                          );
+                          setIsOpen(false);
+                          focusTrigger();
+                        }
                       },
                     },
                   )

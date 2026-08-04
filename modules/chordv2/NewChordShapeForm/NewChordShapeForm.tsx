@@ -283,6 +283,7 @@ export const NewChordShapeForm = ({ qualities }: Props) => {
             startFret={previewStartFret}
             width={200}
             height={200}
+            title={`Preview: ${selectedQuality?.full_name ?? 'chord shape'}`}
           >
             <Pattern
               tab={previewTab}

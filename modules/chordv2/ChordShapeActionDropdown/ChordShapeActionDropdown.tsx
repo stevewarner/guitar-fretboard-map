@@ -31,7 +31,7 @@ export const ChordShapeActionDropdown = ({
     <>
       <DropdownMenu
         triggerElement={
-          <button className="flex items-center gap-2 border-none p-2">
+          <button className="flex min-h-11 min-w-11 items-center justify-center gap-2 border-none p-2">
             <span className="sr-only">Open options menu</span>
             <EllipsisIcon aria-hidden="true" height={20} width={20} />
           </button>

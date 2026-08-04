@@ -432,7 +432,7 @@ export default async function ChordQualityPage({
         </div>
         {degrees.length > 0 && qualityMeta && (
           <>
-            <p className="mb-1 mt-4 text-sm font-medium">Intervals</p>
+            <h2 className="mb-1 mt-4 text-sm font-medium">Intervals</h2>
             <p className="font-mono text-sm tracking-wider">
               {qualityMeta.intervals
                 .map((interval, i) => {
@@ -447,7 +447,7 @@ export default async function ChordQualityPage({
         )}
         {degrees.length > 0 && qualityMeta && (
           <>
-            <p className="mb-1 mt-4 text-sm font-medium">Notes</p>
+            <h2 className="mb-1 mt-4 text-sm font-medium">Notes</h2>
             <p className="font-mono text-sm tracking-wider">
               {qualityMeta.intervals
                 .map((interval, i) => {
@@ -464,7 +464,7 @@ export default async function ChordQualityPage({
         {transposed && (
           <>
             <div className="mb-1 mt-4 flex items-center gap-2">
-              <p className="text-sm font-medium">Tab</p>
+              <h2 className="text-sm font-medium">Tab</h2>
               <span className="text-xs text-fg-secondary">
                 {droppedFifth && 'no 5'}
                 {droppedFifth && droppedSeventh && ' · '}
@@ -472,7 +472,7 @@ export default async function ChordQualityPage({
               </span>
             </div>
             <p className="font-mono text-sm">
-              {JSON.stringify(transposed.tab)}
+              {transposed.tab.map((v) => (v === undefined ? '' : v)).join('-')}
             </p>
           </>
         )}

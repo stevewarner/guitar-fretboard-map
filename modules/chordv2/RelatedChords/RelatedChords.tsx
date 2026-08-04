@@ -113,8 +113,8 @@ export async function RelatedChords({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium">Related chords</p>
-      <CardRow label="Related chords">{cards}</CardRow>
+      <h2 className="text-sm font-medium">Related chords</h2>
+      <CardRow>{cards}</CardRow>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import Link from 'next/link';
 
 const PageNotFound: NextPage = () => {
   return (
@@ -21,6 +22,10 @@ const PageNotFound: NextPage = () => {
         </svg>
 
         <h1 className="text-9xl font-bold">404</h1>
+        <p className="text-lg text-fg-secondary">Page not found</p>
+        <Link href="/" className="mt-4 underline hover:text-fg">
+          Go back home
+        </Link>
       </div>
     </>
   );

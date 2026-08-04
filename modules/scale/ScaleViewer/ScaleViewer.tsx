@@ -37,6 +37,10 @@ export function ScaleViewer({
         position={position}
       />
 
+      <p className="sr-only" aria-live="polite">
+        {`Showing ${modeTitle} ${patternKind} in ${rootNote}, string ${position.rootString}, position ${position.rootFinger}`}
+      </p>
+
       <div className="w-64">
         <Fretboard
           numFrets={render.numFrets}

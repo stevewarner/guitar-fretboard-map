@@ -150,7 +150,7 @@ export default async function Home() {
             </Link>
             <Link href="/about" className="font-semibold leading-6">
               <span className="flex items-center gap-1">
-                Learn more
+                Learn more about GuitarTheory
                 <ChevronRightIcon height={16} width={16} aria-hidden="true" />
               </span>
             </Link>
@@ -227,7 +227,7 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <h3>Open Chords</h3>
-          <CardRow label="Open Chords">
+          <CardRow>
             {openChordCards.map((chord) => (
               <ChordPreviewCard
                 key={chord.label}
@@ -243,7 +243,7 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <h3>Triad Chords</h3>
-          <CardRow label="Triad Chords">
+          <CardRow>
             {triadChordCards.map((chord) => (
               <ChordPreviewCard
                 key={chord.label}
@@ -259,7 +259,7 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <h3>Seventh Chords</h3>
-          <CardRow label="Seventh Chords">
+          <CardRow>
             {seventhChordCards.map((chord) => (
               <ChordPreviewCard
                 key={chord.label}
@@ -285,7 +285,7 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <h3>Modes of the Major Scale</h3>
-          <CardRow label="Modes of the Major Scale">
+          <CardRow>
             {MAJOR_SCALE_MODES.map((mode) => (
               <ScalePreviewCard
                 key={mode.slug}
@@ -303,7 +303,7 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <h3>Pentatonic Scale</h3>
-          <CardRow label="Pentatonic Scale">
+          <CardRow>
             {PENTATONIC_SCALES.map((scale) => (
               <ScalePreviewCard
                 key={scale.slug}

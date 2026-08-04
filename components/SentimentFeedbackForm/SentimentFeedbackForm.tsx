@@ -1,5 +1,5 @@
 'use client';
-import { useActionState } from 'react';
+import { useActionState, useId } from 'react';
 import { Button } from '@/components/Button';
 import { SentimentInput } from '@/components/SentimentInput';
 import { TextArea } from '@/components/TextArea';
@@ -41,6 +41,7 @@ export const SentimentFeedbackForm = ({
     action,
     initialState,
   );
+  const errorId = useId();
 
   if (formState.success) {
     return (
@@ -56,7 +57,12 @@ export const SentimentFeedbackForm = ({
 
   return (
     <form action={formAction} className="flex w-full flex-col gap-6">
-      <SentimentInput name="sentiment" label={sentimentLabel} />
+      <SentimentInput
+        name="sentiment"
+        label={sentimentLabel}
+        required
+        aria-describedby={formState.message ? errorId : undefined}
+      />
 
       <TextArea
         name="description"
@@ -72,7 +78,11 @@ export const SentimentFeedbackForm = ({
       </Button>
 
       {formState.message && (
-        <p role="alert" className="flex items-center gap-2 text-sm text-error">
+        <p
+          id={errorId}
+          role="alert"
+          className="flex items-center gap-2 text-sm text-error"
+        >
           <InfoCircleIcon aria-hidden="true" height={16} width={16} />
           {formState.message}
         </p>

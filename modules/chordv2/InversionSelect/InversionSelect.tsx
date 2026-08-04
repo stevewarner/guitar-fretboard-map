@@ -1,4 +1,5 @@
 'use client';
+import { useId } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 export type InversionOption = {
@@ -19,6 +20,7 @@ export function InversionSelect({ options, selected }: Props) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const hintId = useId();
 
   if (options.length <= 1) return null;
 
@@ -39,6 +41,7 @@ export function InversionSelect({ options, selected }: Props) {
         id="inversion-select"
         value={selected}
         onChange={(e) => onChange(e.target.value)}
+        aria-describedby={hintId}
         className="text-sm"
       >
         {options.map((o) => (
@@ -47,6 +50,9 @@ export function InversionSelect({ options, selected }: Props) {
           </option>
         ))}
       </select>
+      <p id={hintId} className="sr-only">
+        Changing this selection updates the diagram immediately.
+      </p>
     </div>
   );
 }

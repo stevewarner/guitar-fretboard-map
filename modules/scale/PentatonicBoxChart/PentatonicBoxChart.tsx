@@ -97,6 +97,7 @@ export function PentatonicBoxChart({
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         className="w-full"
         strokeWidth={stroke}
+        role="img"
         aria-label={`Pentatonic diagonal pattern, frets ${startFret}–${endFret}`}
       >
         {/* strings */}
@@ -142,7 +143,7 @@ export function PentatonicBoxChart({
                   y={cy + circRad / 3}
                   textAnchor="middle"
                   fontFamily="Arial"
-                  fontSize={circRad}
+                  fontSize={circRad * 1.3}
                   fill="white"
                 >
                   {intervalLabel(si, fret)}

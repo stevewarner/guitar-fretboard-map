@@ -7,7 +7,7 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
   const pathname = usePathname();
 
   return (
-    <nav>
+    <nav aria-label="Scale systems">
       <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-fg-secondary">
         Scale Systems
       </p>
@@ -21,6 +21,7 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
               <>
                 <Link
                   href={firstModeHref}
+                  aria-current={isSystemActive ? 'true' : undefined}
                   className="mb-1 block text-sm font-medium"
                 >
                   {system.displayName}
@@ -37,7 +38,8 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
                       <li key={mode.slug}>
                         <Link
                           href={href}
-                          className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`block border-l-2 py-3 pl-3 text-sm transition-colors ${
                             isActive
                               ? 'border-current font-medium'
                               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'
@@ -53,6 +55,7 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
             ) : (
               <Link
                 href={firstModeHref}
+                aria-current={isSystemActive ? 'page' : undefined}
                 className="mb-1 block text-sm font-medium"
               >
                 {system.displayName}

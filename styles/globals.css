@@ -18,7 +18,11 @@
   h4 {
     @apply text-lg font-medium;
   }
-a:hover {
+  a:hover {
+    @apply underline;
+  }
+  /* Inline links in body copy must not rely on color alone (WCAG 1.4.1) */
+  p a {
     @apply underline;
   }
 }

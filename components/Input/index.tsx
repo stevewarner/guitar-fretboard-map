@@ -45,6 +45,12 @@ export const Input = ({
         className={`block text-sm font-semibold leading-6 text-fg ${error && 'text-error'}`}
       >
         {label}
+        {required && (
+          <span aria-hidden="true" className="text-error">
+            {' '}
+            *
+          </span>
+        )}
       </label>
       <div className="mt-2.5">
         <input

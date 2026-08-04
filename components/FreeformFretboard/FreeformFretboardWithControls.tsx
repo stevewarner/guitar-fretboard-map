@@ -61,7 +61,7 @@ export const FreeformFretboardWithControls = ({
           <button
             type="button"
             onClick={handleClear}
-            className="flex size-8 items-center justify-center rounded border border-current text-fg-secondary hover:bg-surface-sunken hover:text-fg"
+            className="flex size-11 items-center justify-center rounded border border-current text-fg-secondary hover:bg-surface-sunken hover:text-fg"
             aria-label="Reset"
             title="Reset"
           >
@@ -71,9 +71,11 @@ export const FreeformFretboardWithControls = ({
         <div className="flex flex-col rounded border border-current">
           <button
             type="button"
-            onClick={() => setNumFrets((n) => n - 1)}
-            disabled={numFrets <= MIN_FRETS}
-            className="flex size-8 items-center justify-center rounded-t border-b border-current text-sm hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-30"
+            onClick={() => {
+              if (numFrets > MIN_FRETS) setNumFrets((n) => n - 1);
+            }}
+            aria-disabled={numFrets <= MIN_FRETS}
+            className="flex size-11 items-center justify-center rounded-t border-b border-current text-sm hover:bg-surface-sunken aria-disabled:cursor-not-allowed aria-disabled:opacity-30"
             aria-label="Remove fret"
             title="Remove fret"
           >
@@ -81,9 +83,11 @@ export const FreeformFretboardWithControls = ({
           </button>
           <button
             type="button"
-            onClick={() => setNumFrets((n) => n + 1)}
-            disabled={numFrets >= MAX_FRETS}
-            className="flex size-8 items-center justify-center rounded-b text-sm hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-30"
+            onClick={() => {
+              if (numFrets < MAX_FRETS) setNumFrets((n) => n + 1);
+            }}
+            aria-disabled={numFrets >= MAX_FRETS}
+            className="flex size-11 items-center justify-center rounded-b text-sm hover:bg-surface-sunken aria-disabled:cursor-not-allowed aria-disabled:opacity-30"
             aria-label="Add fret"
             title="Add fret"
           >

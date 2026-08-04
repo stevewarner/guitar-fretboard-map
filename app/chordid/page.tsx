@@ -12,7 +12,9 @@ export default function ChordIdPage() {
   return (
     <div>
       <h1 className="mb-6">What chord is this?</h1>
-      <Suspense>
+      <Suspense
+        fallback={<p className="text-sm text-fg-secondary">Loading…</p>}
+      >
         <FreeformChordIdentifier />
       </Suspense>
     </div>

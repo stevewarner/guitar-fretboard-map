@@ -27,6 +27,7 @@ export const Checkbox = ({
           id={id}
           name={name}
           type="checkbox"
+          role="switch"
           value="true"
           checked={isChecked}
           onChange={onChange}

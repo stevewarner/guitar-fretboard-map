@@ -58,15 +58,13 @@ export const RequestChordModal = () => {
     setTabInput('');
   };
 
-  const hasNotes = tab.some((v) => v !== undefined);
-
   return (
     <div>
       <div className="px-4 pt-4 text-sm text-fg-secondary">
         <p>
-          Can&rsquo;t find the chord you are looking for? Search for it{' '}
+          Can&rsquo;t find the chord you are looking for?{' '}
           <Link href="/chordid" className="underline hover:text-fg">
-            here
+            Search the chord identifier
           </Link>{' '}
           or submit a request below. After validating, I will add it to the
           database.
@@ -104,7 +102,7 @@ export const RequestChordModal = () => {
           </div>
 
           <div className="shrink-0">
-            <div className="w-56">
+            <div className="w-64">
               <FreeformFretboardWithControls
                 tab={tab}
                 onTabChange={handleTabChange}
@@ -125,11 +123,7 @@ export const RequestChordModal = () => {
               {formState.message}
             </p>
           )}
-          <Button
-            type="submit"
-            isLoading={isPending}
-            disabled={!hasNotes || !chordName.trim()}
-          >
+          <Button type="submit" isLoading={isPending}>
             Submit chord
           </Button>
         </div>

@@ -26,19 +26,35 @@ export function Button({
   size = SizeVariant.MEDIUM,
   isLoading = false,
   children,
+  onClick,
   ...props
 }: ButtonProps) {
   return (
     <button
       className={`${styles.button} ${styles[variant]} ${styles[size]}${className ? ` ${className}` : ''}`}
-      disabled={isLoading || props.disabled}
+      aria-disabled={isLoading || undefined}
+      aria-busy={isLoading || undefined}
+      onClick={(e) => {
+        if (isLoading) {
+          e.preventDefault();
+          return;
+        }
+        onClick?.(e);
+      }}
       {...props}
     >
-      {isLoading ? (
-        <LoadingIcon aria-label="Loading" width={20} height={20} />
-      ) : (
-        children
-      )}
+      <span aria-live="polite" className="contents">
+        {isLoading ? (
+          <LoadingIcon
+            aria-label="Loading"
+            width={20}
+            height={20}
+            className="motion-safe:animate-spin"
+          />
+        ) : (
+          children
+        )}
+      </span>
     </button>
   );
 }

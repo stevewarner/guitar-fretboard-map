@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { NOTE_OPTIONS, STANDARD_TUNING_PC } from '@/app/utils/constants';
 import {
@@ -72,6 +72,8 @@ export function PositionControls({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const liveUpdateHintId = useId();
+  const positionDisabledHintId = useId();
 
   const updateParams = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams || undefined);
@@ -107,7 +109,11 @@ export function PositionControls({
   }, [position.rootFinger]);
 
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+    <fieldset className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-0 p-0">
+      <legend className="sr-only">Position</legend>
+      <p id={liveUpdateHintId} className="sr-only">
+        Changing these selections updates the diagram immediately.
+      </p>
       <div className="flex items-center gap-2">
         <label className="text-sm font-medium" htmlFor="key-select">
           Root
@@ -124,6 +130,7 @@ export function PositionControls({
               ...(allowAny ? { position: null } : {}),
             })
           }
+          aria-describedby={liveUpdateHintId}
           className="text-sm"
         >
           {allowAny && <option value="">Any key</option>}
@@ -145,6 +152,7 @@ export function PositionControls({
           onChange={(e) =>
             updateParams({ string: e.target.value || null, position: null })
           }
+          aria-describedby={liveUpdateHintId}
           className="text-sm"
         >
           {allowAny && <option value="">Any string</option>}
@@ -165,6 +173,11 @@ export function PositionControls({
           value={allowAny ? rawPosition : position.rootFinger}
           onChange={(e) => updateParams({ position: e.target.value || null })}
           disabled={allowAny && !rawString}
+          aria-describedby={
+            allowAny && !rawString
+              ? `${liveUpdateHintId} ${positionDisabledHintId}`
+              : liveUpdateHintId
+          }
           className="text-sm"
         >
           {allowAny && <option value="">Any position</option>}
@@ -179,7 +192,12 @@ export function PositionControls({
             </option>
           ))}
         </select>
+        {allowAny && !rawString && (
+          <p id={positionDisabledHintId} className="sr-only">
+            Choose a string first.
+          </p>
+        )}
       </div>
-    </div>
+    </fieldset>
   );
 }

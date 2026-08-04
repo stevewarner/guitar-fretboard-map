@@ -127,6 +127,7 @@ function ChordGrid({
                 height={110}
                 width={110}
                 title={`${chord.name} chord diagram`}
+                aria-hidden="true"
               >
                 <Pattern
                   tab={transposed.tab}
@@ -167,13 +168,13 @@ export async function ModeChords({
   return (
     <section className="mt-12">
       <h2 className="mb-6">Chords</h2>
-      <p className="mb-3 text-sm font-medium">Triads</p>
+      <h3 className="mb-3 text-sm font-medium">Triads</h3>
       <ChordGrid
         chords={triads}
         scaleStartFret={scaleStartFret}
         shapes={shapes}
       />
-      <p className="mb-3 mt-8 text-sm font-medium">7th Chords</p>
+      <h3 className="mb-3 mt-8 text-sm font-medium">7th Chords</h3>
       <ChordGrid
         chords={sevenths}
         scaleStartFret={scaleStartFret}

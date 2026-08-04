@@ -22,7 +22,8 @@
   padding: 0.75rem 1.5rem;
 }
 
-.button:disabled {
+.button:disabled,
+.button[aria-disabled='true'] {
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -32,7 +33,7 @@
   color: #ffffff;
 }
 
-.primary:not(:disabled):hover {
+.primary:not(:disabled):not([aria-disabled='true']):hover {
   background-color: #333333;
 }
 
@@ -41,7 +42,7 @@
   color: #ffffff;
 }
 
-.theme:not(:disabled):hover {
+.theme:not(:disabled):not([aria-disabled='true']):hover {
   background-color: #3730a3; /* accent-hover */
 }
 
@@ -51,7 +52,7 @@
   border: 1px solid #6b7280; /* ~4.4:1 against surface-sunken, ~4.8:1 against white */
 }
 
-.secondary:not(:disabled):hover {
+.secondary:not(:disabled):not([aria-disabled='true']):hover {
   background-color: #e5e7eb; /* line */
 }
 
@@ -61,6 +62,6 @@
   border: 1px solid #6b7280; /* ~4.8:1 against white */
 }
 
-.tertiary:not(:disabled):hover {
+.tertiary:not(:disabled):not([aria-disabled='true']):hover {
   background-color: #f0f0f0;
 }

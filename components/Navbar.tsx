@@ -13,7 +13,7 @@ export const Navbar: React.FC = () => {
   const close = () => setNavOpen(false);
 
   return (
-    <nav id="nav" className="w-full border-b border-line">
+    <nav id="nav" aria-label="Primary" className="w-full border-b border-line">
       <div className="mx-auto px-4 md:flex md:items-center md:justify-between md:px-8 lg:max-w-7xl">
         <div className="flex items-center justify-between py-3 md:py-5">
           <Link className="text-2xl font-bold" href="/" onClick={close}>
@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <button
-            className="p-2 md:hidden"
+            className="p-2.5 md:hidden"
             onClick={() => setNavOpen((prev) => !prev)}
             aria-expanded={navOpen}
             aria-controls="nav-menu"
