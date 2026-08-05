@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 import {
@@ -39,8 +39,10 @@ import {
 } from '@/modules/chordv2/InversionSelect';
 import { LogMissingChordVisit } from '@/modules/chordv2/LogMissingChordVisit';
 import { PC_TO_NOTE } from '@/app/utils/constants';
+import { splitCompoundChordSymbol } from '@/modules/chordv2/utils/compoundChordSymbol';
 import {
   getQualityBySymbol,
+  getAllQualities,
   getShapesBySymbol,
   getInversionShapes,
   getFixedInversionsForRoot,
@@ -171,7 +173,25 @@ export default async function ChordQualityPage({
   // exists in the theory but has no seeded shapes yet (e.g. surfaced by the
   // chord identifier's pitch-class matching) still gets a page — just with
   // no diagram, same as an unavailable position.
-  if (!qualityMeta) notFound();
+  if (!qualityMeta) {
+    // V1 used compound root+quality URLs ("/chord/C#dim") that V2 replaced
+    // with "/chord/{quality}?root={root}" — those old links are still out
+    // there (indexed by Google, shared on Reddit/forums). Recover them
+    // instead of 404ing.
+    const allQualities = await getAllQualities();
+    const validSymbols = new Set(allQualities.map((q) => q.symbol));
+    const split = splitCompoundChordSymbol(symbol, validSymbols);
+    if (split) {
+      const redirectParams = new URLSearchParams({ root: split.root });
+      if (sp.string) redirectParams.set('string', sp.string);
+      if (sp.position) redirectParams.set('position', sp.position);
+      if (sp.inversion) redirectParams.set('inversion', sp.inversion);
+      permanentRedirect(
+        `/chord/${encodeURIComponent(split.quality)}?${redirectParams.toString()}`,
+      );
+    }
+    notFound();
+  }
 
   const fullName = shapes[0]?.quality_full_name ?? qualityMeta.full_name;
   const degrees = qualityMeta
