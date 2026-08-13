@@ -1,4 +1,8 @@
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import {
+  Fretboard,
+  Pattern,
+  scaleChartDefaultLayer,
+} from '@/components/FretboardChart';
 import { PositionControls } from '@/components/PositionControls';
 import {
   deriveScaleRender,
@@ -28,6 +32,9 @@ export function ScaleViewer({
   position,
 }: ScaleViewerProps) {
   const render = deriveScaleRender(modeIntervals, rootPc, position);
+  // Library page — every note in the default color, root included, per
+  // docs/STYLE_GUIDE.md.
+  const layer = scaleChartDefaultLayer(render);
 
   return (
     <div>
@@ -48,20 +55,7 @@ export function ScaleViewer({
           fingerLabels={render.fingerLabels}
           title={`${modeTitle} ${patternKind} in ${rootNote} — guitar fretboard diagram`}
         >
-          <Pattern
-            tab={render.scaleTab}
-            fillColor="#000"
-            fillOpen
-            intervals={render.scaleIntervalTab}
-            startFret={render.patternStartFret}
-          />
-          <Pattern
-            tab={render.rootTab}
-            fillColor="#cc2200"
-            fillOpen
-            intervals={render.rootIntervalTab}
-            startFret={render.patternStartFret}
-          />
+          <Pattern {...layer} />
         </Fretboard>
       </div>
     </div>

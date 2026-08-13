@@ -2,13 +2,12 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/app/utils/site';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { getAllQualities } from '@/modules/chordv2/db/queries';
+import { PC_TO_NOTE } from '@/app/utils/constants';
 
-const LESSON_SLUGS = [
-  'intervals',
-  'intro-pentatonic-scale',
-  'movable-shapes',
-  '4-note-voicing',
-];
+// Lesson pages are all noindex stubs right now (see buildLessonMetadata.ts) —
+// intentionally left out of the sitemap until real content lands, since
+// submitting noindex URLs is bad practice. Add them back in per-lesson as
+// each one ships.
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const qualities = await getAllQualities();
@@ -16,6 +15,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: 'yearly', priority: 1 },
     { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.8 },
+    {
+      url: `${SITE_URL}/how-to-read-charts`,
+      changeFrequency: 'yearly',
+      priority: 0.7,
+    },
     { url: `${SITE_URL}/chord`, changeFrequency: 'monthly', priority: 0.7 },
     {
       url: `${SITE_URL}/chord?mode=open`,
@@ -32,11 +36,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/feedback`, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  const chordPages: MetadataRoute.Sitemap = qualities.map((q) => ({
-    url: `${SITE_URL}/chord/${encodeURIComponent(q.symbol)}`,
-    changeFrequency: 'monthly',
-    priority: 0.6,
-  }));
+  // One URL per root, not the bare /chord/{quality} URL — the page's own
+  // canonical tag (app/chord/[quality]/page.tsx) always includes ?root=
+  // (defaulting to A when absent), so submitting the bare URL put the
+  // sitemap at odds with the page's own declared canonical. See
+  // docs/SEO_IMPROVEMENTS.md's 2026-08-06 interim check-in.
+  const chordPages: MetadataRoute.Sitemap = qualities.flatMap((q) =>
+    PC_TO_NOTE.map((root) => ({
+      url: `${SITE_URL}/chord/${encodeURIComponent(q.symbol)}?root=${encodeURIComponent(root)}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+  );
 
   const scalePages: MetadataRoute.Sitemap = SCALE_SYSTEMS.flatMap((system) =>
     system.modes.map((mode) => ({
@@ -46,11 +57,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const lessonPages: MetadataRoute.Sitemap = LESSON_SLUGS.map((slug) => ({
-    url: `${SITE_URL}/lesson/${slug}`,
-    changeFrequency: 'monthly',
-    priority: 0.6,
-  }));
-
-  return [...staticPages, ...chordPages, ...scalePages, ...lessonPages];
+  return [...staticPages, ...chordPages, ...scalePages];
 }

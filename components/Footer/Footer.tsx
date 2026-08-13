@@ -8,6 +8,12 @@ export const Footer = () => (
           About
         </Link>
         <Link
+          href="/how-to-read-charts"
+          className="text-sm text-fg-secondary hover:text-fg"
+        >
+          How to Read the Charts
+        </Link>
+        <Link
           href="/feedback"
           className="text-sm text-fg-secondary hover:text-fg"
         >

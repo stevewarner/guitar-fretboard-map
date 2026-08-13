@@ -39,7 +39,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
         degree: 0,
         dbName: 'pentatonic_minor',
         description:
-          'The minor pentatonic removes the 2nd and 6th from natural minor, leaving the five notes most associated with blues and rock soloing. If you already know the "box shape," you\'re playing this scale in one position.',
+          'The minor pentatonic removes the 2nd and 6th from natural minor, leaving the five notes most associated with blues and rock soloing. The "box shape" is this scale in one position.',
       },
     ],
   },

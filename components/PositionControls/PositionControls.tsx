@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useId } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { NOTE_OPTIONS, STANDARD_TUNING_PC } from '@/app/utils/constants';
+import { STANDARD_TUNING_PC } from '@/app/utils/constants';
+import { RootSelect } from '@/components/RootSelect';
 import {
   ROOT_STRINGS,
   getValidFingersForString,
@@ -114,33 +115,21 @@ export function PositionControls({
       <p id={liveUpdateHintId} className="sr-only">
         Changing these selections updates the diagram immediately.
       </p>
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-medium" htmlFor="key-select">
-          Root
-        </label>
-        <select
-          id="key-select"
-          value={allowAny ? rawRoot : rootNote}
-          onChange={(e) =>
-            updateParams({
-              root: e.target.value || null,
-              // A different root can invalidate the current position (e.g. a
-              // fixed open-chord finger only matches its own root) — reset it
-              // rather than leave a now-disabled option selected.
-              ...(allowAny ? { position: null } : {}),
-            })
-          }
-          aria-describedby={liveUpdateHintId}
-          className="text-sm"
-        >
-          {allowAny && <option value="">Any key</option>}
-          {NOTE_OPTIONS.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <RootSelect
+        id="key-select"
+        value={allowAny ? rawRoot : rootNote}
+        onChange={(value) =>
+          updateParams({
+            root: value || null,
+            // A different root can invalidate the current position (e.g. a
+            // fixed open-chord finger only matches its own root) — reset it
+            // rather than leave a now-disabled option selected.
+            ...(allowAny ? { position: null } : {}),
+          })
+        }
+        describedBy={liveUpdateHintId}
+        extraOption={allowAny ? { value: '', label: 'Any key' } : undefined}
+      />
 
       <div className="flex items-center gap-2">
         <label className="text-sm font-medium" htmlFor="string-select">

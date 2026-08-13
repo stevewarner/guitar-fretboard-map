@@ -5,7 +5,7 @@ import { getContrastColor, needsContrastFallback } from '@/app/utils';
 interface PatternProps {
   tab: TabProp;
   intervals?: ((string | number | undefined)[] | (string | number)[][]) | null;
-  fillColor: string;
+  fillColor?: string;
   fillOpen?: boolean;
   startFret?: number;
 }
@@ -13,7 +13,7 @@ interface PatternProps {
 export const Pattern = ({
   tab = [],
   intervals = [],
-  fillColor,
+  fillColor = '#000',
   fillOpen = false,
   startFret = 1,
 }: PatternProps) => {

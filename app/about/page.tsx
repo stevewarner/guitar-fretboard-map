@@ -35,6 +35,15 @@ const About = () => {
       <ul className="mb-6 flex flex-col gap-1">
         <li>
           <Link
+            href="/how-to-read-charts"
+            className="text-sm text-fg-secondary hover:text-fg"
+          >
+            How to Read the Charts
+          </Link>
+          : new here? Start with the dots, colors, and numbers
+        </li>
+        <li>
+          <Link
             href="/lesson"
             className="text-sm text-fg-secondary hover:text-fg"
           >

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-import { LESSONS } from '@/modules/lesson/lessons';
+import { LESSON_PARTS, LESSONS } from '@/modules/lesson/lessons';
 
 export function LessonsNav() {
   const pathname = usePathname();
@@ -22,7 +22,7 @@ export function LessonsNav() {
           Lessons
         </span>
         <span className="text-xs text-gray-500">
-          {current ? current.label : ''}
+          {current ? current.title : ''}
           <svg
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
@@ -46,27 +46,47 @@ export function LessonsNav() {
         Lessons
       </p>
 
-      <ul className={`space-y-0.5 ${open ? 'mt-2' : 'hidden'} md:block`}>
-        {LESSONS.map(({ href, label }) => {
-          const isActive = pathname === href;
+      <div className={`space-y-4 ${open ? 'mt-2' : 'hidden'} md:block`}>
+        {LESSON_PARTS.map((part) => {
+          const partHref = `/lesson/${part.slug}`;
+          const isActivePart =
+            pathname.startsWith(`${partHref}/`) || pathname === partHref;
+
           return (
-            <li key={href}>
-              <Link
-                href={href}
-                onClick={() => setOpen(false)}
-                aria-current={isActive ? 'page' : undefined}
-                className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
-                  isActive
-                    ? 'border-current font-medium'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'
+            <div key={part.slug}>
+              <p
+                className={`text-xs font-semibold uppercase tracking-widest ${
+                  isActivePart ? 'text-fg' : 'text-fg-secondary'
                 }`}
               >
-                {label}
-              </Link>
-            </li>
+                {part.title}
+              </p>
+              <ul className="mt-1 space-y-0.5">
+                {part.lessons.map((lesson) => {
+                  const href = `${partHref}/${lesson.slug}`;
+                  const isActive = pathname === href;
+                  return (
+                    <li key={lesson.slug}>
+                      <Link
+                        href={href}
+                        onClick={() => setOpen(false)}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
+                          isActive
+                            ? 'border-current font-medium'
+                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'
+                        }`}
+                      >
+                        {lesson.title}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </nav>
   );
 }

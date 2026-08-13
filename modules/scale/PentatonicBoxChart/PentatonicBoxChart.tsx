@@ -7,6 +7,7 @@ import {
   fontSize,
   svgDimension,
 } from '@/components/FretboardChart/constants';
+import { DEFAULT_DOT_COLOR } from '@/components/FretboardChart/scaleChartLayers';
 
 // Horizontal fret width matches the vertical chart's fret height spacing.
 // String spacing matches the vertical chart's string spacing.
@@ -83,8 +84,6 @@ export function PentatonicBoxChart({
   // si 0 = low E = bottom, si 5 = high e = top
   const dotY = (si: number) => PAD + strHeight * (NUM_STRINGS - 1 - si);
 
-  const isRoot = (si: number, fret: number) =>
-    (STANDARD_TUNING_PC[si] + fret) % 12 === rootPc;
   const intervalLabel = (si: number, fret: number) =>
     INTERVAL_LABELS[(STANDARD_TUNING_PC[si] + fret - rootPc + 12) % 12];
 
@@ -127,14 +126,13 @@ export function PentatonicBoxChart({
           frets.map((fret) => {
             const cx = dotX(fret);
             const cy = dotY(si);
-            const root = isRoot(si, fret);
             return (
               <g key={`${si}-${fret}`}>
                 <circle
                   cx={cx}
                   cy={cy}
                   r={circRad}
-                  fill={root ? '#cc2200' : '#000'}
+                  fill={DEFAULT_DOT_COLOR}
                   stroke="#000"
                   strokeWidth={stroke}
                 />

@@ -1,9 +1,17 @@
+// Expands shorthand hex (#abc) to full form (#aabbcc) so callers can pass
+// either.
+const expandHex = (hex: string): string =>
+  hex.length === 4
+    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+    : hex;
+
 // WCAG relative luminance (https://www.w3.org/TR/WCAG21/#dfn-relative-luminance).
 const getRelativeLuminance = (hex: string): number => {
+  const full = expandHex(hex);
   const [r, g, b] = [
-    parseInt(hex.slice(1, 3), 16),
-    parseInt(hex.slice(3, 5), 16),
-    parseInt(hex.slice(5, 7), 16),
+    parseInt(full.slice(1, 3), 16),
+    parseInt(full.slice(3, 5), 16),
+    parseInt(full.slice(5, 7), 16),
   ].map((c) => {
     const channel = c / 255;
     return channel <= 0.03928
