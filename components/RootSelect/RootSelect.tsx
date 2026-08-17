@@ -1,4 +1,5 @@
 import { NOTE_OPTIONS } from '@/app/utils/constants';
+import { PillSelect } from '@/components/PillSelect';
 
 interface RootSelectProps {
   id: string;
@@ -20,15 +21,14 @@ export function RootSelect({
 }: RootSelectProps) {
   return (
     <div className="flex items-center gap-2">
-      <label className="text-sm font-medium" htmlFor={id}>
+      <label className="text-sm text-fg-secondary" htmlFor={id}>
         {label}
       </label>
-      <select
+      <PillSelect
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-describedby={describedBy}
-        className="text-sm"
       >
         {extraOption && (
           <option value={extraOption.value}>{extraOption.label}</option>
@@ -38,7 +38,7 @@ export function RootSelect({
             {l}
           </option>
         ))}
-      </select>
+      </PillSelect>
     </div>
   );
 }

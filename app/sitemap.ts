@@ -3,11 +3,7 @@ import { SITE_URL } from '@/app/utils/site';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { getAllQualities } from '@/modules/chordv2/db/queries';
 import { PC_TO_NOTE } from '@/app/utils/constants';
-
-// Lesson pages are all noindex stubs right now (see buildLessonMetadata.ts) —
-// intentionally left out of the sitemap until real content lands, since
-// submitting noindex URLs is bad practice. Add them back in per-lesson as
-// each one ships.
+import { LESSONS } from '@/modules/lesson/lessons';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const qualities = await getAllQualities();
@@ -57,5 +53,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  return [...staticPages, ...chordPages, ...scalePages];
+  // Only lessons flagged `indexed` in modules/lesson/lessons.ts — the rest
+  // are still header-only stubs, noindexed by buildLessonMetadata, and
+  // submitting a noindex URL here is a bad signal to Google. Priority 0.7
+  // matches /chord's index rather than the 0.6 given to individual chord/
+  // scale detail pages: lessons are the site's flagship content, not a
+  // lower-value page than the browse index.
+  const lessonPages: MetadataRoute.Sitemap = LESSONS.filter(
+    (l) => l.indexed,
+  ).map((l) => ({
+    url: `${SITE_URL}${l.href}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...chordPages, ...scalePages, ...lessonPages];
 }

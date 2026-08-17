@@ -5,12 +5,12 @@ import { Button, ButtonVariant } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { Modal } from '@/components/Modal';
 import { ChordPreviewCard } from '@/components/ChordPreviewCard';
+import { PillSelect } from '@/components/PillSelect';
 import { RequestChordModal } from '@/modules/chordv2/RequestChordModal';
 import {
   CHORD_FAMILIES,
   type ChordFamily,
 } from '@/modules/chordv2/utils/chordFamily';
-import ChevronRightIcon from '@/svgs/chevron-right.svg';
 import type { FlatTabValue } from '@/types';
 
 export type ChordCard = {
@@ -122,59 +122,42 @@ export const FilteredChordShapesList = ({
 
   return (
     <>
-      <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <div className="flex flex-wrap items-baseline gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <SearchInput
             id="search-shapes"
             value={userSearch}
             onChange={(e) => setUserSearch(e.target.value)}
             onClear={() => setUserSearch('')}
           />
-          <div className="relative">
-            <select
-              id="filter-family"
-              aria-label="Filter by chord quality"
-              value={family}
-              onChange={(e) => setFamily(e.target.value)}
-              className="h-10 appearance-none rounded border border-current bg-transparent pl-3 pr-9"
-            >
-              <option value="">All qualities</option>
-              {CHORD_FAMILIES.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-            <ChevronRightIcon
-              aria-hidden="true"
-              height={16}
-              width={16}
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90"
-            />
-          </div>
-          <div className="relative">
-            <select
-              id="filter-mode"
-              aria-label="Browse mode"
-              value={mode}
-              onChange={(e) => setMode(e.target.value)}
-              className="h-10 appearance-none rounded border border-current bg-transparent pl-3 pr-9"
-            >
-              <option value="all">All shapes</option>
-              <option value="open">Open chords</option>
-              <option value="slash">Slash chords</option>
-            </select>
-            <ChevronRightIcon
-              aria-hidden="true"
-              height={16}
-              width={16}
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90"
-            />
-          </div>
+          <PillSelect
+            id="filter-family"
+            aria-label="Filter by chord quality"
+            value={family}
+            onChange={(e) => setFamily(e.target.value)}
+          >
+            <option value="">All qualities</option>
+            {CHORD_FAMILIES.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </PillSelect>
+          <PillSelect
+            id="filter-mode"
+            aria-label="Browse mode"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+          >
+            <option value="all">All shapes</option>
+            <option value="open">Open chords</option>
+            <option value="slash">Slash chords</option>
+          </PillSelect>
           {hasActiveFilters && (
             <Button
               type="button"
               variant={ButtonVariant.TERTIARY}
+              pill
               onClick={clearAll}
             >
               Clear
@@ -184,6 +167,7 @@ export const FilteredChordShapesList = ({
         <Button
           type="button"
           variant={ButtonVariant.TERTIARY}
+          pill
           onClick={() => toggleModalOpen(true)}
         >
           Request a new chord +
@@ -197,7 +181,7 @@ export const FilteredChordShapesList = ({
           No chords match your filters.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {filteredCards.map((card) => {
             const params = new URLSearchParams({
               string: String(card.rootString),
@@ -212,6 +196,7 @@ export const FilteredChordShapesList = ({
             return (
               <ChordPreviewCard
                 key={card.id}
+                variant="raised"
                 href={href}
                 label={
                   card.rootNote

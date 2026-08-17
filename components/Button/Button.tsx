@@ -1,37 +1,28 @@
 import LoadingIcon from '@/svgs/loading.svg';
-import styles from './Button.module.css';
+import { buttonClassName, ButtonVariant, SizeVariant } from './buttonClassName';
 
-export enum ButtonVariant {
-  PRIMARY = 'primary',
-  SECONDARY = 'secondary',
-  TERTIARY = 'tertiary',
-  THEME = 'theme',
-}
-
-export enum SizeVariant {
-  SMALL = 'small',
-  MEDIUM = 'medium',
-  LARGE = 'large',
-}
+export { ButtonVariant, SizeVariant };
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: SizeVariant;
   isLoading?: boolean;
+  pill?: boolean;
 }
 
 export function Button({
   className,
-  variant = ButtonVariant.PRIMARY,
-  size = SizeVariant.MEDIUM,
+  variant,
+  size,
   isLoading = false,
+  pill,
   children,
   onClick,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`${styles.button} ${styles[variant]} ${styles[size]}${className ? ` ${className}` : ''}`}
+      className={buttonClassName({ variant, size, pill, className })}
       aria-disabled={isLoading || undefined}
       aria-busy={isLoading || undefined}
       onClick={(e) => {

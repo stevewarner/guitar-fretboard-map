@@ -73,7 +73,12 @@ export const SentimentFeedbackForm = ({
         required={descriptionRequired}
       />
 
-      <Button type="submit" isLoading={isPending}>
+      <Button
+        type="submit"
+        isLoading={isPending}
+        pill
+        className="self-start px-6"
+      >
         {submitLabel}
       </Button>
 

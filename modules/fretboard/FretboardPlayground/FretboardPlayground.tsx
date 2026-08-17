@@ -53,7 +53,7 @@ function getNoteFrets(pitchClass: number): number[][] {
 
 export const FretboardPlayground = () => {
   const [root, setRoot] = useState('C');
-  const [rootColor, setRootColor] = useState('#3B82F6');
+  const [rootColor, setRootColor] = useState('#2563EB');
   const [intervals, setIntervals] = useState<Set<string>>(new Set());
 
   const toggleInterval = (key: string) =>

@@ -25,6 +25,35 @@ export function computeFingerLabels(
   });
 }
 
+export const STRING_LABELS: Record<number, string> = {
+  6: '6th string',
+  5: '5th string',
+  4: '4th string',
+};
+
+const FINGER_LABELS: Record<number, string> = {
+  0: 'stretch 1st finger',
+  1: '1st finger',
+  2: '2nd finger',
+  3: '3rd finger',
+  4: '4th finger',
+};
+
+export function fingerLabel(
+  finger: number,
+  rootString: number,
+  rootPc: number,
+  zeroOverride?: 'open' | 'stretch',
+): string {
+  if (finger === 0) {
+    if (zeroOverride)
+      return zeroOverride === 'open' ? 'open' : FINGER_LABELS[0];
+    const openPc = STANDARD_TUNING_PC[6 - rootString];
+    if ((rootPc - openPc + 12) % 12 === 0) return 'open';
+  }
+  return FINGER_LABELS[finger];
+}
+
 export function computeRootFret(
   rootString: number,
   rootFinger: number,

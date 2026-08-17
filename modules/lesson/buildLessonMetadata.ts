@@ -2,14 +2,15 @@ import { Metadata } from 'next';
 import { getLesson } from '@/modules/lesson/lessons';
 
 // Stub pages (header only, no content yet) are marked noindex so thin pages
-// don't get crawled — pass indexable: true lesson-by-lesson as real content
-// lands, rather than removing this default.
+// don't get crawled — driven by each lesson's own `indexed` flag in
+// modules/lesson/lessons.ts rather than a per-call-site override, so
+// flipping a lesson to real content is a one-line data change, not a page.tsx
+// edit. Defaults to noindex for an unrecognized slug (lesson === undefined).
 const STUB_ROBOTS = { index: false, follow: true };
 
 export function buildLessonMetadata(
   partSlug: string,
   lessonSlug: string,
-  { indexable = false }: { indexable?: boolean } = {},
 ): Metadata {
   const lesson = getLesson(partSlug, lessonSlug);
   const title = lesson?.title ?? 'Lesson';
@@ -19,6 +20,6 @@ export function buildLessonMetadata(
     title,
     alternates: { canonical: path },
     openGraph: { title: `GuitarTheory | ${title}` },
-    robots: indexable ? undefined : STUB_ROBOTS,
+    robots: lesson?.indexed ? undefined : STUB_ROBOTS,
   };
 }

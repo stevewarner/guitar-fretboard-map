@@ -11,9 +11,9 @@ module.exports = {
       colors: {
         // Accent — interactive elements
         accent: {
-          DEFAULT: '#4F46E5', // bg-accent, text-accent (indigo-600)
-          hover: '#3730A3', // hover:bg-accent-hover (indigo-800)
-          subtle: '#EEF2FF', // bg-accent-subtle (indigo-50)
+          DEFAULT: '#2563EB', // bg-accent, text-accent (blue-600)
+          hover: '#1D4ED8', // hover:bg-accent-hover (blue-700)
+          subtle: '#EFF6FF', // bg-accent-subtle (blue-50)
           fg: '#ffffff', // text-accent-fg (text on accent bg)
         },
         // Surfaces — backgrounds
@@ -38,6 +38,18 @@ module.exports = {
         // Feedback
         success: '#15803d', // ~5:1 against white (was #16a34a at ~3.3:1, failed AA)
         error: '#dc2626',
+      },
+      fontFamily: {
+        // CSS vars set by next/font in app/layout.tsx; fall back to the
+        // system stack Tailwind ships by default if the var is unset.
+        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: [
+          'var(--font-jetbrains-mono)',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'monospace',
+        ],
       },
     },
   },

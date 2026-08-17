@@ -6,6 +6,7 @@ import {
   type ChordCard,
 } from '@/modules/chordv2/FilteredChordShapesList';
 import { PositionControls } from '@/components/PositionControls';
+import { SectionLabel } from '@/components/SectionLabel';
 import { JsonLd } from '@/components/JsonLd';
 import { breadcrumbList } from '@/app/utils/structuredData';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
@@ -71,6 +72,49 @@ function buildInversionCard(
   };
 }
 
+// Single source for each browse mode's copy — reused as the meta/OG
+// description and as the on-page paragraph under that mode's H1, the same
+// pattern scale mode pages use (see docs/TODO.md's SEO section).
+const DEFAULT_DESCRIPTION =
+  "Guitar chord database. Browse every chord quality's shapes in any key and position. Search or filter by chord family below; choose a root, string, and finger to see the shape in a specific key and hand position.";
+const OPEN_DESCRIPTION =
+  "Open position guitar chords in their real keys, with alternate fingerings and inversions included. Search or filter by chord family to narrow the list; root and position filters don't apply here since each shape already carries its own key.";
+const SLASH_DESCRIPTION =
+  "Slash chords (inversions) in their real keys, with the bass note fretted on the lowest strings. Search or filter by chord family to narrow the list; root and position filters don't apply here for the same reason as open chords.";
+
+// Shared header treatment for all three browse modes: breadcrumb-style
+// section label, big title with an optional accent-colored count figure
+// beside it (mirrors the mockup's "Chord database / N qualities" header),
+// then description.
+function ChordPageHeader({
+  sectionLabel,
+  title,
+  description,
+  count,
+}: {
+  sectionLabel: string;
+  title: string;
+  description: string;
+  count?: { value: number; label: string };
+}) {
+  return (
+    <div>
+      <SectionLabel>{sectionLabel}</SectionLabel>
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          {title}
+        </h1>
+        {count && (
+          <p className="text-2xl font-semibold text-accent">
+            {count.value} {count.label}
+          </p>
+        )}
+      </div>
+      <p className="mt-4 max-w-2xl text-sm text-fg-secondary">{description}</p>
+    </div>
+  );
+}
+
 type MetadataProps = {
   searchParams: Promise<{ mode?: string }>;
 };
@@ -83,13 +127,11 @@ export async function generateMetadata({
   if (mode === 'open') {
     return {
       title: 'Open Chords',
-      description:
-        'Open position guitar chords in their real keys, with alternate fingerings and inversions.',
+      description: OPEN_DESCRIPTION,
       alternates: { canonical: '/chord?mode=open' },
       openGraph: {
         title: 'GuitarTheory | Open Chords',
-        description:
-          'Open position guitar chords in their real keys, with alternate fingerings and inversions.',
+        description: OPEN_DESCRIPTION,
       },
     };
   }
@@ -97,26 +139,22 @@ export async function generateMetadata({
   if (mode === 'slash') {
     return {
       title: 'Slash Chords',
-      description:
-        'Slash chords (inversions) in their real keys, with the bass note fretted on the lowest strings.',
+      description: SLASH_DESCRIPTION,
       alternates: { canonical: '/chord?mode=slash' },
       openGraph: {
         title: 'GuitarTheory | Slash Chords',
-        description:
-          'Slash chords (inversions) in their real keys, with the bass note fretted on the lowest strings.',
+        description: SLASH_DESCRIPTION,
       },
     };
   }
 
   return {
     title: 'Chord Database',
-    description:
-      'Guitar chord database. Browse chord qualities and explore shapes in any key and position.',
+    description: DEFAULT_DESCRIPTION,
     alternates: { canonical: '/chord' },
     openGraph: {
       title: 'GuitarTheory | Chord Database',
-      description:
-        'Guitar chord database. Browse chord qualities and explore shapes in any key and position.',
+      description: DEFAULT_DESCRIPTION,
     },
   };
 }
@@ -245,7 +283,12 @@ export default async function ChordsV2({ searchParams }: Props) {
           { name: 'Chords', path: '/chord' },
         ])}
       />
-      <h1 className="text-2xl font-bold">Chord Database</h1>
+      <ChordPageHeader
+        sectionLabel="Chords"
+        title="Chord Database"
+        description={DEFAULT_DESCRIPTION}
+        count={{ value: qualities.length, label: 'qualities' }}
+      />
       <Suspense>
         <FilteredChordShapesList
           cards={cards}
@@ -331,7 +374,12 @@ async function OpenChordsView() {
           { name: 'Open Chords', path: '/chord?mode=open' },
         ])}
       />
-      <h1 className="text-2xl font-bold">Open Chords</h1>
+      <ChordPageHeader
+        sectionLabel="Chords / Open"
+        title="Open Chords"
+        description={OPEN_DESCRIPTION}
+        count={{ value: cards.length, label: 'shapes' }}
+      />
       <Suspense>
         <FilteredChordShapesList cards={cards} showFretLabels />
       </Suspense>
@@ -374,7 +422,12 @@ async function SlashChordsView() {
           { name: 'Slash Chords', path: '/chord?mode=slash' },
         ])}
       />
-      <h1 className="text-2xl font-bold">Slash Chords</h1>
+      <ChordPageHeader
+        sectionLabel="Chords / Slash"
+        title="Slash Chords"
+        description={SLASH_DESCRIPTION}
+        count={{ value: cards.length, label: 'shapes' }}
+      />
       <Suspense>
         <FilteredChordShapesList cards={cards} showFretLabels />
       </Suspense>

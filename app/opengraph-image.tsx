@@ -14,7 +14,7 @@ export default async function Image() {
     // ImageResponse JSX element
     <div
       style={{
-        background: '#4F46E5',
+        background: '#2563EB',
         color: '#fff',
         width: '100%',
         height: '100%',

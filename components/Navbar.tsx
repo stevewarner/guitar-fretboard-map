@@ -16,7 +16,15 @@ export const Navbar: React.FC = () => {
     <nav id="nav" aria-label="Primary" className="w-full border-b border-line">
       <div className="mx-auto px-4 md:flex md:items-center md:justify-between md:px-8 lg:max-w-7xl">
         <div className="flex items-center justify-between py-3 md:py-5">
-          <Link className="text-2xl font-bold" href="/" onClick={close}>
+          <Link
+            className="flex items-center gap-2 text-base font-semibold tracking-tight"
+            href="/"
+            onClick={close}
+          >
+            <span
+              aria-hidden="true"
+              className="inline-block size-2 rounded-sm bg-accent"
+            />
             GuitarTheory
           </Link>
 
@@ -72,13 +80,13 @@ export const Navbar: React.FC = () => {
           id="nav-menu"
           className={`border-t border-line-subtle pb-4 md:border-none md:pb-0 ${navOpen ? 'block' : 'hidden'} md:block`}
         >
-          <ul className="space-y-1 md:flex md:items-center md:space-x-6 md:space-y-0">
+          <ul className="space-y-1 md:flex md:items-center md:space-x-8 md:space-y-0">
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
                   onClick={close}
-                  className="block p-2 text-base font-medium md:inline md:p-0 md:text-sm"
+                  className="block p-2 text-base font-medium text-fg-secondary hover:text-fg md:inline md:p-0 md:text-sm"
                 >
                   {label}
                 </Link>

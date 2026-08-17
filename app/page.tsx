@@ -1,17 +1,36 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChartLegacy';
-import { CardRow } from '@/components/CardRow';
 import { ChordPreviewCard } from '@/components/ChordPreviewCard';
 import { ScalePreviewCard } from '@/components/ScalePreviewCard';
+import { ButtonLink } from '@/components/Button';
+import { Panel } from '@/components/Panel';
+import ChevronRightIcon from '@/svgs/chevron-right.svg';
+import { ShowcaseSection } from '@/modules/home/ShowcaseSection';
 import { getModeIntervals } from '@/modules/scale/utils/scaleUtils';
-import { getShapesAtPosition } from '@/modules/chordv2/db/queries';
+import {
+  getShapesAtPosition,
+  getAllQualities,
+} from '@/modules/chordv2/db/queries';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import { parseNote } from '@/app/utils/noteSpelling';
-import ChevronRightIcon from '@/svgs/chevron-right.svg';
+import { ACCENT_HEX } from '@/app/utils/constants';
+import { LESSON_PARTS, LESSONS } from '@/modules/lesson/lessons';
+
+// Hero + the 3 showcase sections below it (Lessons/Chords/Scales) are a
+// deliberate exception to the site's normal plain styling — see CLAUDE.md's
+// Design Philosophy section. Went through 3 shapes: FEATURE_PLAN.md's plain
+// text-only pillar cards, then real preview cards restored in plain style,
+// then this — a bigger, tab-filtered showcase per subdirectory, modeled on
+// a design mockup provided directly, because the plain-text pillars read as
+// SEO filler with nothing a visitor actually clicks.
+const description =
+  'Guitar theory lessons for guitarists who know tab but not the fretboard. Interactive chord and scale diagrams for every key and position.';
 
 export const metadata: Metadata = {
+  description,
   alternates: { canonical: '/' },
+  openGraph: { description },
 };
 
 const numFrets = 13;
@@ -40,14 +59,14 @@ const PENTATONIC_SCALES = [
 ];
 
 // Hand-picked (quality, root, string, position) triples — same 6 roots
-// across all three rows, increasing harmonic complexity per row. Open picks
-// the shape a guitarist actually recognizes as "the open chord" for that
-// root; Triad and Seventh deliberately share one consistent string/position
+// across all three tabs, increasing harmonic complexity per tab. Popular
+// picks the shape a guitarist actually recognizes as "the open chord" for
+// that root; Sevenths deliberately shares one consistent string/position
 // per string group (C/D/E on string 5, F/G/A on string 6) so the shapes read
-// as one connected position across the row, not unrelated voicings. Each
-// spec resolves via getShapesAtPosition, the same exact-position lookup the
-// chord detail page uses, so the diagram and href always match a real seeded
-// shape instead of a hand-typed guess.
+// as one connected position, not unrelated voicings. Each spec resolves via
+// getShapesAtPosition, the same exact-position lookup the chord detail page
+// uses, so the diagram and href always match a real seeded shape instead of
+// a hand-typed guess.
 type CuratedChordSpec = {
   symbol: string;
   rootNote: string;
@@ -55,7 +74,7 @@ type CuratedChordSpec = {
   rootFinger: number;
 };
 
-const OPEN_CHORDS: CuratedChordSpec[] = [
+const POPULAR_CHORDS: CuratedChordSpec[] = [
   { symbol: 'maj', rootNote: 'C', rootString: 5, rootFinger: 3 },
   { symbol: 'm', rootNote: 'D', rootString: 4, rootFinger: 0 },
   { symbol: 'm', rootNote: 'E', rootString: 6, rootFinger: 0 },
@@ -64,13 +83,13 @@ const OPEN_CHORDS: CuratedChordSpec[] = [
   { symbol: 'm', rootNote: 'A', rootString: 5, rootFinger: 0 },
 ];
 
-const TRIAD_CHORDS: CuratedChordSpec[] = [
-  { symbol: 'maj', rootNote: 'C', rootString: 5, rootFinger: 1 },
-  { symbol: 'm', rootNote: 'D', rootString: 5, rootFinger: 1 },
-  { symbol: 'm', rootNote: 'E', rootString: 5, rootFinger: 1 },
-  { symbol: 'maj', rootNote: 'F', rootString: 6, rootFinger: 1 },
-  { symbol: 'maj', rootNote: 'G', rootString: 6, rootFinger: 1 },
-  { symbol: 'm', rootNote: 'A', rootString: 6, rootFinger: 1 },
+const OPEN_CHORDS: CuratedChordSpec[] = [
+  { symbol: 'maj', rootNote: 'C', rootString: 5, rootFinger: 3 },
+  { symbol: 'm', rootNote: 'D', rootString: 4, rootFinger: 0 },
+  { symbol: 'm', rootNote: 'E', rootString: 6, rootFinger: 0 },
+  { symbol: '7', rootNote: 'G', rootString: 6, rootFinger: 3 },
+  { symbol: 'm7', rootNote: 'A', rootString: 5, rootFinger: 0 },
+  { symbol: 'maj7', rootNote: 'F', rootString: 6, rootFinger: 1 },
 ];
 
 const SEVENTH_CHORDS: CuratedChordSpec[] = [
@@ -117,6 +136,7 @@ async function getCuratedChordCards(specs: CuratedChordSpec[]) {
     return [
       {
         label: chordLabel(spec.rootNote, spec.symbol),
+        sublabel: shape.quality_full_name.toLowerCase(),
         href: `/chord/${spec.symbol}?root=${spec.rootNote}&string=${spec.rootString}&position=${spec.rootFinger}`,
         tab: transposed.tab,
         startFret: transposed.startFret,
@@ -126,200 +146,213 @@ async function getCuratedChordCards(specs: CuratedChordSpec[]) {
   });
 }
 
+function LessonPreviewCard({
+  href,
+  label,
+  sublabel,
+}: {
+  href: string;
+  label: string;
+  sublabel?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex w-48 shrink-0 flex-col justify-center gap-1 rounded-xl bg-surface-raised px-4 py-6 hover:bg-surface-sunken"
+    >
+      <span className="text-base font-bold">{label}</span>
+      {sublabel && (
+        <span className="text-sm text-fg-secondary">{sublabel}</span>
+      )}
+    </Link>
+  );
+}
+
 export default async function Home() {
-  const [openChordCards, triadChordCards, seventhChordCards] =
+  const [popularChordCards, openChordCards, seventhChordCards, qualities] =
     await Promise.all([
+      getCuratedChordCards(POPULAR_CHORDS),
       getCuratedChordCards(OPEN_CHORDS),
-      getCuratedChordCards(TRIAD_CHORDS),
       getCuratedChordCards(SEVENTH_CHORDS),
+      getAllQualities(),
     ]);
 
   return (
     <>
-      <header className="flex flex-row flex-wrap items-center justify-between md:flex-nowrap">
-        <div className="mx-auto mb-8 min-w-[45%] max-w-md text-center md:my-0 lg:mx-0 lg:flex-auto lg:px-4 lg:py-32 lg:text-left">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Learn chords and scales across the fretboard
+      <header className="grid grid-cols-1 items-center gap-12 py-8 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-16">
+        <div className="mx-auto max-w-md text-center lg:mx-0 lg:text-left">
+          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+            Guitar theory lessons taught through the fretboard diagram
           </h1>
-          <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-            <Link
-              href="/chord"
-              className="rounded-md bg-accent px-6 py-3 text-lg font-semibold text-accent-fg shadow-sm hover:bg-accent-hover"
-            >
-              See all chords
-            </Link>
-            <Link href="/about" className="font-semibold leading-6">
-              <span className="flex items-center gap-1">
-                Learn more about GuitarTheory
-                <ChevronRightIcon height={16} width={16} aria-hidden="true" />
-              </span>
+          <p className="mt-5 max-w-sm text-base leading-relaxed text-fg-secondary lg:mx-0">
+            Interactive chord and scale charts that update as you read, not a
+            separate reference to look up.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-6 lg:justify-start">
+            <ButtonLink href="/lesson" pill className="text-base">
+              Start learning
+              <ChevronRightIcon width={16} height={16} aria-hidden="true" />
+            </ButtonLink>
+            <Link href="/chord" className="font-semibold leading-6">
+              Browse chords
             </Link>
           </div>
         </div>
 
-        <Fretboard
-          numFrets={numFrets}
-          showOpenNotes={false}
-          styles="m-4 md:mx-0"
-          title="Guitar fretboard diagram highlighting the minor pentatonic scale pattern"
-        >
-          <path
-            d="M 52 380 C 500 380 500 20 1252 20"
-            stroke="#FF0000"
-            strokeOpacity="0.7"
-            strokeWidth="40"
-            strokeLinecap="round"
-            fill="transparent"
-          />
-          {/* <Pattern
-            // nested array for scales
-            // full major scale
-            tab={[
-              [0, 2, 4, 5, 7, 9, 11, 12],
-              [0, 2, 4, 6, 7, 9, 11, 12],
-              [1, 2, 4, 6, 7, 9, 11],
-              [1, 2, 4, 6, 8, 9, 11],
-              [0, 2, 4, 5, 7, 9, 10, 12],
-              [0, 2, 4, 5, 7, 9, 11, 12],
-            ]}
-            // tab={[0, 2, 2, 1, 0, 12]}
-            fillColor="#000"
-          /> */}
-          <Pattern
-            // pentatonic
-            tab={[
-              [0, 2, 4, 7, 9, 12],
-              [2, 4, 7, 9, 11],
-              [2, 4, 6, 9, 11],
-              [1, 4, 6, 9, 11],
-              [0, 2, 5, 7, 9, 12],
-              [0, 2, 4, 7, 9, 12],
-            ]}
-            fillColor="#000"
-          />
-          {/* <Pattern
-            // chord tones 1 - 3 - 5
-            tab={[
-              [0, 4, 7, 12],
-              [2, 6, 7, 11],
-              [2, 6, 9],
-              [1, 4, 9],
-              [0, 5, 9, 12],
-              [0, 4, 7, 12],
-            ]}
-            fillColor="#2200ff"
-          /> */}
-          {/* <Pattern
-            // root
-            tab={[[0, 12], [7], [2], [9], [5], [0, 12]]}
-            fillColor="#ff0000"
-          /> */}
-        </Fretboard>
+        <Panel className="min-w-0 sm:p-8">
+          <Fretboard
+            numFrets={numFrets}
+            showOpenNotes={false}
+            title="Guitar fretboard diagram highlighting the minor pentatonic scale pattern"
+          >
+            <path
+              d="M 52 380 C 500 380 500 20 1252 20"
+              stroke={ACCENT_HEX}
+              strokeOpacity="0.55"
+              strokeWidth="40"
+              strokeLinecap="round"
+              fill="transparent"
+            />
+            <Pattern
+              tab={[
+                [0, 2, 4, 7, 9, 12],
+                [2, 4, 7, 9, 11],
+                [2, 4, 6, 9, 11],
+                [1, 4, 6, 9, 11],
+                [0, 2, 5, 7, 9, 12],
+                [0, 2, 4, 7, 9, 12],
+              ]}
+              fillColor="#000"
+            />
+            <Pattern tab={[[0], [], [], [], [], [12]]} fillColor="#2563EB" />
+          </Fretboard>
+        </Panel>
       </header>
-      <section className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <h2>
-            <Link href="/chord">Chord Library</Link>
-          </h2>
-          <p className="text-sm text-fg-secondary">
-            Browse chord shapes by quality and voicing in any key.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3>Open Chords</h3>
-          <CardRow>
-            {openChordCards.map((chord) => (
-              <ChordPreviewCard
-                key={chord.label}
-                href={chord.href}
-                label={chord.label}
-                tab={chord.tab}
-                startFret={chord.startFret}
-                numFrets={chord.numFrets}
-                className="w-32 shrink-0"
+
+      <div className="divide-y divide-line">
+        <ShowcaseSection
+          sectionLabel="CHORDS"
+          headline={['Every voicing,', 'every position.']}
+          description={`${qualities.length} chord qualities across all 12 roots, each mapped to the shapes that actually fall under your hand.`}
+          ctaLabel="Browse the chord database"
+          ctaHref="/chord"
+          tabs={[
+            {
+              label: 'Popular',
+              content: popularChordCards.map((chord) => (
+                <ChordPreviewCard
+                  key={chord.label}
+                  variant="raised"
+                  href={chord.href}
+                  label={chord.label}
+                  sublabel={chord.sublabel}
+                  tab={chord.tab}
+                  startFret={chord.startFret}
+                  numFrets={chord.numFrets}
+                  className="w-36 shrink-0"
+                />
+              )),
+            },
+            {
+              label: 'Open',
+              content: openChordCards.map((chord) => (
+                <ChordPreviewCard
+                  key={chord.label}
+                  variant="raised"
+                  href={chord.href}
+                  label={chord.label}
+                  sublabel={chord.sublabel}
+                  tab={chord.tab}
+                  startFret={chord.startFret}
+                  numFrets={chord.numFrets}
+                  className="w-36 shrink-0"
+                />
+              )),
+            },
+            {
+              label: 'Sevenths',
+              content: seventhChordCards.map((chord) => (
+                <ChordPreviewCard
+                  key={chord.label}
+                  variant="raised"
+                  href={chord.href}
+                  label={chord.label}
+                  sublabel={chord.sublabel}
+                  tab={chord.tab}
+                  startFret={chord.startFret}
+                  numFrets={chord.numFrets}
+                  className="w-36 shrink-0"
+                />
+              )),
+            },
+          ]}
+        />
+
+        <ShowcaseSection
+          mirror
+          sectionLabel="SCALES"
+          headline={['Every mode,', 'every key.']}
+          description="All 7 modes of the major scale, plus major and minor pentatonic, mapped across the full neck in any key."
+          ctaLabel="Explore the scale library"
+          ctaHref="/scale"
+          tabs={[
+            {
+              label: 'Major Scale Modes',
+              content: MAJOR_SCALE_MODES.map((mode) => (
+                <ScalePreviewCard
+                  key={mode.slug}
+                  variant="raised"
+                  className="w-36 shrink-0"
+                  href={`/scale/major-scale/${mode.slug}`}
+                  label={mode.displayName}
+                  sublabel="mode"
+                  modeIntervals={getModeIntervals(
+                    MAJOR_SCALE_INTERVALS,
+                    mode.degree,
+                  )}
+                  rootPc={ROOT_PC}
+                />
+              )),
+            },
+            {
+              label: 'Pentatonic',
+              content: PENTATONIC_SCALES.map((scale) => (
+                <ScalePreviewCard
+                  key={scale.slug}
+                  variant="raised"
+                  className="w-36 shrink-0"
+                  href={`/scale/pentatonic/${scale.slug}`}
+                  label={scale.displayName}
+                  sublabel="scale"
+                  modeIntervals={getModeIntervals(
+                    MAJOR_PENTATONIC_INTERVALS,
+                    scale.degree,
+                  )}
+                  rootPc={ROOT_PC}
+                />
+              )),
+            },
+          ]}
+        />
+
+        <ShowcaseSection
+          sectionLabel="LESSONS"
+          headline={['Structured lessons,', 'taught on the fretboard.']}
+          description={`${LESSONS.length} lessons across ${LESSON_PARTS.length} parts, from intervals and the root note to modes and voicings — each one taught through an interactive diagram.`}
+          ctaLabel="Start learning"
+          ctaHref="/lesson"
+          tabs={LESSON_PARTS.map((part) => ({
+            label: part.title,
+            content: part.lessons.map((lesson) => (
+              <LessonPreviewCard
+                key={lesson.slug}
+                href={`/lesson/${part.slug}/${lesson.slug}`}
+                label={lesson.title}
               />
-            ))}
-          </CardRow>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3>Triad Chords</h3>
-          <CardRow>
-            {triadChordCards.map((chord) => (
-              <ChordPreviewCard
-                key={chord.label}
-                href={chord.href}
-                label={chord.label}
-                tab={chord.tab}
-                startFret={chord.startFret}
-                numFrets={chord.numFrets}
-                className="w-32 shrink-0"
-              />
-            ))}
-          </CardRow>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3>Seventh Chords</h3>
-          <CardRow>
-            {seventhChordCards.map((chord) => (
-              <ChordPreviewCard
-                key={chord.label}
-                href={chord.href}
-                label={chord.label}
-                tab={chord.tab}
-                startFret={chord.startFret}
-                numFrets={chord.numFrets}
-                className="w-32 shrink-0"
-              />
-            ))}
-          </CardRow>
-        </div>
-      </section>
-      <section className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <h2>
-            <Link href="/scale/major-scale/ionian">Scale Explorer</Link>
-          </h2>
-          <p className="text-sm text-fg-secondary">
-            See any mode or scale across the full neck in your chosen key.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3>Modes of the Major Scale</h3>
-          <CardRow>
-            {MAJOR_SCALE_MODES.map((mode) => (
-              <ScalePreviewCard
-                key={mode.slug}
-                className="w-32 shrink-0"
-                href={`/scale/major-scale/${mode.slug}`}
-                label={mode.displayName}
-                modeIntervals={getModeIntervals(
-                  MAJOR_SCALE_INTERVALS,
-                  mode.degree,
-                )}
-                rootPc={ROOT_PC}
-              />
-            ))}
-          </CardRow>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3>Pentatonic Scale</h3>
-          <CardRow>
-            {PENTATONIC_SCALES.map((scale) => (
-              <ScalePreviewCard
-                key={scale.slug}
-                className="w-32 shrink-0"
-                href={`/scale/pentatonic/${scale.slug}`}
-                label={scale.displayName}
-                modeIntervals={getModeIntervals(
-                  MAJOR_PENTATONIC_INTERVALS,
-                  scale.degree,
-                )}
-                rootPc={ROOT_PC}
-              />
-            ))}
-          </CardRow>
-        </div>
-      </section>
+            )),
+          }))}
+        />
+      </div>
     </>
   );
 }

@@ -1,43 +1,15 @@
 'use client';
 import { useEffect, useId } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { STANDARD_TUNING_PC } from '@/app/utils/constants';
+import { STRING_LABELS, fingerLabel } from '@/app/utils/musicUtils';
 import { RootSelect } from '@/components/RootSelect';
+import { PillSelect } from '@/components/PillSelect';
 import {
   ROOT_STRINGS,
   getValidFingersForString,
   type RootString,
   type ScalePosition,
 } from '@/modules/scale/utils/scaleUtils';
-
-const STRING_LABELS: Record<RootString, string> = {
-  6: '6th string',
-  5: '5th string',
-  4: '4th string',
-};
-
-const FINGER_LABELS: Record<number, string> = {
-  0: 'stretch 1st finger',
-  1: '1st finger',
-  2: '2nd finger',
-  3: '3rd finger',
-  4: '4th finger',
-};
-
-function fingerLabel(
-  finger: number,
-  rootString: RootString,
-  rootPc: number,
-  zeroOverride?: 'open' | 'stretch',
-): string {
-  if (finger === 0) {
-    if (zeroOverride)
-      return zeroOverride === 'open' ? 'open' : FINGER_LABELS[0];
-    const openPc = STANDARD_TUNING_PC[6 - rootString];
-    if ((rootPc - openPc + 12) % 12 === 0) return 'open';
-  }
-  return FINGER_LABELS[finger];
-}
 
 interface PositionControlsProps {
   rootNote: string;
@@ -132,17 +104,16 @@ export function PositionControls({
       />
 
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium" htmlFor="string-select">
+        <label className="text-sm text-fg-secondary" htmlFor="string-select">
           String
         </label>
-        <select
+        <PillSelect
           id="string-select"
           value={allowAny ? rawString : position.rootString}
           onChange={(e) =>
             updateParams({ string: e.target.value || null, position: null })
           }
           aria-describedby={liveUpdateHintId}
-          className="text-sm"
         >
           {allowAny && <option value="">Any string</option>}
           {ROOT_STRINGS.map((s) => (
@@ -150,14 +121,14 @@ export function PositionControls({
               {STRING_LABELS[s]}
             </option>
           ))}
-        </select>
+        </PillSelect>
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium" htmlFor="position-select">
+        <label className="text-sm text-fg-secondary" htmlFor="position-select">
           Position
         </label>
-        <select
+        <PillSelect
           id="position-select"
           value={allowAny ? rawPosition : position.rootFinger}
           onChange={(e) => updateParams({ position: e.target.value || null })}
@@ -167,7 +138,6 @@ export function PositionControls({
               ? `${liveUpdateHintId} ${positionDisabledHintId}`
               : liveUpdateHintId
           }
-          className="text-sm"
         >
           {allowAny && <option value="">Any position</option>}
           {validFingers.map((f) => (
@@ -180,7 +150,7 @@ export function PositionControls({
               )}
             </option>
           ))}
-        </select>
+        </PillSelect>
         {allowAny && !rawString && (
           <p id={positionDisabledHintId} className="sr-only">
             Choose a string first.

@@ -11,13 +11,35 @@ import {
   buildDotLabelMap,
 } from '@/modules/chordv2/utils/intervalDegrees';
 import { getMissingIntervalPcs } from '@/modules/chordv2/utils/droppedIntervals';
+import {
+  classifyFamily,
+  FAMILY_DESCRIPTIONS,
+} from '@/modules/chordv2/utils/chordFamily';
+import Link from 'next/link';
 import { PositionControls } from '@/components/PositionControls';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
 import { Tags, type Tag } from '@/components/Tags';
+import { SectionLabel } from '@/components/SectionLabel';
+import { Panel } from '@/components/Panel';
+import {
+  RootHighlightProvider,
+  RootHighlightToggle,
+  RootHighlightLayer,
+} from '@/components/RootHighlightToggle';
 import { JsonLd } from '@/components/JsonLd';
 import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
-import { INTERVAL_LABELS, STANDARD_TUNING_PC } from '@/app/utils/constants';
-import { computeRootFret, computeFingerLabels } from '@/app/utils/musicUtils';
+import {
+  INTERVAL_LABELS,
+  STANDARD_TUNING_PC,
+  DEGREE_FULL_NAMES,
+  ACCENT_HEX,
+} from '@/app/utils/constants';
+import {
+  computeRootFret,
+  computeFingerLabels,
+  STRING_LABELS,
+  fingerLabel,
+} from '@/app/utils/musicUtils';
 import { parseNote } from '@/app/utils/noteSpelling';
 import type { FlatTabValue } from '@/types';
 import {
@@ -33,10 +55,6 @@ import {
 import { ChordShapeActionDropdown } from '@/modules/chordv2/ChordShapeActionDropdown';
 import { RelatedChords } from '@/modules/chordv2/RelatedChords';
 import { Inversions } from '@/modules/chordv2/Inversions';
-import {
-  InversionSelect,
-  type InversionOption,
-} from '@/modules/chordv2/InversionSelect';
 import { LogMissingChordVisit } from '@/modules/chordv2/LogMissingChordVisit';
 import { PC_TO_NOTE } from '@/app/utils/constants';
 import { splitCompoundChordSymbol } from '@/modules/chordv2/utils/compoundChordSymbol';
@@ -50,12 +68,6 @@ import {
   getOpenRootsByShapeId,
 } from '@/modules/chordv2/db/queries';
 
-const INVERSION_ORDINAL: Record<number, string> = {
-  1: '1st',
-  2: '2nd',
-  3: '3rd',
-};
-
 type Props = {
   params: Promise<{ quality: string }>;
   searchParams: Promise<{
@@ -66,6 +78,25 @@ type Props = {
   }>;
 };
 
+function joinWithAnd(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+}
+
+// Spells out a chord's full interval set in plain words ("root, major 3rd,
+// perfect 5th, and major 7th") — quality-level, so it holds regardless of
+// which shape/position is currently on screen.
+function buildIntervalSentence(
+  intervals: number[],
+  overrides: Record<string, string> = {},
+): string {
+  const names = intervalsToDegrees(intervals, overrides).map(
+    (d) => DEGREE_FULL_NAMES[d] ?? d,
+  );
+  return joinWithAnd(names);
+}
+
 // "Cmaj7" is the dominant real search form (guitartheory.app GSC data shows
 // it beats "C maj7" / "C major 7" by roughly 250:1) but "C Major 7th" still
 // matters for semantic/voice-search variants — pairing both in one string
@@ -74,14 +105,45 @@ function buildChordDisplayNames(
   rootNote: string,
   symbol: string,
   fullName: string,
+  intervals: number[],
+  overrides: Record<string, string> = {},
 ): { compactName: string; title: string; description: string } {
   const compactName = `${rootNote}${symbol}`;
   const spelledName = `${rootNote} ${fullName}`;
+  const intervalSentence = buildIntervalSentence(intervals, overrides);
   return {
     compactName,
     title: `${compactName} (${spelledName})`,
-    description: `${compactName} guitar chord shapes — ${spelledName}, in every position on the fretboard.`,
+    description: `${compactName} (${spelledName}) guitar chord shapes in every position on the fretboard. Built from the ${intervalSentence}.`,
   };
+}
+
+// Position-specific "how to play" sentence: root string/finger (the site's
+// established position vocabulary, e.g. PositionControls) plus a bass-note
+// clause for inversions and an omitted-tone clause when the current shape
+// drops a chord tone (see droppedFifth/droppedSeventh at the call site).
+function buildHowToPlayText(
+  spelledName: string,
+  rootString: number,
+  rootFinger: number,
+  rootPc: number,
+  fingerZeroLabel: 'open' | 'stretch',
+  bassNote: string | null,
+  omittedDegrees: string[],
+  isOpen: boolean,
+): string {
+  const finger = fingerLabel(rootFinger, rootString, rootPc, fingerZeroLabel);
+  const bassClause = bassNote ? `, with ${bassNote} in the bass` : '';
+  const omittedNames = omittedDegrees.map((d) => DEGREE_FULL_NAMES[d] ?? d);
+  const omissionClause =
+    omittedNames.length > 0
+      ? ` This voicing omits the ${joinWithAnd(omittedNames)}.`
+      : '';
+  // Skip when the finger label already says "open" (root on an open string)
+  // — stating it again right after would just repeat itself.
+  const openClause =
+    isOpen && finger !== 'open' ? ' This is an open chord.' : '';
+  return `${spelledName}, root on the ${STRING_LABELS[rootString]}, ${finger}${bassClause}.${omissionClause}${openClause}`;
 }
 
 export async function generateMetadata({
@@ -98,6 +160,8 @@ export async function generateMetadata({
     rootNote,
     symbol,
     qualityMeta.full_name,
+    qualityMeta.intervals,
+    qualityMeta.interval_overrides ?? {},
   );
   return {
     title,
@@ -122,6 +186,18 @@ function tabDegreeLabels(
     const interval = (STANDARD_TUNING_PC[si] + fret - rootPc + 120) % 12;
     return labelMap[interval] ?? INTERVAL_LABELS[interval];
   });
+}
+
+// Isolates just the root-note position(s) from a tab — a shape can double
+// the root on more than one string (e.g. a barre chord), so this goes by
+// each string's actual degree label rather than assuming root_string is the
+// only root. Used for the RootHighlightToggle overlay, drawn as a second
+// Pattern layer on top of the default one.
+function rootOnlyTab(
+  tab: FlatTabValue[],
+  labels: (string | undefined)[],
+): FlatTabValue[] {
+  return tab.map((fret, i) => (labels[i] === '1' ? fret : undefined));
 }
 
 function parseRootNote(raw: string | undefined): string {
@@ -194,6 +270,7 @@ export default async function ChordQualityPage({
   }
 
   const fullName = shapes[0]?.quality_full_name ?? qualityMeta.full_name;
+  const family = classifyFamily(qualityMeta.intervals);
   const degrees = qualityMeta
     ? intervalsToDegrees(
         qualityMeta.intervals,
@@ -214,7 +291,13 @@ export default async function ChordQualityPage({
     compactName,
     title: rootAwareTitle,
     description: chordDescription,
-  } = buildChordDisplayNames(rootNote, symbol, fullName);
+  } = buildChordDisplayNames(
+    rootNote,
+    symbol,
+    fullName,
+    qualityMeta.intervals,
+    qualityMeta.interval_overrides ?? {},
+  );
 
   // A moveable shape is valid at a given root unless it's root-restricted:
   //   - it has its own open_chords entries → valid ONLY at those roots (an
@@ -297,20 +380,19 @@ export default async function ChordQualityPage({
     : 'open';
 
   // Fixed (open-position) inversions — slash chords like C/G — are looked up
-  // purely by root, independent of string/position (see InversionSelect).
-  // Moveable multi-string-set inversions (e.g. maj7's drop-2 cycle) are still
-  // scoped by the currently-selected string, since which string set you're
-  // browsing is a real choice for those.
-  const fixedInversionsForRoot = qualityMeta
-    ? await getFixedInversionsForRoot(symbol, rootPc)
-    : [];
-  const inversionOptions: InversionOption[] = [
-    { inversion: 0, label: 'Root position' },
-    ...fixedInversionsForRoot.map((s) => ({
-      inversion: s.inversion,
-      label: `${INVERSION_ORDINAL[s.inversion] ?? `${s.inversion}th`} inversion`,
-    })),
-  ];
+  // purely by root, independent of string/position. Moveable multi-string-
+  // set inversions (e.g. maj7's drop-2 cycle) are still scoped by the
+  // currently-selected string, since which string set you're browsing is a
+  // real choice for those. Both pools feed the one Inversions card row
+  // below (see that file's top comment) and resolve which shape
+  // `?inversion=` currently points at — fetched once here and passed down,
+  // rather than re-fetched inside <Inversions> too.
+  const [fixedInversionsForRoot, moveableInversionShapes] = qualityMeta
+    ? await Promise.all([
+        getFixedInversionsForRoot(symbol, rootPc),
+        getInversionShapes(symbol, effectivePosition.rootString),
+      ])
+    : [[], []];
 
   const requestedInversion = Number(sp.inversion);
   const inversionShape =
@@ -320,7 +402,7 @@ export default async function ChordQualityPage({
       ? (fixedInversionsForRoot.find(
           (s) => s.inversion === requestedInversion,
         ) ??
-        (await getInversionShapes(symbol, effectivePosition.rootString)).find(
+        moveableInversionShapes.find(
           (s) => s.inversion === requestedInversion && s.moveable,
         ) ??
         null)
@@ -406,31 +488,54 @@ export default async function ChordQualityPage({
   // added in the bass) — root_string/root_finger on the inversion row are set
   // to that parent shape's position, so the controls stay meaningful instead
   // of describing where the bass note happens to fall.
-  const isFixedInversion = !!inversionShape && !inversionShape.moveable;
   const displayPosition: ScalePosition = inversionShape
     ? {
         rootString: inversionShape.root_string as RootString,
         rootFinger: (inversionShape.root_finger ?? 0) as RootFinger,
       }
     : effectivePosition;
-  // The string-scoped Inversions card row can't discover fixed inversions
-  // (they're keyed by bass_string, which no longer matches root_string once
-  // it points at the parent shape) — the Inversion select above is the
-  // reliable path for those, so skip the card row while one's showing.
+
+  const isOpen = matchingShape
+    ? await isOpenChord(matchingShape.id, rootPc)
+    : false;
+
+  const omittedDegrees = qualityMeta.intervals
+    .map((interval, i) => (missingPcs.has(interval % 12) ? degrees[i] : null))
+    .filter((d): d is string => d !== null);
+  const howToPlayText = transposed
+    ? buildHowToPlayText(
+        `${rootNote} ${fullName}`,
+        displayPosition.rootString,
+        displayPosition.rootFinger,
+        rootPc,
+        fingerZeroLabel,
+        bassNote,
+        omittedDegrees,
+        isOpen,
+      )
+    : null;
 
   // Room to grow — more tags (e.g. "Barre", "Beginner") can push onto this
   // array as more curated properties get added. Each links back to the
   // matching browse mode on the chord list page.
   const tags: Tag[] = [];
-  if (matchingShape && (await isOpenChord(matchingShape.id, rootPc))) {
+  if (isOpen) {
     tags.push({ label: 'Open', href: '/chord?mode=open' });
   }
   if (matchingShape && matchingShape.inversion > 0) {
     tags.push({ label: 'Slash', href: '/chord?mode=slash' });
   }
 
+  const dotLabels = transposed
+    ? tabDegreeLabels(transposed.tab, rootPc, dotLabelMap)
+    : undefined;
+  // Always computed — RootHighlightLayer (client) decides whether to
+  // actually render it, based on the toggle's local state.
+  const rootHighlightTab =
+    transposed && dotLabels ? rootOnlyTab(transposed.tab, dotLabels) : null;
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <JsonLd
         data={breadcrumbList([
           { name: 'Home', path: '/' },
@@ -447,138 +552,187 @@ export default async function ChordQualityPage({
         })}
       />
       <div>
-        <div>
-          <h1 className="text-2xl font-bold">{rootAwareTitle}</h1>
-        </div>
+        <SectionLabel>Chords / {fullName}</SectionLabel>
+        {/* Text content is identical to rootAwareTitle ("Cmaj7 (C Major
+            7th)") — split across spans purely for the accent-color
+            treatment, not to change what's rendered for SEO. */}
+        <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+          {compactName}{' '}
+          <span className="text-2xl font-normal text-fg-secondary sm:text-3xl">
+            ({rootNote} <span className="text-accent">{fullName}</span>)
+          </span>
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm text-fg-secondary">
+          {chordDescription}
+        </p>
+
         {degrees.length > 0 && qualityMeta && (
-          <>
-            <h2 className="mb-1 mt-4 text-sm font-medium">Intervals</h2>
-            <p className="font-mono text-sm tracking-wider">
-              {qualityMeta.intervals
-                .map((interval, i) => {
-                  const label = missingPcs.has(interval % 12)
-                    ? `(${degrees[i]})`
-                    : degrees[i];
-                  return i === 0 ? label : `  ${label}`;
-                })
-                .join('')}
-            </p>
-          </>
-        )}
-        {degrees.length > 0 && qualityMeta && (
-          <>
-            <h2 className="mb-1 mt-4 text-sm font-medium">Notes</h2>
-            <p className="font-mono text-sm tracking-wider">
-              {qualityMeta.intervals
-                .map((interval, i) => {
-                  const note = PC_TO_NOTE[(rootPc + interval) % 12];
-                  const label = missingPcs.has(interval % 12)
-                    ? `(${note})`
-                    : note;
-                  return i === 0 ? label : `  ${label}`;
-                })
-                .join('')}
-            </p>
-          </>
-        )}
-        {transposed && (
-          <>
-            <div className="mb-1 mt-4 flex items-center gap-2">
-              <h2 className="text-sm font-medium">Tab</h2>
-              <span className="text-xs text-fg-secondary">
-                {droppedFifth && 'no 5'}
-                {droppedFifth && droppedSeventh && ' · '}
-                {droppedSeventh && 'no 7'}
-              </span>
+          <div className="mt-8 flex flex-wrap gap-x-12 gap-y-6">
+            <div>
+              <SectionLabel as="h2">Intervals</SectionLabel>
+              <p className="mt-2 font-mono text-sm tracking-wider">
+                {qualityMeta.intervals
+                  .map((interval, i) => {
+                    const label = missingPcs.has(interval % 12)
+                      ? `(${degrees[i]})`
+                      : degrees[i];
+                    return i === 0 ? label : `  ${label}`;
+                  })
+                  .join('')}
+              </p>
+              <p className="mt-1 max-w-xs text-xs text-fg-secondary">
+                {FAMILY_DESCRIPTIONS[family]} See how interval numbers work in
+                the{' '}
+                <Link href="/lesson/foundations/intervals-and-root-note">
+                  Intervals and the Root Note
+                </Link>{' '}
+                lesson.
+              </p>
             </div>
-            <p className="font-mono text-sm">
-              {transposed.tab.map((v) => (v === undefined ? '' : v)).join('-')}
-            </p>
-          </>
+            <div>
+              <SectionLabel as="h2">Notes</SectionLabel>
+              <p className="mt-2 font-mono text-sm tracking-wider">
+                {qualityMeta.intervals
+                  .map((interval, i) => {
+                    const note = PC_TO_NOTE[(rootPc + interval) % 12];
+                    const label = missingPcs.has(interval % 12)
+                      ? `(${note})`
+                      : note;
+                    return i === 0 ? label : `  ${label}`;
+                  })
+                  .join('')}
+              </p>
+            </div>
+            {transposed && (
+              <div>
+                <div className="flex items-center gap-2">
+                  <SectionLabel as="h2">Tab</SectionLabel>
+                  <span className="text-xs text-fg-muted">
+                    {droppedFifth && 'no 5'}
+                    {droppedFifth && droppedSeventh && ' · '}
+                    {droppedSeventh && 'no 7'}
+                  </span>
+                </div>
+                <p className="mt-2 font-mono text-sm">
+                  {transposed.tab
+                    .map((v) => (v === undefined ? '' : v))
+                    .join('-')}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
-      <Suspense>
-        <PositionControls
-          rootNote={rootNote}
-          rootPc={rootPc}
-          position={displayPosition}
-          disabledStrings={disabledStrings}
-          disabledFingers={disabledFingers}
-          fingerZeroLabel={fingerZeroLabel}
-        />
-      </Suspense>
-
-      <InversionSelect
-        options={inversionOptions}
-        selected={inversionShape?.inversion ?? 0}
-      />
-
-      {transposed && <p className="text-base font-semibold">{displayName}</p>}
-
-      {transposed ? (
-        <div className="flex items-start gap-2">
-          <div className="w-64">
-            <Fretboard
-              id="chord-diagram"
-              numFrets={transposed.numFrets}
-              startFret={transposed.startFret}
-              title={displayName}
-              fingerLabels={fingerLabels}
-            >
-              <Pattern
-                tab={transposed.tab}
-                startFret={transposed.startFret}
-                fillColor="#000"
-                intervals={tabDegreeLabels(transposed.tab, rootPc, dotLabelMap)}
+      {/* key resets the toggle when navigating to a different quality (e.g.
+          a Related Chords/Inversions card) — root/string/position/inversion
+          changes reuse the same key (symbol doesn't change), so those
+          intentionally leave the toggle as the reader left it. */}
+      <RootHighlightProvider key={symbol}>
+        <Panel>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Suspense>
+              <PositionControls
+                rootNote={rootNote}
+                rootPc={rootPc}
+                position={displayPosition}
+                disabledStrings={disabledStrings}
+                disabledFingers={disabledFingers}
+                fingerZeroLabel={fingerZeroLabel}
               />
-            </Fretboard>
-            <div className="mt-2">
-              <Tags tags={tags} />
-            </div>
-            {!bassNote &&
-              qualityMeta?.aliases &&
-              qualityMeta.aliases.length > 0 && (
-                <p className="mt-2 text-sm text-fg-secondary">
-                  Also known as:{' '}
-                  {qualityMeta.aliases.map((a) => `${rootNote}${a}`).join(', ')}
+            </Suspense>
+            <RootHighlightToggle />
+          </div>
+
+          {transposed && (
+            <div className="mt-4">
+              <p className="text-base font-semibold">{displayName}</p>
+              {howToPlayText && (
+                <p className="mt-1 text-sm text-fg-secondary">
+                  {howToPlayText}
                 </p>
               )}
-          </div>
-          {matchingShape && (
-            <ChordShapeActionDropdown
-              shapeId={matchingShape.id}
-              chordName={displayName}
-              svgId="chord-diagram"
-            />
+            </div>
           )}
-        </div>
-      ) : (
-        <>
-          <p className="text-sm text-fg-secondary">
-            {shapes.length === 0
-              ? 'No shapes have been added for this chord yet.'
-              : 'No shape found for this string and position.'}
-          </p>
-          {shapes.length === 0 && qualityMeta && (
-            <LogMissingChordVisit
-              qualitySymbol={qualityMeta.symbol}
-              qualityFullName={qualityMeta.full_name}
-              intervals={qualityMeta.intervals}
-            />
-          )}
-        </>
-      )}
 
-      {!isFixedInversion && (
-        <Inversions
-          symbol={symbol}
-          rootNote={rootNote}
-          rootPc={rootPc}
-          position={effectivePosition}
-          currentInversion={inversionShape?.inversion ?? 0}
-        />
-      )}
+          {transposed ? (
+            <div className="mt-4 flex items-start gap-2">
+              <div className="w-64">
+                <Fretboard
+                  id="chord-diagram"
+                  numFrets={transposed.numFrets}
+                  startFret={transposed.startFret}
+                  title={`${displayName} chord, root on the ${displayPosition.rootString}th string, guitar fretboard diagram`}
+                  fingerLabels={fingerLabels}
+                >
+                  <Pattern
+                    tab={transposed.tab}
+                    startFret={transposed.startFret}
+                    fillColor="#000"
+                    intervals={dotLabels}
+                  />
+                  {rootHighlightTab && (
+                    <RootHighlightLayer>
+                      <Pattern
+                        tab={rootHighlightTab}
+                        startFret={transposed.startFret}
+                        fillColor={ACCENT_HEX}
+                        intervals={dotLabels}
+                      />
+                    </RootHighlightLayer>
+                  )}
+                </Fretboard>
+                <div className="mt-2">
+                  <Tags tags={tags} />
+                </div>
+                {!bassNote &&
+                  qualityMeta?.aliases &&
+                  qualityMeta.aliases.length > 0 && (
+                    <p className="mt-2 text-sm text-fg-secondary">
+                      Also known as:{' '}
+                      {qualityMeta.aliases
+                        .map((a) => `${rootNote}${a}`)
+                        .join(', ')}
+                    </p>
+                  )}
+              </div>
+              {matchingShape && (
+                <ChordShapeActionDropdown
+                  shapeId={matchingShape.id}
+                  chordName={displayName}
+                  svgId="chord-diagram"
+                />
+              )}
+            </div>
+          ) : (
+            <div className="mt-4">
+              <p className="text-sm text-fg-secondary">
+                {shapes.length === 0
+                  ? 'No shapes have been added for this chord yet.'
+                  : 'No shape found for this string and position.'}
+              </p>
+              {shapes.length === 0 && qualityMeta && (
+                <LogMissingChordVisit
+                  qualitySymbol={qualityMeta.symbol}
+                  qualityFullName={qualityMeta.full_name}
+                  intervals={qualityMeta.intervals}
+                />
+              )}
+            </div>
+          )}
+        </Panel>
+      </RootHighlightProvider>
+
+      <Inversions
+        symbol={symbol}
+        quality={qualityMeta}
+        fixedShapes={fixedInversionsForRoot}
+        moveableShapes={moveableInversionShapes}
+        rootNote={rootNote}
+        rootPc={rootPc}
+        position={effectivePosition}
+        currentInversion={inversionShape?.inversion ?? 0}
+      />
 
       <RelatedChords
         symbol={symbol}

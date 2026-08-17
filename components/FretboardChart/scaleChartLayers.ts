@@ -68,7 +68,9 @@ export function scaleChartDefaultLayer(
 // Splits a derived scale render into a default layer (every scale tone) and
 // a highlight layer (the root) — the standard lesson-page treatment. Not for
 // library pages: those call scaleChartDefaultLayer instead, since there the
-// root isn't singled out from the rest of the scale.
+// root isn't singled out from the rest of the scale. (ScaleViewer's
+// RootHighlightToggle overlay is built separately, straight off
+// deriveScaleRender's rootTab/rootIntervalTab — see ScaleViewer.tsx.)
 export function scaleChartLayers(
   rendered: DerivedScaleRender,
 ): ScaleChartLayer[] {

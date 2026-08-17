@@ -4,6 +4,9 @@ import { useState, useTransition } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ChordPreviewCard } from '@/components/ChordPreviewCard';
 import { FreeformFretboardWithControls } from '@/components/FreeformFretboard';
+import { SectionLabel } from '@/components/SectionLabel';
+import { Panel } from '@/components/Panel';
+import { Button } from '@/components/Button';
 import { identifyChord, type FreeformMatch } from '@/modules/chordid/actions';
 import type { FlatTabValue } from '@/types';
 
@@ -47,6 +50,7 @@ function MatchResult({
 
   return (
     <ChordPreviewCard
+      variant="raised"
       href={href}
       label={`${m.rootNote}${m.quality_symbol}`}
       sublabel={m.quality_full_name}
@@ -143,77 +147,85 @@ export function FreeformChordIdentifier() {
   const hasNotes = tab.some((v) => v !== undefined);
 
   return (
-    <div>
-      <div className="w-80">
-        <FreeformFretboardWithControls
-          tab={tab}
-          onTabChange={handleTabChange}
-          onClear={handleClear}
-        />
-      </div>
-
-      <p className="mt-3 font-mono text-xs tracking-widest text-fg-secondary">
-        {tabDisplay}
-      </p>
-
-      <button
-        type="button"
-        onClick={handleCheck}
-        disabled={isPending || !hasNotes}
-        className="mt-4 rounded border border-current px-4 py-2 text-sm font-medium hover:bg-surface-sunken disabled:opacity-50"
-      >
-        {isPending ? 'Checking…' : 'Check'}
-      </button>
-
-      {error && (
-        <p role="alert" className="mt-4 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
-      {checked && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="mt-6 flex flex-col gap-4"
-        >
-          {exactMatches.length === 0 && suggestMatches.length === 0 && (
-            <p className="text-sm text-fg-secondary">No match found</p>
-          )}
-          {exactMatches.length > 0 && (
-            <div>
-              <p className="mb-2 text-sm font-medium">Match</p>
-              <div className="flex flex-wrap gap-4">
-                {exactMatches.map((m) => (
-                  <MatchResult
-                    key={`${m.rootPc}-${m.quality_symbol}`}
-                    m={m}
-                    fallbackTab={displayInfo.tab}
-                    fallbackStartFret={displayInfo.startFret}
-                    fallbackNumFrets={displayInfo.numFrets}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          {suggestMatches.length > 0 && (
-            <div>
-              <p className="mb-2 text-sm font-medium">Did you mean?</p>
-              <div className="flex flex-wrap gap-4">
-                {suggestMatches.map((m) => (
-                  <MatchResult
-                    key={`${m.rootPc}-${m.quality_symbol}`}
-                    m={m}
-                    fallbackTab={displayInfo.tab}
-                    fallbackStartFret={displayInfo.startFret}
-                    fallbackNumFrets={displayInfo.numFrets}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
+      <Panel>
+        <SectionLabel className="mb-4">Freeform fretboard</SectionLabel>
+        <div className="w-80 max-w-full">
+          <FreeformFretboardWithControls
+            tab={tab}
+            onTabChange={handleTabChange}
+            onClear={handleClear}
+          />
         </div>
-      )}
+
+        <p className="mt-4 font-mono text-xs tracking-widest text-fg-muted">
+          {tabDisplay}
+        </p>
+
+        <Button
+          type="button"
+          pill
+          className="mt-4 px-6"
+          onClick={handleCheck}
+          disabled={isPending || !hasNotes}
+          isLoading={isPending}
+        >
+          Check
+        </Button>
+
+        {error && (
+          <p role="alert" className="mt-4 text-sm text-error">
+            {error}
+          </p>
+        )}
+      </Panel>
+
+      <aside>
+        <SectionLabel className="mb-4">Matches</SectionLabel>
+        {checked ? (
+          <div role="status" aria-live="polite" className="flex flex-col gap-6">
+            {exactMatches.length === 0 && suggestMatches.length === 0 && (
+              <p className="text-sm text-fg-secondary">No match found</p>
+            )}
+            {exactMatches.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium">Match</p>
+                <div className="flex flex-wrap gap-4">
+                  {exactMatches.map((m) => (
+                    <MatchResult
+                      key={`${m.rootPc}-${m.quality_symbol}`}
+                      m={m}
+                      fallbackTab={displayInfo.tab}
+                      fallbackStartFret={displayInfo.startFret}
+                      fallbackNumFrets={displayInfo.numFrets}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {suggestMatches.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium">Did you mean?</p>
+                <div className="flex flex-wrap gap-4">
+                  {suggestMatches.map((m) => (
+                    <MatchResult
+                      key={`${m.rootPc}-${m.quality_symbol}`}
+                      m={m}
+                      fallbackTab={displayInfo.tab}
+                      fallbackStartFret={displayInfo.startFret}
+                      fallbackNumFrets={displayInfo.numFrets}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-fg-secondary">
+            Place some notes and press Check to see matches here.
+          </p>
+        )}
+      </aside>
     </div>
   );
 }

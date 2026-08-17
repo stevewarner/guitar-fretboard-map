@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { SectionLabel } from '@/components/SectionLabel';
 import {
   DiatonicChord,
   computePositionWindow,
@@ -113,13 +114,13 @@ function ChordGrid({
           <Link
             key={chord.degree}
             href={`/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(chord.rootNote)}${shape ? `&string=${shape.root_string}&position=${shape.root_finger ?? 1}` : ''}`}
-            className="flex flex-col items-center gap-1 rounded border border-current px-3 py-2 hover:bg-surface-sunken"
+            className="flex flex-col items-center gap-1 rounded-xl bg-surface-raised p-3 hover:bg-surface-sunken"
           >
-            <span className="font-mono text-xs text-fg-secondary">
+            <span className="font-mono text-xs text-fg-muted">
               {chord.romanNumeral}
               {chord.quality}
             </span>
-            <span className="text-sm font-medium">{chord.name}</span>
+            <span className="text-sm font-semibold">{chord.name}</span>
             {transposed && (
               <Fretboard
                 numFrets={transposed.numFrets}
@@ -167,7 +168,9 @@ export async function ModeChords({
 
   return (
     <section className="mt-12">
-      <h2 className="mb-6">Chords</h2>
+      <SectionLabel as="h2" className="mb-6">
+        Chords
+      </SectionLabel>
       <h3 className="mb-3 text-sm font-medium">Triads</h3>
       <ChordGrid
         chords={triads}

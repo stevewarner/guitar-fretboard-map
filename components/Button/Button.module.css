@@ -1,10 +1,20 @@
 .button {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   font-weight: 600;
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
+  text-decoration: none;
+}
+
+/* ButtonLink renders an <a> — globals.css sets `a:hover { text-decoration:
+   underline }` site-wide, which would otherwise win on specificity over the
+   plain .button rule above. */
+.button:hover {
+  text-decoration: none;
 }
 
 .small {
@@ -38,12 +48,12 @@
 }
 
 .theme {
-  background-color: #4f46e5; /* accent */
+  background-color: #2563eb; /* accent */
   color: #ffffff;
 }
 
 .theme:not(:disabled):not([aria-disabled='true']):hover {
-  background-color: #3730a3; /* accent-hover */
+  background-color: #1d4ed8; /* accent-hover */
 }
 
 .secondary {
@@ -64,4 +74,10 @@
 
 .tertiary:not(:disabled):not([aria-disabled='true']):hover {
   background-color: #f0f0f0;
+}
+
+/* Declared last so it always wins over any variant's border-radius,
+   regardless of which order the two classes appear in the class list. */
+.pill {
+  border-radius: 9999px;
 }

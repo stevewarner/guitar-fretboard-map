@@ -20,6 +20,7 @@ import { getOrdinal } from '@/app/utils';
 import { ScaleViewer } from '@/modules/scale/ScaleViewer';
 import { ModeChords } from '@/modules/scale/ModeChords';
 import { PentatonicBoxChart } from '@/modules/scale/PentatonicBoxChart';
+import { SectionLabel } from '@/components/SectionLabel';
 import { JsonLd } from '@/components/JsonLd';
 import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
 
@@ -137,23 +138,34 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
           termSetPath: '/scale',
         })}
       />
-      <h1 className="mb-2">{modeTitle}</h1>
+      <SectionLabel>
+        Scales / {system.displayName} / {modeData.displayName}
+      </SectionLabel>
+      <h1 className="mb-2 mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+        {modeTitle}
+      </h1>
       <p className="mb-4 max-w-2xl text-sm text-fg-secondary">
         {modeData.description}
       </p>
       {system.showModeInfo && (
-        <>
-          <p className="text-sm text-gray-500">
-            {degree}
-            {getOrdinal(degree)} mode of the {system.displayName} scale
-          </p>
-          <p className="mb-4 text-sm text-gray-500">{quality}</p>
-        </>
+        <p className="mb-6 text-sm text-fg-muted">
+          {degree}
+          {getOrdinal(degree)} mode of the {system.displayName} scale
+          {quality && ` · ${quality}`}
+        </p>
       )}
-      <h2 className="mb-1 text-sm font-medium">Intervals</h2>
+      <SectionLabel as="h2" className="mb-1">
+        Intervals
+      </SectionLabel>
       <p className="mb-6 font-mono text-sm tracking-wider">{intervalFormula}</p>
-      <h2 className="mb-1 text-sm font-medium">Diagram</h2>
+      <SectionLabel as="h2" className="mb-3">
+        Diagram
+      </SectionLabel>
+      {/* key resets ScaleViewer's root-highlight toggle when navigating to a
+          different system/mode — root/string/position changes reuse the
+          same key, so those intentionally leave the toggle as-is. */}
       <ScaleViewer
+        key={`${system.slug}-${modeData.slug}`}
         modeIntervals={modeIntervals}
         modeTitle={modeTitle}
         patternKind={system.slug === 'pentatonic' ? 'scale' : 'mode'}
@@ -163,7 +175,9 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
       />
       {system.slug === 'pentatonic' && (
         <>
-          <h2 className="mb-1 mt-4 text-sm font-medium">Pentatonic Pattern</h2>
+          <SectionLabel as="h2" className="mb-3 mt-8">
+            Pentatonic Pattern
+          </SectionLabel>
           <PentatonicBoxChart
             rootPc={rootPc}
             modeIntervals={modeIntervals}

@@ -15,6 +15,23 @@ export const CHORD_FAMILIES: ChordFamily[] = [
   'Suspended',
 ];
 
+// Plain-language construction of the family's base triad/chord — generic to
+// the family, not the specific quality (e.g. maj7's own 7th is described
+// separately, alongside its own interval list). Targets searches phrased
+// around the family name itself ("C major guitar chord", "what is a
+// diminished chord") rather than a specific quality symbol.
+export const FAMILY_DESCRIPTIONS: Record<ChordFamily, string> = {
+  Major: 'The major triad is constructed from the 1, 3, and 5 intervals.',
+  Minor: 'The minor triad is constructed from the 1, b3, and 5 intervals.',
+  Dominant: 'A dominant chord is a major triad (1, 3, 5) with an added b7.',
+  Diminished:
+    'The diminished triad is constructed from the 1, b3, and b5 intervals.',
+  Augmented:
+    'The augmented triad is constructed from the 1, 3, and #5 intervals.',
+  Suspended:
+    'A suspended chord replaces the 3rd with the 2nd (sus2) or the 4th (sus4).',
+};
+
 const has = (intervals: number[], semitone: number) =>
   intervals.some((i) => i % 12 === semitone);
 

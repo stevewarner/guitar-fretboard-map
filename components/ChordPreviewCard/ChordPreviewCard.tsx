@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
+import { previewCardClassName } from '@/components/PreviewCard';
 import type { FlatTabValue } from '@/types';
 
 interface Props {
@@ -12,6 +13,10 @@ interface Props {
   numFrets: number;
   showFretLabel?: boolean;
   className?: string;
+  // See previewCardClassName — 'plain' (default) is the border-only style
+  // pages still on the old plain style must keep; 'raised' is the
+  // redesigned pages' card treatment.
+  variant?: 'plain' | 'raised';
 }
 
 export function ChordPreviewCard({
@@ -24,18 +29,13 @@ export function ChordPreviewCard({
   numFrets,
   showFretLabel = true,
   className = '',
+  variant = 'plain',
 }: Props) {
+  const styles = previewCardClassName({ variant, className });
   return (
-    <Link
-      href={href}
-      className={`flex flex-col items-center gap-1 rounded border border-current px-3 py-2 hover:bg-surface-sunken ${className}`}
-    >
-      <span className="text-center text-xs font-medium">{label}</span>
-      {sublabel && (
-        <span className="text-center text-xs text-fg-secondary">
-          {sublabel}
-        </span>
-      )}
+    <Link href={href} className={styles.link}>
+      <span className={styles.label}>{label}</span>
+      {sublabel && <span className={styles.sublabel}>{sublabel}</span>}
       {note && (
         <span className="text-center text-xs text-fg-secondary">{note}</span>
       )}

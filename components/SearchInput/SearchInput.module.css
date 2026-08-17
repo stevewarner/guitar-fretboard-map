@@ -23,14 +23,21 @@
 .input {
   height: 2.5rem;
   width: 100%;
-  border-radius: 0.25rem;
-  border: 1px solid currentColor;
+  border-radius: 999px;
+  border: none;
+  background-color: #f9fafb; /* surface-raised */
   padding-left: 36px;
   padding-right: 24px;
+  color: inherit;
+}
+
+.input:focus {
+  outline: 2px solid #2563eb; /* accent */
+  outline-offset: -1px;
 }
 
 .input::placeholder {
-  color: currentColor;
+  color: #9ca3af; /* fg-muted */
 }
 
 .clearButton {

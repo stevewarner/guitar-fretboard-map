@@ -1,5 +1,6 @@
 import { CardRow } from '@/components/CardRow';
 import { ChordPreviewCard } from '@/components/ChordPreviewCard';
+import { SectionLabel } from '@/components/SectionLabel';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import { getMissingIntervalPcs } from '@/modules/chordv2/utils/droppedIntervals';
 import {
@@ -98,13 +99,14 @@ export async function RelatedChords({
     return [
       <ChordPreviewCard
         key={quality.symbol}
+        variant="raised"
         href={href}
         label={`${rootNote}${quality.symbol}`}
         sublabel={quality.full_name}
         tab={transposed.tab}
         startFret={transposed.startFret}
         numFrets={transposed.numFrets}
-        className="w-32 shrink-0"
+        className="w-36 shrink-0"
       />,
     ];
   });
@@ -113,7 +115,7 @@ export async function RelatedChords({
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-sm font-medium">Related chords</h2>
+      <SectionLabel as="h2">Related chords</SectionLabel>
       <CardRow>{cards}</CardRow>
     </div>
   );
