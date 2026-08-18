@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Chord from '@/svgs/chord.svg';
 
 const NAV_LINKS = [
   { href: '/chord', label: 'Chords' },
@@ -23,8 +24,10 @@ export const Navbar: React.FC = () => {
           >
             <span
               aria-hidden="true"
-              className="inline-block size-2 rounded-sm bg-accent"
-            />
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent p-1 text-white"
+            >
+              <Chord className="size-full" />
+            </span>
             GuitarTheory
           </Link>
 
