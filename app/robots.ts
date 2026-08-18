@@ -10,6 +10,10 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/print'],
       },
       {
+        // Bulk AI-training crawlers only — not the live browsing/citation
+        // bots (ChatGPT-User, OAI-SearchBot, Claude-User, PerplexityBot,
+        // etc.) that fetch a page in response to a real user question and
+        // typically link back. Those stay allowed under the '*' rule above.
         userAgent: [
           'meta-externalagent',
           'GPTBot',
@@ -18,6 +22,13 @@ export default function robots(): MetadataRoute.Robots {
           'Google-Extended',
           'Bytespider',
           'Applebot-Extended',
+          'Amazonbot',
+          'Diffbot',
+          'ImagesiftBot',
+          'omgili',
+          'Ai2Bot',
+          'cohere-ai',
+          'Timpibot',
         ],
         disallow: '/',
       },
