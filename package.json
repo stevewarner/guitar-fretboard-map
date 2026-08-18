@@ -10,7 +10,8 @@
     "lint:fix": "eslint . --fix",
     "format": "npx prettier --check pages",
     "format:fix": "npx prettier --write pages",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "generate-icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@types/node": "18.15.11",
@@ -43,6 +44,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.8.3",
-    "semantic-release": "^25.0.3"
+    "semantic-release": "^25.0.3",
+    "sharp": "^0.35.3"
   }
 }
