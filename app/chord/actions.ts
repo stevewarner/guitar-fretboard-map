@@ -1,6 +1,6 @@
 'use server';
 import { sql } from '@vercel/postgres';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { createTab } from '@/app/utils/createTab';
 import { TAB_PATTERN } from '@/app/utils/validation';
 
@@ -190,6 +190,7 @@ export async function createNewChordShape(
       );
     }
 
+    updateTag('chord-data');
     revalidatePath('/chord');
     return { success: true, message: 'Shape created' };
   } catch (e) {

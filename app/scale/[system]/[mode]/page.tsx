@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { sql } from '@vercel/postgres';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
+import { SCALE_INTERVALS } from '@/modules/scale/data/scaleIntervals';
 import { INTERVAL_LABELS, NOTE_TO_PC } from '@/app/utils/constants';
 import {
   getModeIntervals,
@@ -53,8 +53,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-type ScaleRow = { intervals: number[] };
-
 function parseRootNote(raw: string | undefined): string {
   return raw && raw in NOTE_TO_PC ? raw : 'A';
 }
@@ -91,12 +89,8 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   if (!system || !modeData) notFound();
 
   const dbName = modeData.dbName ?? system.dbName;
-  const { rows } = await sql<ScaleRow>`
-    SELECT intervals FROM scales WHERE name = ${dbName} LIMIT 1
-  `;
-  if (!rows.length) notFound();
-
-  const parentIntervals = rows[0].intervals as number[];
+  const parentIntervals = SCALE_INTERVALS[dbName];
+  if (!parentIntervals) notFound();
   const modeIntervals = getModeIntervals(parentIntervals, modeData.degree);
   const intervalFormula = modeIntervals
     .map((i) => INTERVAL_LABELS[i])
