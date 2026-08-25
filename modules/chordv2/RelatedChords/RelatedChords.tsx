@@ -2,16 +2,10 @@ import { CardRow } from '@/components/CardRow';
 import { ChordPreviewCard } from '@/components/ChordPreviewCard';
 import { SectionLabel } from '@/components/SectionLabel';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
-import { getMissingIntervalPcs } from '@/modules/chordv2/utils/droppedIntervals';
-import {
-  findQualitiesWithinNoteDifference,
-  type QualityMeta,
-} from '@/modules/chordv2/utils/relatedChords';
+import { findQualitiesWithinNoteDifference } from '@/modules/chordv2/utils/relatedChords';
+import { getQualitiesWithActualIntervals } from '@/modules/chordv2/utils/actualQualityIntervals';
 import type { ScalePosition } from '@/modules/scale/utils/scaleUtils';
-import {
-  getAllQualities,
-  getShapesForRelated,
-} from '@/modules/chordv2/db/queries';
+import { getAllQualities } from '@/modules/chordv2/db/queries';
 
 interface Props {
   symbol: string;
@@ -35,43 +29,31 @@ export async function RelatedChords({
   const current = allQualities.find((q) => q.symbol === symbol);
   if (!current) return null;
 
-  // One representative shape per quality on this string — the same shape a
-  // card would preview — used both to render the card and to determine what
-  // each quality actually plays. A curated voicing can omit a chord tone its
-  // quality formally requires (e.g. a maj9#11 shape that drops the 3rd);
-  // comparing raw quality.intervals on either side would overstate how
-  // different two chords really are. This has to apply to every candidate,
-  // not just the chord currently on screen, or relatedness stops being
-  // symmetric — a candidate that drops a note would show up as related FROM
-  // its own page but not TO it.
-  const shapesOnString = await getShapesForRelated(
-    allQualities.map((q) => q.id),
+  // One representative shape per quality on this string - the same shape a
+  // card would preview - used both to render the card and to determine what
+  // each quality actually plays. Has to apply to every candidate, not just
+  // the chord currently on screen, or relatedness stops being symmetric - a
+  // candidate that drops a note would show up as related FROM its own page
+  // but not TO it. See getQualitiesWithActualIntervals's own doc comment.
+  const withActualIntervals = await getQualitiesWithActualIntervals(
+    allQualities,
     position.rootString,
+    position.rootFinger,
+    rootPc,
   );
-  const shapeFor = (qualityId: number) =>
-    shapesOnString.find(
-      (s) =>
-        s.quality_id === qualityId && s.root_finger === position.rootFinger,
-    ) ?? shapesOnString.find((s) => s.quality_id === qualityId);
+  const shapeByQualityId = new Map(
+    withActualIntervals.map((c) => [c.quality.id, c.shape]),
+  );
 
-  const actualIntervalsFor = (quality: QualityMeta): number[] => {
-    const shape = shapeFor(quality.id);
-    if (!shape) return quality.intervals;
-    const missing = getMissingIntervalPcs(
-      shape.tab_relative,
-      shape.root_string,
-      shape.root_finger ?? 0,
-      rootPc,
-      quality.intervals,
-    );
-    return quality.intervals.filter((i) => !missing.has(i % 12));
-  };
-
-  const candidatesWithActualIntervals = allQualities.map((q) => ({
-    ...q,
-    intervals: actualIntervalsFor(q),
+  const candidatesWithActualIntervals = withActualIntervals.map((c) => ({
+    ...c.quality,
+    intervals: c.intervals,
   }));
-  const referenceIntervals = actualIntervals ?? actualIntervalsFor(current);
+  const currentEntry = withActualIntervals.find(
+    (c) => c.quality.id === current.id,
+  );
+  const referenceIntervals =
+    actualIntervals ?? currentEntry?.intervals ?? current.intervals;
   const oneAway = findQualitiesWithinNoteDifference(
     referenceIntervals,
     candidatesWithActualIntervals,
@@ -82,7 +64,7 @@ export async function RelatedChords({
   if (oneAway.length === 0) return null;
 
   const cards = oneAway.flatMap((quality) => {
-    const shape = shapeFor(quality.id);
+    const shape = shapeByQualityId.get(quality.id);
     if (!shape) return [];
 
     const transposed = transposeShape(

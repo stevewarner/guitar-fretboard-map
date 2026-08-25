@@ -54,6 +54,7 @@ import {
 
 import { ChordShapeActionDropdown } from '@/modules/chordv2/ChordShapeActionDropdown';
 import { RelatedChords } from '@/modules/chordv2/RelatedChords';
+import { SameNotesChords } from '@/modules/chordv2/SameNotesChords';
 import { Inversions } from '@/modules/chordv2/Inversions';
 import { LogMissingChordVisit } from '@/modules/chordv2/LogMissingChordVisit';
 import { PC_TO_NOTE } from '@/app/utils/constants';
@@ -737,6 +738,15 @@ export default async function ChordQualityPage({
       <RelatedChords
         symbol={symbol}
         rootNote={rootNote}
+        rootPc={rootPc}
+        position={effectivePosition}
+        actualIntervals={qualityMeta.intervals.filter(
+          (i) => !missingPcs.has(i % 12),
+        )}
+      />
+
+      <SameNotesChords
+        symbol={symbol}
         rootPc={rootPc}
         position={effectivePosition}
         actualIntervals={qualityMeta.intervals.filter(
