@@ -55,6 +55,7 @@ import {
 import { ChordShapeActionDropdown } from '@/modules/chordv2/ChordShapeActionDropdown';
 import { RelatedChords } from '@/modules/chordv2/RelatedChords';
 import { SameNotesChords } from '@/modules/chordv2/SameNotesChords';
+import { AdditionalChordShapes } from '@/modules/chordv2/AdditionalChordShapes';
 import { Inversions } from '@/modules/chordv2/Inversions';
 import { LogMissingChordVisit } from '@/modules/chordv2/LogMissingChordVisit';
 import { PC_TO_NOTE } from '@/app/utils/constants';
@@ -496,6 +497,12 @@ export default async function ChordQualityPage({
       }
     : effectivePosition;
 
+  // Every other root-position voicing of this exact quality+root — other
+  // places to play the same chord, not a different inversion/quality/root.
+  const otherShapesAtRoot = shapes.filter(
+    (s) => s.id !== matchingShape?.id && isShapeValidAtRoot(s, rootPc),
+  );
+
   const isOpen = matchingShape
     ? await isOpenChord(matchingShape.id, rootPc)
     : false;
@@ -723,6 +730,13 @@ export default async function ChordQualityPage({
           )}
         </Panel>
       </RootHighlightProvider>
+
+      <AdditionalChordShapes
+        symbol={symbol}
+        rootNote={rootNote}
+        rootPc={rootPc}
+        shapes={otherShapesAtRoot}
+      />
 
       <Inversions
         symbol={symbol}

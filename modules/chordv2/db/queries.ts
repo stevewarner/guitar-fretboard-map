@@ -324,10 +324,16 @@ export const getAvailableFingersForRoot = unstable_cache(
 // has a small set of shapes in memory (e.g. one quality's shapes on the
 // detail page) and wants to apply the same root-restriction rule as
 // getAvailableFingersForRoot without a broader cross-quality query.
-export const getOpenRootsByShapeId = unstable_cache(
-  async (shapeIds: number[]): Promise<Map<number, number[]>> => {
-    const map = new Map<number, number[]>();
-    if (shapeIds.length === 0) return map;
+//
+// unstable_cache can only cache serializable values — a Map isn't one (it
+// round-trips through Next's Data Cache as `{}`, breaking every `.get()`
+// call) — so the cached layer returns plain rows and the Map is built fresh
+// on top of that, outside the cache boundary.
+const getOpenRootsRows = unstable_cache(
+  async (
+    shapeIds: number[],
+  ): Promise<{ chord_shape_id: number; root_pc: number }[]> => {
+    if (shapeIds.length === 0) return [];
     const { rows } = await sql.query<{
       chord_shape_id: number;
       root_pc: number;
@@ -335,16 +341,24 @@ export const getOpenRootsByShapeId = unstable_cache(
       `SELECT chord_shape_id, root_pc FROM open_chords WHERE chord_shape_id = ANY($1)`,
       [shapeIds],
     );
-    for (const r of rows) {
-      const arr = map.get(r.chord_shape_id) ?? [];
-      arr.push(r.root_pc);
-      map.set(r.chord_shape_id, arr);
-    }
-    return map;
+    return rows;
   },
   ['getOpenRootsByShapeId'],
   { tags: CHORD_DATA_TAGS, revalidate: CHORD_DATA_REVALIDATE },
 );
+
+export async function getOpenRootsByShapeId(
+  shapeIds: number[],
+): Promise<Map<number, number[]>> {
+  const rows = await getOpenRootsRows(shapeIds);
+  const map = new Map<number, number[]>();
+  for (const r of rows) {
+    const arr = map.get(r.chord_shape_id) ?? [];
+    arr.push(r.root_pc);
+    map.set(r.chord_shape_id, arr);
+  }
+  return map;
+}
 
 // Whether any MOVEABLE (true stretch) shape ever uses finger 0 on this string.
 // Today every finger=0 chord shape is a fixed open chord, so the "position=0"
