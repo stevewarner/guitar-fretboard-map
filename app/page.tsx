@@ -8,14 +8,11 @@ import { Panel } from '@/components/Panel';
 import ChevronRightIcon from '@/svgs/chevron-right.svg';
 import { ShowcaseSection } from '@/modules/home/ShowcaseSection';
 import { getModeIntervals } from '@/modules/scale/utils/scaleUtils';
-import {
-  getShapesAtPosition,
-  getAllQualities,
-} from '@/modules/chordv2/db/queries';
+import { getShapesAtPosition } from '@/modules/chordv2/db/queries';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import { parseNote } from '@/app/utils/noteSpelling';
 import { ACCENT_HEX } from '@/app/utils/constants';
-import { LESSON_PARTS, LESSONS } from '@/modules/lesson/lessons';
+import { LESSON_PARTS } from '@/modules/lesson/lessons';
 
 // Hero + the 3 showcase sections below it (Lessons/Chords/Scales) are a
 // deliberate exception to the site's normal plain styling — see CLAUDE.md's
@@ -169,12 +166,11 @@ function LessonPreviewCard({
 }
 
 export default async function Home() {
-  const [popularChordCards, openChordCards, seventhChordCards, qualities] =
+  const [popularChordCards, openChordCards, seventhChordCards] =
     await Promise.all([
       getCuratedChordCards(POPULAR_CHORDS),
       getCuratedChordCards(OPEN_CHORDS),
       getCuratedChordCards(SEVENTH_CHORDS),
-      getAllQualities(),
     ]);
 
   return (
@@ -185,7 +181,7 @@ export default async function Home() {
             Guitar theory lessons taught through the fretboard diagram
           </h1>
           <p className="mt-5 max-w-sm text-base leading-relaxed text-fg-secondary lg:mx-0">
-            Interactive chord and scale charts that update as you read, not a
+            Interactive chord and scale charts that update in place, not a
             separate reference to look up.
           </p>
           <div className="mt-8 flex items-center justify-center gap-6 lg:justify-start">
@@ -233,7 +229,7 @@ export default async function Home() {
         <ShowcaseSection
           sectionLabel="CHORDS"
           headline={['Every voicing,', 'every position.']}
-          description={`${qualities.length} chord qualities across all 12 roots, each mapped to the shapes that actually fall under your hand.`}
+          description="Chord qualities, each with the shapes, voicings, and inversions that actually fall under the fretting hand."
           ctaLabel="Browse the chord database"
           ctaHref="/chord"
           tabs={[
@@ -292,7 +288,7 @@ export default async function Home() {
           mirror
           sectionLabel="SCALES"
           headline={['Every mode,', 'every key.']}
-          description="All 7 modes of the major scale, plus major and minor pentatonic, mapped across the full neck in any key."
+          description="All 7 modes of the major scale, plus major and minor pentatonic, mapped across every position in any key."
           ctaLabel="Explore the scale library"
           ctaHref="/scale"
           tabs={[
@@ -338,7 +334,7 @@ export default async function Home() {
         <ShowcaseSection
           sectionLabel="LESSONS"
           headline={['Structured lessons,', 'taught on the fretboard.']}
-          description={`${LESSONS.length} lessons across ${LESSON_PARTS.length} parts, from intervals and the root note to modes and voicings — each one taught through an interactive diagram.`}
+          description="Starting with intervals and how they're named, then triads and the pentatonic scale, then scales and chords in every position across the full neck."
           ctaLabel="Start learning"
           ctaHref="/lesson"
           tabs={LESSON_PARTS.map((part) => ({
