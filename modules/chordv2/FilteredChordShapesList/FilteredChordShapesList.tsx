@@ -176,6 +176,15 @@ export const FilteredChordShapesList = ({
 
       {controls}
 
+      {/* Search/filter changes re-render this list purely visually; this
+          announces the new result count to screen reader users who wouldn't
+          otherwise know it changed. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {filteredCards.length === 0
+          ? 'No chords match your filters.'
+          : `${filteredCards.length} chord${filteredCards.length === 1 ? '' : 's'} found.`}
+      </p>
+
       {filteredCards.length === 0 ? (
         <p className="text-sm text-fg-secondary">
           No chords match your filters.

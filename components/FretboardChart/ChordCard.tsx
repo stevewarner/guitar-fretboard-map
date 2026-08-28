@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Fretboard } from './Fretboard';
 import { Pattern } from './Pattern';
+import { describeChartForScreenReaders } from './describeChartForScreenReaders';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import { intervalLabels } from '@/app/utils/musicUtils';
 
@@ -52,32 +53,38 @@ export function ChordCard({
   const transposed = transposeShape(tab, rootString, rootFinger, rootPc);
   if (!transposed) return null;
   const inversionParam = inversion ? `&inversion=${inversion}` : '';
+  const intervals = showIntervals
+    ? intervalLabels(transposed.tab, labelRootPc ?? rootPc)
+    : undefined;
   return (
-    <Link
-      href={`/chord/${encodeURIComponent(quality)}?root=${encodeURIComponent(rootNote)}&string=${rootString}&position=${rootFinger}${inversionParam}`}
-      className="hover:opacity-80"
-    >
-      <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
-        {label}
-      </p>
-      <div className="w-40">
-        <Fretboard
-          numFrets={transposed.numFrets}
-          startFret={transposed.startFret}
-          title={`${rootNote}${quality} chord, root on the ${rootString}th string — guitar fretboard diagram`}
-        >
-          <Pattern
-            tab={transposed.tab}
-            intervals={
-              showIntervals
-                ? intervalLabels(transposed.tab, labelRootPc ?? rootPc)
-                : undefined
-            }
+    <div>
+      <Link
+        href={`/chord/${encodeURIComponent(quality)}?root=${encodeURIComponent(rootNote)}&string=${rootString}&position=${rootFinger}${inversionParam}`}
+        className="hover:opacity-80"
+      >
+        <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
+          {label}
+        </p>
+        <div className="w-40">
+          <Fretboard
+            numFrets={transposed.numFrets}
             startFret={transposed.startFret}
-            fillColor="#000"
-          />
-        </Fretboard>
-      </div>
-    </Link>
+            title={`${rootNote}${quality} chord, root on the ${rootString}th string — guitar fretboard diagram`}
+          >
+            <Pattern
+              tab={transposed.tab}
+              intervals={intervals}
+              startFret={transposed.startFret}
+              fillColor="#000"
+            />
+          </Fretboard>
+        </div>
+      </Link>
+      {/* Outside the Link so this doesn't get folded into its accessible
+          name — see describeChartForScreenReaders' own doc comment. */}
+      <p className="sr-only">
+        {describeChartForScreenReaders([{ tab: transposed.tab, intervals }])}
+      </p>
+    </div>
   );
 }

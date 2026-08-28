@@ -116,7 +116,7 @@ function ChordGrid({
             href={`/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(chord.rootNote)}${shape ? `&string=${shape.root_string}&position=${shape.root_finger ?? 1}` : ''}`}
             className="flex flex-col items-center gap-1 rounded-xl bg-surface-raised p-3 hover:bg-surface-sunken"
           >
-            <span className="font-mono text-xs text-fg-muted">
+            <span className="font-mono text-xs text-fg-secondary">
               {chord.romanNumeral}
               {chord.quality}
             </span>

@@ -3,6 +3,7 @@ import {
   Fretboard,
   Pattern,
   buildChart,
+  describeChartForScreenReaders,
   type ScaleChartLayer,
 } from '@/components/FretboardChart';
 import {
@@ -100,26 +101,28 @@ export function ScalePositionsExplorer({
         ({ rootString, rootFinger, numFrets, startFret, layers }) => {
           const label = `${rootString}th String, ${FINGER_ORDINAL[rootFinger]} Finger`;
           return (
-            <Link
-              key={`${rootString}-${rootFinger}`}
-              href={`/scale/major-scale/ionian?root=${encodeURIComponent(root)}&string=${rootString}&position=${rootFinger}`}
-              className="hover:opacity-80"
-            >
-              <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
-                {label}
-              </p>
-              <div className="w-40">
-                <Fretboard
-                  numFrets={numFrets}
-                  startFret={startFret > 1 ? startFret : undefined}
-                  title={`${root} major scale, ${label} — guitar fretboard diagram`}
-                >
-                  {layers.map((layer, i) => (
-                    <Pattern key={i} {...layer} />
-                  ))}
-                </Fretboard>
-              </div>
-            </Link>
+            <div key={`${rootString}-${rootFinger}`}>
+              <Link
+                href={`/scale/major-scale/ionian?root=${encodeURIComponent(root)}&string=${rootString}&position=${rootFinger}`}
+                className="hover:opacity-80"
+              >
+                <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
+                  {label}
+                </p>
+                <div className="w-40">
+                  <Fretboard
+                    numFrets={numFrets}
+                    startFret={startFret > 1 ? startFret : undefined}
+                    title={`${root} major scale, ${label} — guitar fretboard diagram`}
+                  >
+                    {layers.map((layer, i) => (
+                      <Pattern key={i} {...layer} />
+                    ))}
+                  </Fretboard>
+                </div>
+              </Link>
+              <p className="sr-only">{describeChartForScreenReaders(layers)}</p>
+            </div>
           );
         },
       )}

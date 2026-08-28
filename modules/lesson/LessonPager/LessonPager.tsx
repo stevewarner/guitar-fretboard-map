@@ -13,7 +13,10 @@ export function LessonPager() {
   const next = LESSONS[index + 1] ?? null;
 
   return (
-    <div className="mt-auto flex items-center justify-between border-t border-gray-200 pt-6">
+    <nav
+      aria-label="Lesson pagination"
+      className="mt-auto flex items-center justify-between border-t border-gray-200 pt-6"
+    >
       {prev ? (
         <Link
           href={prev.href}
@@ -44,6 +47,6 @@ export function LessonPager() {
       ) : (
         <div />
       )}
-    </div>
+    </nav>
   );
 }

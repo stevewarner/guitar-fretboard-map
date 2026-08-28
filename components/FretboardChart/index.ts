@@ -10,3 +10,4 @@ export * from './buildSpotlightShape';
 export * from './RootPickerCharts';
 export * from './StaticChart';
 export * from './scaleChartLayers';
+export * from './describeChartForScreenReaders';

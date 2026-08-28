@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { LESSON_PARTS, LESSONS } from '@/modules/lesson/lessons';
 
@@ -9,19 +9,21 @@ export function LessonsNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const current = LESSONS.find((l) => l.href === pathname);
+  const listId = useId();
 
   return (
-    <nav>
+    <nav aria-label="Lessons">
       {/* Mobile toggle */}
       <button
-        className="flex w-full items-center justify-between md:hidden"
+        className="flex w-full items-center justify-between py-2 md:hidden"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
+        aria-controls={listId}
       >
         <span className="text-xs font-semibold uppercase tracking-widest text-fg-secondary">
           Lessons
         </span>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-fg-secondary">
           {current ? current.title : ''}
           <svg
             aria-hidden="true"
@@ -46,7 +48,10 @@ export function LessonsNav() {
         Lessons
       </p>
 
-      <div className={`space-y-4 ${open ? 'mt-2' : 'hidden'} md:block`}>
+      <div
+        id={listId}
+        className={`space-y-4 ${open ? 'mt-2' : 'hidden'} md:block`}
+      >
         {LESSON_PARTS.map((part) => {
           const partHref = `/lesson/${part.slug}`;
           const isActivePart =
@@ -71,7 +76,7 @@ export function LessonsNav() {
                         href={href}
                         onClick={() => setOpen(false)}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
+                        className={`block border-l-2 py-2 pl-3 text-sm transition-colors ${
                           isActive
                             ? 'border-current font-medium'
                             : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-current'

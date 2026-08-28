@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import ChevronRightIcon from '@/svgs/chevron-right.svg';
 import { ButtonLink } from '@/components/Button';
 import { SectionLabel } from '@/components/SectionLabel';
@@ -45,12 +45,51 @@ export function ShowcaseSection({
 }: Props) {
   const [activeTab, setActiveTab] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const baseId = useId();
+  const tabId = (i: number) => `${baseId}-tab-${i}`;
+  const panelId = (i: number) => `${baseId}-panel-${i}`;
 
   const scrollBy = (direction: 1 | -1) => {
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
     scrollRef.current?.scrollBy({
       left: direction * SCROLL_AMOUNT,
-      behavior: 'smooth',
+      behavior: reduceMotion ? 'auto' : 'smooth',
     });
+  };
+
+  // ARIA APG Tabs pattern: only the active tab is a Tab stop (roving
+  // tabindex); Left/Right (and Home/End) move focus between tabs and
+  // activate them immediately (automatic activation, matching the mouse
+  // behavior below).
+  const focusTab = (i: number) => {
+    setActiveTab(i);
+    tabRefs.current[i]?.focus();
+  };
+
+  const handleTabKeyDown = (e: React.KeyboardEvent, i: number) => {
+    switch (e.key) {
+      case 'ArrowRight':
+        e.preventDefault();
+        focusTab((i + 1) % tabs.length);
+        return;
+      case 'ArrowLeft':
+        e.preventDefault();
+        focusTab((i - 1 + tabs.length) % tabs.length);
+        return;
+      case 'Home':
+        e.preventDefault();
+        focusTab(0);
+        return;
+      case 'End':
+        e.preventDefault();
+        focusTab(tabs.length - 1);
+        return;
+      default:
+        return;
+    }
   };
 
   return (
@@ -87,10 +126,17 @@ export function ShowcaseSection({
             {tabs.map((tab, i) => (
               <button
                 key={tab.label}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
+                id={tabId(i)}
                 type="button"
                 role="tab"
                 aria-selected={i === activeTab}
+                aria-controls={panelId(i)}
+                tabIndex={i === activeTab ? 0 : -1}
                 onClick={() => setActiveTab(i)}
+                onKeyDown={(e) => handleTabKeyDown(e, i)}
                 className={
                   i === activeTab
                     ? 'font-semibold text-fg'
@@ -129,6 +175,9 @@ export function ShowcaseSection({
         </div>
         <div
           ref={scrollRef}
+          role="tabpanel"
+          id={panelId(activeTab)}
+          aria-labelledby={tabId(activeTab)}
           className="mt-4 flex flex-nowrap gap-4 overflow-x-auto p-1 pb-2"
         >
           {tabs[activeTab].content}

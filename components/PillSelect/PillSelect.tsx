@@ -14,7 +14,11 @@ export const PillSelect = forwardRef<HTMLSelectElement, Props>(
       <div className="relative inline-flex items-center">
         <select
           ref={ref}
-          className={`appearance-none rounded-full bg-surface-raised py-1.5 pl-3 pr-8 text-sm font-medium hover:bg-surface-sunken focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+          // border-gray-500 (~4.8:1 against white) rather than bg-surface-raised
+          // alone — the raised surface is only ~1:1 against a white page, so
+          // without a border this control has no perceivable boundary until
+          // hovered or focused (WCAG 1.4.11 Non-text Contrast).
+          className={`appearance-none rounded-full border border-gray-500 bg-surface-raised py-1.5 pl-3 pr-8 text-sm font-medium hover:bg-surface-sunken focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
           {...props}
         />
         <ChevronDownIcon

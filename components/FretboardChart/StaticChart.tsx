@@ -1,6 +1,7 @@
 import { Fretboard } from './Fretboard';
 import { Pattern } from './Pattern';
 import { buildChart, type ChartSource } from './buildChart';
+import { describeChartForScreenReaders } from './describeChartForScreenReaders';
 
 interface StaticChartProps {
   source: ChartSource;
@@ -37,6 +38,7 @@ export function StaticChart({
           ))}
         </Fretboard>
       </div>
+      <p className="sr-only">{describeChartForScreenReaders(built.layers)}</p>
     </div>
   );
 }

@@ -615,7 +615,7 @@ export default async function ChordQualityPage({
               <div>
                 <div className="flex items-center gap-2">
                   <SectionLabel as="h2">Tab</SectionLabel>
-                  <span className="text-xs text-fg-muted">
+                  <span className="text-xs text-fg-secondary">
                     {droppedFifth && 'no 5'}
                     {droppedFifth && droppedSeventh && ' · '}
                     {droppedSeventh && 'no 7'}

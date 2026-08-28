@@ -12,8 +12,12 @@ interface Props {
   className?: string;
 }
 
+// 'muted' uses fg-secondary, not fg-muted — fg-muted (#9ca3af) is only
+// ~2.5:1 against the page's white/near-white backgrounds, well under the
+// 4.5:1 WCAG AA requires for text this small (12px), and this component
+// renders real breadcrumb and <h2> section-heading text, not decoration.
 const TONE_CLASSES: Record<NonNullable<Props['tone']>, string> = {
-  muted: 'text-fg-muted',
+  muted: 'text-fg-secondary',
   accent: 'text-accent',
 };
 

@@ -61,7 +61,11 @@ export default function RootLayout({
         </a>
         <JsonLd data={websiteSchema()} />
         <Navbar />
-        <main id="main-content" className="flex flex-1 flex-col">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex flex-1 flex-col outline-none"
+        >
           <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8 sm:px-6">
             {children}
             <Analytics />

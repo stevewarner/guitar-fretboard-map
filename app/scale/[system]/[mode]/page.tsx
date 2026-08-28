@@ -142,7 +142,7 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
         {modeData.description}
       </p>
       {system.showModeInfo && (
-        <p className="mb-6 text-sm text-fg-muted">
+        <p className="mb-6 text-sm text-fg-secondary">
           {degree}
           {getOrdinal(degree)} mode of the {system.displayName} scale
           {quality && ` · ${quality}`}

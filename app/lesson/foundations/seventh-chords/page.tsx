@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { LessonHeader } from '@/modules/lesson/LessonHeader';
 import { buildLessonMetadata } from '@/modules/lesson/buildLessonMetadata';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import {
+  Fretboard,
+  Pattern,
+  describeChartForScreenReaders,
+} from '@/components/FretboardChart';
 import { NOTE_TO_PC } from '@/app/utils/constants';
 import {
   MAJOR_SCALE_INTERVALS,
@@ -68,28 +72,32 @@ export default async function SeventhChordsLesson() {
           const transposed = transposeShape(tab, 5, 1, rootPc);
           if (!transposed) return null;
           return (
-            <Link
-              key={chord.degree}
-              href={`/chord/${encodeURIComponent(chord.quality)}?root=${encodeURIComponent(chord.rootNote)}&string=5&position=1`}
-              className="hover:opacity-80"
-            >
-              <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
-                {chord.romanNumeral} &ndash; {chord.name}
-              </p>
-              <div className="w-40">
-                <Fretboard
-                  numFrets={transposed.numFrets}
-                  startFret={transposed.startFret}
-                  title={`${chord.name} chord, root on the 5th string — guitar fretboard diagram`}
-                >
-                  <Pattern
-                    tab={transposed.tab}
+            <div key={chord.degree}>
+              <Link
+                href={`/chord/${encodeURIComponent(chord.quality)}?root=${encodeURIComponent(chord.rootNote)}&string=5&position=1`}
+                className="hover:opacity-80"
+              >
+                <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
+                  {chord.romanNumeral} &ndash; {chord.name}
+                </p>
+                <div className="w-40">
+                  <Fretboard
+                    numFrets={transposed.numFrets}
                     startFret={transposed.startFret}
-                    fillColor="#000"
-                  />
-                </Fretboard>
-              </div>
-            </Link>
+                    title={`${chord.name} chord, root on the 5th string — guitar fretboard diagram`}
+                  >
+                    <Pattern
+                      tab={transposed.tab}
+                      startFret={transposed.startFret}
+                      fillColor="#000"
+                    />
+                  </Fretboard>
+                </div>
+              </Link>
+              <p className="sr-only">
+                {describeChartForScreenReaders([{ tab: transposed.tab }])}
+              </p>
+            </div>
           );
         })}
       </div>

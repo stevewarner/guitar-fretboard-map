@@ -16,7 +16,7 @@ export function RootHighlightToggle() {
         type="checkbox"
         checked={checked}
         onChange={(e) => setChecked(e.target.checked)}
-        className="size-4 rounded border-line-strong accent-accent"
+        className="size-4 rounded border-gray-500 accent-accent"
       />
       Highlight root
     </label>

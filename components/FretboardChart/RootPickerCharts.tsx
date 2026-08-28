@@ -7,6 +7,7 @@ import { RootSelect } from '@/components/RootSelect';
 import { Fretboard } from './Fretboard';
 import { Pattern } from './Pattern';
 import { buildChart, type ChartSource } from './buildChart';
+import { describeChartForScreenReaders } from './describeChartForScreenReaders';
 
 export interface RootPickerChartSpec {
   label?: string;
@@ -78,12 +79,23 @@ export function RootPickerCharts({
             </>
           );
 
-          return href ? (
-            <Link key={i} href={href} className="hover:opacity-80">
-              {content}
-            </Link>
-          ) : (
-            <div key={i}>{content}</div>
+          // The sr-only description lives outside the Link (not inside
+          // `content`) so it doesn't get folded into the link's accessible
+          // name — a screen reader user browsing by links just wants "G
+          // Ionian scale, position 2", not the full string-by-string dump.
+          return (
+            <div key={i}>
+              {href ? (
+                <Link href={href} className="hover:opacity-80">
+                  {content}
+                </Link>
+              ) : (
+                content
+              )}
+              <p className="sr-only">
+                {describeChartForScreenReaders(built.layers)}
+              </p>
+            </div>
           );
         })}
       </div>

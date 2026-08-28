@@ -158,7 +158,7 @@ export function FreeformChordIdentifier() {
           />
         </div>
 
-        <p className="mt-4 font-mono text-xs tracking-widest text-fg-muted">
+        <p className="mt-4 font-mono text-xs tracking-widest text-fg-secondary">
           {tabDisplay}
         </p>
 

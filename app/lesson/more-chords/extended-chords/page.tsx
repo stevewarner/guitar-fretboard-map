@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { LessonHeader } from '@/modules/lesson/LessonHeader';
 import { buildLessonMetadata } from '@/modules/lesson/buildLessonMetadata';
-import { Fretboard, Pattern } from '@/components/FretboardChart';
+import {
+  Fretboard,
+  Pattern,
+  describeChartForScreenReaders,
+} from '@/components/FretboardChart';
 import { NOTE_TO_PC } from '@/app/utils/constants';
 import {
   MAJOR_SCALE_INTERVALS,
@@ -114,27 +118,32 @@ function ChordCard({
   );
   if (!transposed) return null;
   return (
-    <Link
-      href={`/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(rootNote)}&string=${rootString}&position=${rootFinger}`}
-      className="hover:opacity-80"
-    >
-      <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
-        {label}
-      </p>
-      <div className="w-40">
-        <Fretboard
-          numFrets={transposed.numFrets}
-          startFret={transposed.startFret}
-          title={`${rootNote}${symbol} chord, root on the ${rootString}th string — guitar fretboard diagram`}
-        >
-          <Pattern
-            tab={transposed.tab}
+    <div>
+      <Link
+        href={`/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(rootNote)}&string=${rootString}&position=${rootFinger}`}
+        className="hover:opacity-80"
+      >
+        <p className="mb-1 text-xs font-semibold tracking-widest text-fg-secondary">
+          {label}
+        </p>
+        <div className="w-40">
+          <Fretboard
+            numFrets={transposed.numFrets}
             startFret={transposed.startFret}
-            fillColor="#000"
-          />
-        </Fretboard>
-      </div>
-    </Link>
+            title={`${rootNote}${symbol} chord, root on the ${rootString}th string — guitar fretboard diagram`}
+          >
+            <Pattern
+              tab={transposed.tab}
+              startFret={transposed.startFret}
+              fillColor="#000"
+            />
+          </Fretboard>
+        </div>
+      </Link>
+      <p className="sr-only">
+        {describeChartForScreenReaders([{ tab: transposed.tab }])}
+      </p>
+    </div>
   );
 }
 

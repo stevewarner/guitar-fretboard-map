@@ -5,6 +5,7 @@ import {
   Fretboard,
   Pattern,
   scaleChartLayersWithHighlight,
+  describeChartForScreenReaders,
 } from '@/components/FretboardChart';
 import { PositionPicker, usePositionPicker } from '@/components/PositionPicker';
 import {
@@ -88,6 +89,7 @@ export function PositionPlayingExplorer() {
             <Pattern key={i} {...layer} />
           ))}
         </Fretboard>
+        <p className="sr-only">{describeChartForScreenReaders(layers)}</p>
       </div>
     </div>
   );
