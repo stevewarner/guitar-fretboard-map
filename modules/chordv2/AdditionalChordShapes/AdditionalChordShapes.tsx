@@ -55,7 +55,13 @@ export function AdditionalChordShapes({
 
   return (
     <div className="flex flex-col gap-3">
-      <SectionLabel as="h2">Additional chord shapes</SectionLabel>
+      {/* States explicitly that this is one of several ways to play the
+          chord, not a generic "more shapes" label — helps match queries like
+          "other ways to play Cmaj7". See docs/GEO_STRATEGY.md item 8. */}
+      <SectionLabel as="h2">
+        Other ways to play {rootNote}
+        {symbol}
+      </SectionLabel>
       <CardRow>{cards}</CardRow>
     </div>
   );

@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { SCALE_INTERVALS } from '@/modules/scale/data/scaleIntervals';
-import { INTERVAL_LABELS, NOTE_TO_PC } from '@/app/utils/constants';
+import { INTERVAL_LABELS, NOTE_TO_PC, PC_TO_NOTE } from '@/app/utils/constants';
+import { STRING_LABELS } from '@/app/utils/musicUtils';
 import {
   getModeIntervals,
   isValidPosition,
@@ -112,6 +113,17 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
 
   const modeTitle = modeData.pageTitle ?? modeData.displayName;
 
+  // SVG-only <desc> summary (docs/GEO_STRATEGY.md item 5) — short standalone
+  // sentences covering notes, intervals, and root string, so a crawler/
+  // screen reader that only reads the diagram's own accessible name still
+  // gets the full answer. See buildChordSvgDescription in
+  // app/chord/[quality]/page.tsx for the equivalent on chord pages.
+  const scaleNoteNames = modeIntervals.map(
+    (i) => PC_TO_NOTE[(rootPc + i) % 12],
+  );
+  const scaleIntervalLabels = modeIntervals.map((i) => INTERVAL_LABELS[i]);
+  const scaleSvgDescription = `${modeTitle} ${system.slug === 'pentatonic' ? 'scale' : 'mode'} in ${rootNote} guitar fretboard diagram. Notes ${scaleNoteNames.join(', ')}. Intervals ${scaleIntervalLabels.join(', ')}. Root ${rootNote} on the ${STRING_LABELS[position.rootString]}.`;
+
   return (
     <div>
       <JsonLd
@@ -166,6 +178,7 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
         rootNote={rootNote}
         rootPc={rootPc}
         position={position}
+        description={scaleSvgDescription}
       />
       {system.slug === 'pentatonic' && (
         <>

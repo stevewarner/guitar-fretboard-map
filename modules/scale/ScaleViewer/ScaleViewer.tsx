@@ -28,6 +28,11 @@ interface ScaleViewerProps {
   rootNote: string;
   rootPc: number;
   position: ScalePosition;
+  // SVG-only <desc> summary (notes/intervals/root string) — see
+  // components/FretboardChart/Fretboard.tsx and docs/GEO_STRATEGY.md item 5.
+  // Built by the page (has the notes/interval-label data already) and just
+  // threaded through here.
+  description?: string;
 }
 
 export function ScaleViewer({
@@ -37,6 +42,7 @@ export function ScaleViewer({
   rootNote,
   rootPc,
   position,
+  description,
 }: ScaleViewerProps) {
   const render = deriveScaleRender(modeIntervals, rootPc, position);
   // Library page — every note in the default color, root included, per
@@ -67,6 +73,7 @@ export function ScaleViewer({
             startFret={render.startFret > 1 ? render.startFret : undefined}
             fingerLabels={render.fingerLabels}
             title={`${modeTitle} ${patternKind} in ${rootNote} — guitar fretboard diagram`}
+            description={description}
           >
             <Pattern {...layer} />
             <RootHighlightLayer>

@@ -120,32 +120,54 @@ function buildChordDisplayNames(
   };
 }
 
-// Position-specific "how to play" sentence: root string/finger (the site's
-// established position vocabulary, e.g. PositionControls) plus a bass-note
-// clause for inversions and an omitted-tone clause when the current shape
-// drops a chord tone (see droppedFifth/droppedSeventh at the call site).
+// Position-specific "how to play" sentence, paired in the JSX with a
+// {rootNote} {fullName} heading above it (e.g. "C Major 7th") that carries
+// the identity. No tab here per direct feedback: it's already visible in
+// the Tab box above and in the SVG's own <desc> (buildChordSvgDescription),
+// so repeating it a third time added nothing. Root string + root finger
+// stay in (see the position clause below) since together they're what
+// identify *this* shape among the several possible shapes on the same
+// string (see AdditionalChordShapes) — dropping them read as generic
+// rather than specific to this shape, per earlier direct pushback. No
+// isOpen flag either, same reasoning: the "Open" Tag rendered below the
+// diagram (components/Tags) is already real, crawlable anchor text, so
+// restating it here would just be a 2nd copy of the same fact with no new
+// SEO/readability value, not a new one worth its own sentence.
 function buildHowToPlayText(
-  spelledName: string,
   rootString: number,
   rootFinger: number,
   rootPc: number,
   fingerZeroLabel: 'open' | 'stretch',
   bassNote: string | null,
   omittedDegrees: string[],
-  isOpen: boolean,
 ): string {
   const finger = fingerLabel(rootFinger, rootString, rootPc, fingerZeroLabel);
-  const bassClause = bassNote ? `, with ${bassNote} in the bass` : '';
+  const playedClause =
+    finger === 'open' ? 'played open' : `played with ${finger}`;
+  const facts = [`Root on ${STRING_LABELS[rootString]}, ${playedClause}`];
+  if (bassNote) facts.push(`${bassNote} in the bass`);
   const omittedNames = omittedDegrees.map((d) => DEGREE_FULL_NAMES[d] ?? d);
-  const omissionClause =
-    omittedNames.length > 0
-      ? ` This voicing omits the ${joinWithAnd(omittedNames)}.`
-      : '';
-  // Skip when the finger label already says "open" (root on an open string)
-  // — stating it again right after would just repeat itself.
-  const openClause =
-    isOpen && finger !== 'open' ? ' This is an open chord.' : '';
-  return `${spelledName}, root on the ${STRING_LABELS[rootString]}, ${finger}${bassClause}.${omissionClause}${openClause}`;
+  if (omittedNames.length > 0) facts.push(`no ${joinWithAnd(omittedNames)}`);
+  return `${facts.join(', ')}.`;
+}
+
+// SVG-only <desc> summary (see components/FretboardChart/Fretboard.tsx and
+// docs/GEO_STRATEGY.md item 5) — short standalone sentences covering the tab,
+// notes, intervals, and root string, so a crawler/screen reader that only
+// reads the diagram's own accessible name (not the surrounding page text)
+// still gets the full answer. Deliberately separate from howToPlayText,
+// which is written as visible page prose, not an SVG description.
+function buildChordSvgDescription(
+  displayName: string,
+  tab: string,
+  notes: string[],
+  degreeLabels: string[],
+  rootNote: string,
+  rootString: number,
+  isOpen: boolean,
+): string {
+  const positionClause = isOpen ? 'Open-position ' : '';
+  return `${positionClause}${displayName} guitar chord. Tab ${tab}. Notes ${notes.join(', ')}. Intervals ${degreeLabels.join(', ')}. Root ${rootNote} on the ${STRING_LABELS[rootString]}.`;
 }
 
 export async function generateMetadata({
@@ -485,6 +507,11 @@ export default async function ChordQualityPage({
   const droppedFifth = missingPcs.has(7);
   const droppedSeventh = missingPcs.has(10) || missingPcs.has(11);
   const displayName = bassNote ? `${compactName}/${bassNote}` : compactName;
+  // Spelled-out name for the heading directly above the diagram (e.g. "C
+  // Major 7th") — identity stays fixed regardless of inversion; the bass
+  // note is a fact about this shape, stated in howToPlayText below, not
+  // part of what chord it is.
+  const spelledChordName = `${rootNote} ${fullName}`;
   // A fixed inversion (open-position slash chord) is a variant of a specific
   // root-position shape (e.g. C/G is "open C, string 5, 3rd finger" with G
   // added in the bass) — root_string/root_finger on the inversion row are set
@@ -510,18 +537,37 @@ export default async function ChordQualityPage({
   const omittedDegrees = qualityMeta.intervals
     .map((interval, i) => (missingPcs.has(interval % 12) ? degrees[i] : null))
     .filter((d): d is string => d !== null);
+
+  const tabString = transposed
+    ? transposed.tab.map((v) => (v === undefined ? '' : v)).join('-')
+    : null;
+
   const howToPlayText = transposed
     ? buildHowToPlayText(
-        `${rootNote} ${fullName}`,
         displayPosition.rootString,
         displayPosition.rootFinger,
         rootPc,
         fingerZeroLabel,
         bassNote,
         omittedDegrees,
-        isOpen,
       )
     : null;
+
+  const noteNames = qualityMeta.intervals.map(
+    (interval) => PC_TO_NOTE[(rootPc + interval) % 12],
+  );
+  const svgDescription =
+    transposed && tabString
+      ? buildChordSvgDescription(
+          displayName,
+          tabString,
+          noteNames,
+          degrees,
+          rootNote,
+          displayPosition.rootString,
+          isOpen,
+        )
+      : undefined;
 
   // Room to grow — more tags (e.g. "Barre", "Beginner") can push onto this
   // array as more curated properties get added. Each links back to the
@@ -621,11 +667,7 @@ export default async function ChordQualityPage({
                     {droppedSeventh && 'no 7'}
                   </span>
                 </div>
-                <p className="mt-2 font-mono text-sm">
-                  {transposed.tab
-                    .map((v) => (v === undefined ? '' : v))
-                    .join('-')}
-                </p>
+                <p className="mt-2 font-mono text-sm">{tabString}</p>
               </div>
             )}
           </div>
@@ -652,9 +694,13 @@ export default async function ChordQualityPage({
             <RootHighlightToggle />
           </div>
 
+          {/* Heading names the chord (e.g. "C Major 7th"); howToPlayText
+              covers how this specific shape is played (position, bass note,
+              omissions). No tab here, it's already in the Tab box above and
+              the diagram's own SVG <desc>. */}
           {transposed && (
             <div className="mt-4">
-              <p className="text-base font-semibold">{displayName}</p>
+              <h2 className="text-lg font-semibold">{spelledChordName}</h2>
               {howToPlayText && (
                 <p className="mt-1 text-sm text-fg-secondary">
                   {howToPlayText}
@@ -671,6 +717,7 @@ export default async function ChordQualityPage({
                   numFrets={transposed.numFrets}
                   startFret={transposed.startFret}
                   title={`${displayName} chord, root on the ${displayPosition.rootString}th string, guitar fretboard diagram`}
+                  description={svgDescription}
                   fingerLabels={fingerLabels}
                 >
                   <Pattern

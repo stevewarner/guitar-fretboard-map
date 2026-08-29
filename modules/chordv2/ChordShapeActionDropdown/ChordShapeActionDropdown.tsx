@@ -48,6 +48,7 @@ export const ChordShapeActionDropdown = ({
           <button
             key="svg"
             className="flex w-full items-center gap-2 border-none p-2"
+            aria-label={`Download this ${chordName} guitar chord diagram as SVG`}
             onClick={() => {
               const svg = getSvg();
               if (svg)
@@ -60,6 +61,7 @@ export const ChordShapeActionDropdown = ({
           <button
             key="png"
             className="flex w-full items-center gap-2 border-none p-2"
+            aria-label={`Download this ${chordName} guitar chord diagram as PNG`}
             onClick={() => {
               const svg = getSvg();
               if (svg)

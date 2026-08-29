@@ -13,6 +13,12 @@ interface FretboardProps {
   numFrets: number;
   startFret?: number;
   title?: string;
+  // Longer machine/screen-reader-only summary (tab, notes, intervals, root
+  // string) — the <title> is a one-line label, this is the full answer, so a
+  // crawler that only reads the SVG's own accessible name still gets
+  // everything docs/GEO_STRATEGY.md item 5 asks for. Omitted entirely (no
+  // <desc>, aria-labelledby stays title-only) when not provided.
+  description?: string;
   fingerLabels?: string[];
   showFretLabel?: boolean;
 }
@@ -22,21 +28,24 @@ export const Fretboard = ({
   numFrets,
   startFret,
   title = '',
+  description,
   fingerLabels,
   showFretLabel = true,
   ...rest
 }: FretboardProps & SVGProps<SVGSVGElement>) => {
   const titleId = useId();
+  const descId = useId();
 
   return (
     <svg
       strokeWidth={stroke}
       viewBox={`0 0 ${svgDimension} ${topSpace * (numFrets + 2)}`}
       role="img"
-      aria-labelledby={titleId}
+      aria-labelledby={description ? `${titleId} ${descId}` : titleId}
       {...rest}
     >
       <title id={titleId}>{title}</title>
+      {description && <desc id={descId}>{description}</desc>}
 
       {/* strings */}
       {[...Array(numStrings)].map((_, index) => (

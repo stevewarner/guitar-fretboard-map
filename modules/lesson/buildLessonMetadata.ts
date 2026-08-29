@@ -15,11 +15,13 @@ export function buildLessonMetadata(
   const lesson = getLesson(partSlug, lessonSlug);
   const title = lesson?.title ?? 'Lesson';
   const path = lesson?.href ?? `/lesson/${partSlug}/${lessonSlug}`;
+  const description = lesson?.description;
 
   return {
     title,
+    description,
     alternates: { canonical: path },
-    openGraph: { title: `GuitarTheory | ${title}` },
+    openGraph: { title: `GuitarTheory | ${title}`, description },
     robots: lesson?.indexed ? undefined : STUB_ROBOTS,
   };
 }
