@@ -29,6 +29,15 @@ export const metadata: Metadata = {
   },
   description:
     'Chord and scale charts for guitar. Interactive fretboard diagrams and music theory lessons for guitarists.',
+  // Explicit, plain-path apple-touch-icon rather than the app/apple-icon.png
+  // file convention: Next appends a cache-busting query string to that
+  // convention's generated href, and iOS Safari has a documented bug where
+  // it silently ignores an apple-touch-icon link with a query string on it
+  // (falls back to a plain letter-tile icon on "Add to Home Screen" rather
+  // than erroring). See scripts/generate-icons.mjs, which now writes here.
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     title: 'GuitarTheory | Music Theory for Guitarists',
     description:
