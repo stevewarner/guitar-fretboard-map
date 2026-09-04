@@ -11,7 +11,7 @@ import {
 interface Props {
   href: string;
   label: string;
-  sublabel?: string;
+  sublabel?: React.ReactNode;
   modeIntervals: number[];
   rootPc: number;
   position?: ScalePosition;

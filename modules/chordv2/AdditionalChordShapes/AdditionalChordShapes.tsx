@@ -57,8 +57,12 @@ export function AdditionalChordShapes({
     <div className="flex flex-col gap-3">
       {/* States explicitly that this is one of several ways to play the
           chord, not a generic "more shapes" label — helps match queries like
-          "other ways to play Cmaj7". See docs/GEO_STRATEGY.md item 8. */}
-      <SectionLabel as="h2">
+          "other ways to play Cmaj7". See docs/GEO_STRATEGY.md item 8.
+          uppercase off: {rootNote}{symbol} is a case-sensitive chord symbol
+          ("Dm"), and the CSS transform would collapse it to "DM" —
+          indistinguishable from D major. See docs/STYLE_GUIDE.md's "Chord
+          symbols" section. */}
+      <SectionLabel as="h2" uppercase={false}>
         Other ways to play {rootNote}
         {symbol}
       </SectionLabel>

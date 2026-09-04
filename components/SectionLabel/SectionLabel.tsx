@@ -9,6 +9,12 @@ interface Props {
   // real h2s, just styled small) or a plain paragraph (breadcrumbs aren't
   // headings). Defaults to 'p'.
   as?: ElementType;
+  // Off only when children embed a compact chord symbol ("Dm", "Bm7b5") —
+  // the CSS uppercase transform would visually collapse the case-sensitive
+  // quality letter into caps (lowercase m = minor, uppercase M = major),
+  // silently changing what the chord name means. See docs/STYLE_GUIDE.md's
+  // "Chord symbols" section. Defaults to true.
+  uppercase?: boolean;
   className?: string;
 }
 
@@ -30,11 +36,12 @@ export function SectionLabel({
   children,
   tone = 'muted',
   as: Tag = 'p',
+  uppercase = true,
   className = '',
 }: Props) {
   return (
     <Tag
-      className={`text-xs font-semibold uppercase tracking-wide ${TONE_CLASSES[tone]} ${className}`}
+      className={`text-xs font-semibold ${uppercase ? 'uppercase ' : ''}tracking-wide ${TONE_CLASSES[tone]} ${className}`}
     >
       {children}
     </Tag>

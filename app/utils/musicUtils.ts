@@ -1,4 +1,8 @@
-import { STANDARD_TUNING_PC, INTERVAL_LABELS } from '@/app/utils/constants';
+import {
+  STANDARD_TUNING_PC,
+  INTERVAL_LABELS,
+  PC_TO_NOTE,
+} from '@/app/utils/constants';
 import type { FlatTabValue } from '@/types';
 
 export function intervalLabels(
@@ -10,6 +14,18 @@ export function intervalLabels(
     return INTERVAL_LABELS[
       (STANDARD_TUNING_PC[si] + (fret as number) - rootPc + 120) % 12
     ];
+  });
+}
+
+// Same shape as intervalLabels but the absolute note name per string
+// instead of a root-relative interval — the LabelModeToggle "Show note
+// names" alternative, shared by the chord detail page and ScaleViewer. No
+// rootPc needed: a note name doesn't depend on the root, only the interval
+// label does.
+export function noteLabels(tab: FlatTabValue[]): (string | undefined)[] {
+  return tab.map((fret, si) => {
+    if (fret === 'x' || fret === undefined) return undefined;
+    return PC_TO_NOTE[(STANDARD_TUNING_PC[si] + (fret as number)) % 12];
   });
 }
 

@@ -8,8 +8,8 @@
 // svgs/chord.svg itself is unaffected — it's imported live by
 // app/opengraph-image.tsx (via @svgr/webpack) and needs no regeneration.
 // This script only rebuilds the separately-committed static files:
-//   app/icon.png, app/apple-icon.png, app/favicon.ico, app/icon.svg,
-//   public/web-app-manifest-{192x192,512x512}.png
+//   app/icon.png, app/favicon.ico, app/icon.svg,
+//   public/apple-touch-icon.png, public/web-app-manifest-{192x192,512x512}.png
 //
 // Run: node scripts/generate-icons.mjs  (or `npm run generate-icons`)
 
@@ -150,7 +150,14 @@ function writeIconSvg(outPath) {
 
 async function main() {
   await writePng(96, join(ROOT, 'app/icon.png'));
-  await writePng(180, join(ROOT, 'app/apple-icon.png'));
+  // Deliberately public/, not app/apple-icon.png — Next's App Router icon
+  // convention appends a cache-busting query string to the href it
+  // generates, and iOS Safari has a documented bug where it silently fails
+  // to use an apple-touch-icon link whose href has a query string (falls
+  // back to a plain letter-tile icon on "Add to Home Screen" instead of
+  // erroring). A plain /public file has no query string, so this is a
+  // real fix, not a style choice. See app/layout.tsx's metadata.icons.apple.
+  await writePng(180, join(ROOT, 'public/apple-touch-icon.png'));
   await writePng(192, join(ROOT, 'public/web-app-manifest-192x192.png'));
   await writePng(512, join(ROOT, 'public/web-app-manifest-512x512.png'));
   await writeFavicon([16, 32, 48], join(ROOT, 'app/favicon.ico'));

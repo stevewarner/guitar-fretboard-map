@@ -97,7 +97,12 @@ export async function SameNotesChords({
 
   return (
     <div className="flex flex-col gap-3">
-      <SectionLabel as="h2">Same notes, different chord</SectionLabel>
+      {/* uppercase off for consistency with the other section headings on
+          this page that must stay natural-case (embedded chord symbols) —
+          see docs/STYLE_GUIDE.md's "Chord symbols" section. */}
+      <SectionLabel as="h2" uppercase={false}>
+        Same notes, different chord
+      </SectionLabel>
       <CardRow>{cards}</CardRow>
     </div>
   );

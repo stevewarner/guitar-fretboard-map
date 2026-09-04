@@ -26,6 +26,11 @@ import {
   RootHighlightToggle,
   RootHighlightLayer,
 } from '@/components/RootHighlightToggle';
+import {
+  LabelModeProvider,
+  LabelModeToggle,
+  LabelModeLayer,
+} from '@/components/LabelModeToggle';
 import { JsonLd } from '@/components/JsonLd';
 import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
 import {
@@ -39,6 +44,7 @@ import {
   computeFingerLabels,
   STRING_LABELS,
   fingerLabel,
+  noteLabels as computeNoteLabels,
 } from '@/app/utils/musicUtils';
 import { parseNote } from '@/app/utils/noteSpelling';
 import type { FlatTabValue } from '@/types';
@@ -56,6 +62,8 @@ import { ChordShapeActionDropdown } from '@/modules/chordv2/ChordShapeActionDrop
 import { RelatedChords } from '@/modules/chordv2/RelatedChords';
 import { SameNotesChords } from '@/modules/chordv2/SameNotesChords';
 import { AdditionalChordShapes } from '@/modules/chordv2/AdditionalChordShapes';
+import { OtherKeys } from '@/modules/chordv2/OtherKeys';
+import { CompatibleScales } from '@/modules/chordv2/CompatibleScales';
 import { Inversions } from '@/modules/chordv2/Inversions';
 import { LogMissingChordVisit } from '@/modules/chordv2/LogMissingChordVisit';
 import { PC_TO_NOTE } from '@/app/utils/constants';
@@ -437,6 +445,12 @@ export default async function ChordQualityPage({
   let missingPcs = new Set<number>();
   let fingerLabels: string[] | undefined;
   let bassNote: string | null = null;
+  // Real transposition anchor for the active shape — same as root_string/
+  // root_finger for a root-position shape, but bass_string/bass_finger for
+  // an inversion (see OtherKeys below, which needs this to transpose the
+  // same shape to every other key, not just show the current one).
+  let anchorString: number | null = null;
+  let anchorFinger: number | null = null;
 
   if (inversionShape && qualityMeta) {
     // Bass note is quality.intervals[inversion] semitones above the root.
@@ -444,10 +458,13 @@ export default async function ChordQualityPage({
       (rootPc + (qualityMeta.intervals[inversionShape.inversion] % 12)) % 12;
     bassNote = PC_TO_NOTE[bassPc];
     matchingShape = inversionShape;
+    anchorString = inversionShape.bass_string ?? inversionShape.root_string;
+    anchorFinger =
+      inversionShape.bass_finger ?? inversionShape.root_finger ?? 0;
     transposed = transposeShape(
       inversionShape.tab_relative,
-      inversionShape.bass_string ?? inversionShape.root_string,
-      inversionShape.bass_finger ?? inversionShape.root_finger ?? 0,
+      anchorString,
+      anchorFinger,
       bassPc,
     );
   } else {
@@ -467,6 +484,8 @@ export default async function ChordQualityPage({
       ) ??
       null;
 
+    anchorString = matchingShape?.root_string ?? null;
+    anchorFinger = effectivePosition.rootFinger;
     transposed = matchingShape
       ? transposeShape(
           matchingShape.tab_relative,
@@ -583,6 +602,11 @@ export default async function ChordQualityPage({
   const dotLabels = transposed
     ? tabDegreeLabels(transposed.tab, rootPc, dotLabelMap)
     : undefined;
+  // LabelModeToggle's "Show note names" alternative to dotLabels — same
+  // dots, different text. Always computed alongside dotLabels for the same
+  // reason: the client-side toggle decides which to show, not this
+  // server component.
+  const noteLabels = transposed ? computeNoteLabels(transposed.tab) : undefined;
   // Always computed — RootHighlightLayer (client) decides whether to
   // actually render it, based on the toggle's local state.
   const rootHighlightTab =
@@ -623,7 +647,13 @@ export default async function ChordQualityPage({
         {degrees.length > 0 && qualityMeta && (
           <div className="mt-8 flex flex-wrap gap-x-12 gap-y-6">
             <div>
-              <SectionLabel as="h2">Intervals</SectionLabel>
+              {/* uppercase off for consistency with this page's other
+                  section headings, several of which must stay natural-case
+                  (embedded chord symbols) — see docs/STYLE_GUIDE.md's
+                  "Chord symbols" section. */}
+              <SectionLabel as="h2" uppercase={false}>
+                Intervals
+              </SectionLabel>
               <p className="mt-2 font-mono text-sm tracking-wider">
                 {qualityMeta.intervals
                   .map((interval, i) => {
@@ -644,7 +674,9 @@ export default async function ChordQualityPage({
               </p>
             </div>
             <div>
-              <SectionLabel as="h2">Notes</SectionLabel>
+              <SectionLabel as="h2" uppercase={false}>
+                Notes
+              </SectionLabel>
               <p className="mt-2 font-mono text-sm tracking-wider">
                 {qualityMeta.intervals
                   .map((interval, i) => {
@@ -660,7 +692,9 @@ export default async function ChordQualityPage({
             {transposed && (
               <div>
                 <div className="flex items-center gap-2">
-                  <SectionLabel as="h2">Tab</SectionLabel>
+                  <SectionLabel as="h2" uppercase={false}>
+                    Tab
+                  </SectionLabel>
                   <span className="text-xs text-fg-secondary">
                     {droppedFifth && 'no 5'}
                     {droppedFifth && droppedSeventh && ' · '}
@@ -678,9 +712,9 @@ export default async function ChordQualityPage({
           a Related Chords/Inversions card) — root/string/position/inversion
           changes reuse the same key (symbol doesn't change), so those
           intentionally leave the toggle as the reader left it. */}
-      <RootHighlightProvider key={symbol}>
-        <Panel>
-          <div className="flex flex-wrap items-center justify-between gap-4">
+      <LabelModeProvider key={symbol}>
+        <RootHighlightProvider key={symbol}>
+          <Panel>
             <Suspense>
               <PositionControls
                 rootNote={rootNote}
@@ -691,52 +725,84 @@ export default async function ChordQualityPage({
                 fingerZeroLabel={fingerZeroLabel}
               />
             </Suspense>
-            <RootHighlightToggle />
-          </div>
 
-          {/* Heading names the chord (e.g. "C Major 7th"); howToPlayText
+            {/* Heading names the chord (e.g. "C Major 7th"); howToPlayText
               covers how this specific shape is played (position, bass note,
               omissions). No tab here, it's already in the Tab box above and
               the diagram's own SVG <desc>. */}
-          {transposed && (
-            <div className="mt-4">
-              <h2 className="text-lg font-semibold">{spelledChordName}</h2>
-              {howToPlayText && (
-                <p className="mt-1 text-sm text-fg-secondary">
-                  {howToPlayText}
-                </p>
-              )}
-            </div>
-          )}
+            {transposed && (
+              <div className="mt-4">
+                <h2 className="text-lg font-semibold">{spelledChordName}</h2>
+                {howToPlayText && (
+                  <p className="mt-1 text-sm text-fg-secondary">
+                    {howToPlayText}
+                  </p>
+                )}
+              </div>
+            )}
 
-          {transposed ? (
-            <div className="mt-4 flex items-start gap-2">
-              <div className="w-64">
-                <Fretboard
-                  id="chord-diagram"
-                  numFrets={transposed.numFrets}
-                  startFret={transposed.startFret}
-                  title={`${displayName} chord, root on the ${displayPosition.rootString}th string, guitar fretboard diagram`}
-                  description={svgDescription}
-                  fingerLabels={fingerLabels}
-                >
-                  <Pattern
-                    tab={transposed.tab}
-                    startFret={transposed.startFret}
-                    fillColor="#000"
-                    intervals={dotLabels}
-                  />
-                  {rootHighlightTab && (
-                    <RootHighlightLayer>
-                      <Pattern
-                        tab={rootHighlightTab}
-                        startFret={transposed.startFret}
-                        fillColor={ACCENT_HEX}
-                        intervals={dotLabels}
+            {transposed ? (
+              <div className="mt-4">
+                <div className="flex items-start gap-2">
+                  <div className="w-64">
+                    <Fretboard
+                      id="chord-diagram"
+                      numFrets={transposed.numFrets}
+                      startFret={transposed.startFret}
+                      title={`${displayName} chord, root on the ${displayPosition.rootString}th string, guitar fretboard diagram`}
+                      description={svgDescription}
+                      fingerLabels={fingerLabels}
+                    >
+                      <LabelModeLayer
+                        intervalContent={
+                          <Pattern
+                            tab={transposed.tab}
+                            startFret={transposed.startFret}
+                            fillColor="#000"
+                            intervals={dotLabels}
+                          />
+                        }
+                        noteContent={
+                          <Pattern
+                            tab={transposed.tab}
+                            startFret={transposed.startFret}
+                            fillColor="#000"
+                            intervals={noteLabels}
+                          />
+                        }
                       />
-                    </RootHighlightLayer>
+                      {rootHighlightTab && (
+                        <RootHighlightLayer>
+                          <LabelModeLayer
+                            intervalContent={
+                              <Pattern
+                                tab={rootHighlightTab}
+                                startFret={transposed.startFret}
+                                fillColor={ACCENT_HEX}
+                                intervals={dotLabels}
+                              />
+                            }
+                            noteContent={
+                              <Pattern
+                                tab={rootHighlightTab}
+                                startFret={transposed.startFret}
+                                fillColor={ACCENT_HEX}
+                                intervals={noteLabels}
+                              />
+                            }
+                          />
+                        </RootHighlightLayer>
+                      )}
+                    </Fretboard>
+                  </div>
+                  {matchingShape && (
+                    <ChordShapeActionDropdown
+                      shapeId={matchingShape.id}
+                      chordName={displayName}
+                      svgId="chord-diagram"
+                    />
                   )}
-                </Fretboard>
+                </div>
                 <div className="mt-2">
                   <Tags tags={tags} />
                 </div>
@@ -751,32 +817,35 @@ export default async function ChordQualityPage({
                     </p>
                   )}
               </div>
-              {matchingShape && (
-                <ChordShapeActionDropdown
-                  shapeId={matchingShape.id}
-                  chordName={displayName}
-                  svgId="chord-diagram"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="mt-4">
-              <p className="text-sm text-fg-secondary">
-                {shapes.length === 0
-                  ? 'No shapes have been added for this chord yet.'
-                  : 'No shape found for this string and position.'}
-              </p>
-              {shapes.length === 0 && qualityMeta && (
-                <LogMissingChordVisit
-                  qualitySymbol={qualityMeta.symbol}
-                  qualityFullName={qualityMeta.full_name}
-                  intervals={qualityMeta.intervals}
-                />
-              )}
-            </div>
-          )}
-        </Panel>
-      </RootHighlightProvider>
+            ) : null}
+            {/* Not width-constrained to the w-64 diagram column above — these
+                2 labels don't fit side by side in 256px, and the point of a
+                row layout is that they don't wrap. */}
+            {transposed && (
+              <div className="mt-4 flex flex-row items-center gap-4">
+                <LabelModeToggle />
+                <RootHighlightToggle />
+              </div>
+            )}
+            {!transposed && (
+              <div className="mt-4">
+                <p className="text-sm text-fg-secondary">
+                  {shapes.length === 0
+                    ? 'No shapes have been added for this chord yet.'
+                    : 'No shape found for this string and position.'}
+                </p>
+                {shapes.length === 0 && qualityMeta && (
+                  <LogMissingChordVisit
+                    qualitySymbol={qualityMeta.symbol}
+                    qualityFullName={qualityMeta.full_name}
+                    intervals={qualityMeta.intervals}
+                  />
+                )}
+              </div>
+            )}
+          </Panel>
+        </RootHighlightProvider>
+      </LabelModeProvider>
 
       <AdditionalChordShapes
         symbol={symbol}
@@ -814,6 +883,36 @@ export default async function ChordQualityPage({
           (i) => !missingPcs.has(i % 12),
         )}
       />
+
+      <CompatibleScales
+        compactName={compactName}
+        rootNote={rootNote}
+        rootPc={rootPc}
+        chordIntervals={qualityMeta.intervals}
+      />
+
+      {/* Last section on the page, deliberately: this is the "you've seen
+          everything about this chord, here's the same shape elsewhere"
+          exit point, not core content. Only for a moveable shape — a fixed
+          shape (e.g. a curated open-position voicing) relies on specific
+          open strings ringing at specific pitches and genuinely has no
+          equivalent in other keys, so there's nothing accurate to show. */}
+      {transposed &&
+        matchingShape?.moveable &&
+        anchorString !== null &&
+        anchorFinger !== null && (
+          <OtherKeys
+            symbol={symbol}
+            rootPc={rootPc}
+            rootString={displayPosition.rootString}
+            rootFinger={displayPosition.rootFinger}
+            inversion={inversionShape?.inversion ?? 0}
+            tabRelative={matchingShape.tab_relative}
+            anchorString={anchorString}
+            anchorFinger={anchorFinger}
+            qualityIntervals={qualityMeta.intervals}
+          />
+        )}
     </div>
   );
 }

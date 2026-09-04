@@ -1,4 +1,8 @@
-import { STANDARD_TUNING_PC, INTERVAL_LABELS } from '@/app/utils/constants';
+import {
+  STANDARD_TUNING_PC,
+  INTERVAL_LABELS,
+  PC_TO_NOTE,
+} from '@/app/utils/constants';
 import { spellScale } from '@/app/utils/noteSpelling';
 
 // Ionian = the major scale itself — the reference scale most lesson
@@ -25,6 +29,39 @@ export function computeIntervalTab(
     scaleTab[stringIndex].map(
       (fret) => INTERVAL_LABELS[(openPc + fret - rootPc + 12) % 12],
     ),
+  );
+}
+
+// Same shape as computeIntervalTab but the absolute note name per string
+// instead of a root-relative interval — ScaleViewer's LabelModeToggle "Show
+// note names" alternative (see app/utils/musicUtils.ts's noteLabels, the
+// flat-tab equivalent for the chord page).
+//
+// Uses spellScale rather than a bare pitch-class lookup: a fixed PC→name
+// table (PC_TO_NOTE) can't tell G# and Ab apart, so a scale like G Locrian
+// (G Ab Bb C Db Eb F) would come out G G# A# C C# D# F — two different
+// letters (G and G#, A and A#) standing in for what should be 7 distinct
+// letters, exactly the bug this was built to avoid. spellScale already
+// solves this correctly (one instance of each letter A-G) for every 7-note
+// system on the site; falls back to bare pitch-class spelling only for a
+// non-7-note system (pentatonic), where there's no unique-letter rule to
+// begin with.
+export function computeNoteTab(
+  scaleTab: number[][],
+  rootNote: string,
+  rootPc: number,
+  modeIntervals: number[],
+): string[][] {
+  const spelled = spellScale(rootNote, modeIntervals);
+  const pcToLabel = new Map<number, string>();
+  modeIntervals.forEach((interval, i) => {
+    pcToLabel.set((rootPc + interval) % 12, spelled[i]);
+  });
+  return STANDARD_TUNING_PC.map((openPc, stringIndex) =>
+    scaleTab[stringIndex].map((fret) => {
+      const pc = (openPc + fret) % 12;
+      return pcToLabel.get(pc) ?? PC_TO_NOTE[pc];
+    }),
   );
 }
 
