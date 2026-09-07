@@ -28,14 +28,16 @@ export default async function VoicingInversionsLesson() {
       <LessonHeader partSlug="chord-voicings" lessonSlug="voicing-inversions" />
 
       <h2>Inverting the voicing</h2>
+      {/* prettier-ignore */}
       <p>
-        A 7th chord has 4 notes, so it has exactly 4 possible arrangements from
-        the bottom up, one for each tone taking its turn as the lowest note.
-        This lesson takes the 1-5-7-3 voicing from the last lesson and cycles
-        through all 4 of them. The string set never changes (still the top 4
-        strings, 4th through 1st) and the voicing&apos;s own shape never changes
-        either. All that moves is which chord tone lands on the 4th string, and
-        with it, which finger reaches for the bottom note.
+        An <strong>inversion</strong>{' '}
+        rearranges the notes of a chord to change
+        what&apos;s in the bass, the lowest note, and what&apos;s in the melody,
+        the highest note. The 1-5-7-3 voicing of a major 7 chord cycles through
+        4 arrangements this way: each note moves up to the next interval,
+        giving 4 distinct patterns, one for each tone taking a turn in the
+        bass. Inversions can be used to
+        introduce melody or bass movements while still playing the same chord.
       </p>
       <ul className="list-disc space-y-1 pl-5">
         <li>
