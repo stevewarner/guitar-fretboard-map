@@ -105,7 +105,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
     slug: 'harmonic-minor',
     displayName: 'Harmonic Minor',
     dbName: 'harmonic_minor',
-    showModes: false,
+    showModes: true,
     modes: [
       {
         slug: 'harmonic-minor',
@@ -162,7 +162,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
     slug: 'melodic-minor',
     displayName: 'Melodic Minor',
     dbName: 'melodic_minor',
-    showModes: false,
+    showModes: true,
     modes: [
       {
         slug: 'melodic-minor',
