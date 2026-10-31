@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
 import { SectionLabel } from '@/components/SectionLabel';
-import { PrintTemplate } from '@/modules/print/PrintTemplate';
+import { PrintWorksheet } from '@/modules/print/PrintWorksheet';
 
 export const metadata: Metadata = {
   title: 'Print template',
-  description: 'Guitar chord charts print template',
+  description: 'Blank chord chart and fretboard print templates',
   openGraph: {
     title: 'GuitarTheory | Print template',
-    description: 'Guitar chord charts print template',
+    description: 'Blank chord chart and fretboard print templates',
   },
   robots: { index: false, follow: false },
 };
@@ -20,9 +20,9 @@ const Print = () => {
           Printable handout
         </SectionLabel>
         <h1 className="printHidden mb-6 text-3xl font-bold tracking-tight">
-          Blank chord chart worksheet
+          Blank practice worksheet
         </h1>
-        <PrintTemplate />
+        <PrintWorksheet />
       </div>
     </>
   );

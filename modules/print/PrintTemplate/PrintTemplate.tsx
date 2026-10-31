@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Fretboard } from '@/components/FretboardChart';
 import { Button, ButtonVariant } from '@/components/Button';
+import { NumberField } from '../NumberField';
 import styles from './PrintTemplate.module.scss';
 
 export const PrintTemplate = () => {
@@ -12,21 +13,14 @@ export const PrintTemplate = () => {
   return (
     <div className="w-full max-w-3xl rounded-2xl bg-surface p-8 shadow-sm print:shadow-none">
       <div className="printHidden mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="numChords" className="text-sm text-fg-secondary">
-            Number of chord charts:
-          </label>
-          <input
-            id="numChords"
-            name="numChords"
-            type="number"
-            value={numChords}
-            onChange={(e) => setNumChords(Number(e.target.value))}
-            className="w-16 rounded-full bg-surface-raised px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
-            min={1}
-            max={20}
-          />
-        </div>
+        <NumberField
+          id="numChords"
+          label="Number of chord charts:"
+          value={numChords}
+          onChange={setNumChords}
+          min={1}
+          max={20}
+        />
         <Button
           type="button"
           variant={ButtonVariant.TERTIARY}
