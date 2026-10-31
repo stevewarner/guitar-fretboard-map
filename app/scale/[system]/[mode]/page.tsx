@@ -197,6 +197,8 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
           triads={diatonicTriads}
           sevenths={diatonicChords}
           rootPc={rootPc}
+          modeIntervals={modeIntervals}
+          tonicNote={rootNote}
         />
       )}
     </div>

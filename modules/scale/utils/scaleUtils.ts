@@ -4,6 +4,7 @@ import {
   PC_TO_NOTE,
 } from '@/app/utils/constants';
 import { spellScale } from '@/app/utils/noteSpelling';
+import { intervalsToDegrees } from '@/modules/chordv2/utils/intervalDegrees';
 
 // Ionian = the major scale itself — the reference scale most lesson
 // explorers and modes are derived from or compared against.
@@ -701,9 +702,33 @@ export interface DiatonicChord {
   quality: string; // 'maj7', 'm7', '7', 'm7b5', 'dim7', 'mMaj7', 'maj7#5', '7#5'
   rootNote: string; // 'C', 'C#', etc.
   name: string; // rootNote + quality, e.g. 'Cmaj7'
+  scaleDegrees: string[]; // chord tones as scale degrees, e.g. ['1', 'b3', '5', '7']
+  chordIntervals: string[]; // same tones relative to the chord's own root, e.g. ['1', 'b3', '5', 'b7']
 }
 
 const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+// A mode's degree can sit a semitone (or two) off the major scale's degree at
+// the same position (e.g. Dorian's 3rd is a semitone below Ionian's) — that
+// difference is what puts a b/# in front of the Roman numeral.
+function numeralAccidental(interval: number, degreeIndex: number): string {
+  const diff = interval - MAJOR_SCALE_INTERVALS[degreeIndex];
+  if (diff === 0) return '';
+  return diff < 0 ? 'b'.repeat(-diff) : '#'.repeat(diff);
+}
+
+// Label one chord tone by its scale degree (1-7), independent of the chord's
+// own root — e.g. the b3 scale degree reads 'b3' whether it's a chord's root,
+// 3rd, or 7th. Always the plain tonic-relative degree, even for an extended
+// chord's 9th/11th/13th tone: this line cross-references the scale's own
+// degree numbering (docs/MUSIC_THEORY.md), not the chord's internal interval
+// structure — that's `chordIntervals`, which does use 9/11/13 naming.
+function degreeLabel(modeIntervals: number[], positionIndex: number): string {
+  return (
+    numeralAccidental(modeIntervals[positionIndex], positionIndex) +
+    String(positionIndex + 1)
+  );
+}
 
 function classifyTriad(
   third: number,
@@ -714,6 +739,174 @@ function classifyTriad(
   if (third === 3 && fifth === 6) return { quality: 'mb5', isMajor: false };
   if (third === 4 && fifth === 8) return { quality: 'aug', isMajor: true };
   return null;
+}
+
+// Build the diatonic sus2/sus4/7sus4 chord sequence for the given mode +
+// tonic. A sus chord replaces the 3rd with the 2nd or 4th degree, so unlike
+// most functions here it's independent of classifyTriad's major/minor split
+// (there's no 3rd left to classify) - every degree is attempted, and the
+// standard exact-interval-match against each quality's own definition
+// ([0,2,7] sus2 / [0,5,7] sus4 / [0,5,7,10] 7sus4) naturally excludes a
+// degree whose diatonic 5th isn't perfect (e.g. a diminished-triad degree)
+// or, for 7sus4, whose 7th isn't a b7, with no special-casing needed.
+// Roman numeral casing instead follows whatever triad quality the degree's
+// own (unmodified) 3rd/5th would classify as, matching how sus chords are
+// conventionally notated (e.g. "V sus4" stays uppercase since V is a
+// major-family degree) - sus2 is checked before sus4 so results list in
+// ascending interval order (2 before 4); 7sus4 (keeps the b7, unlike the
+// plain triad sus4/sus2 above it) lists last.
+export function getDiatonicSusChords(
+  modeIntervals: number[],
+  tonicNote: string,
+  qualities: { symbol: string; intervals: number[] }[],
+): DiatonicChord[] | null {
+  if (modeIntervals.length !== 7) return null;
+
+  const spelled = spellScale(tonicNote, modeIntervals);
+  const symbolByIntervals = new Map(
+    qualities.map((q) => [q.intervals.join(','), q.symbol]),
+  );
+
+  const chords: DiatonicChord[] = [];
+
+  modeIntervals.forEach((rootInterval, i) => {
+    const second = (modeIntervals[(i + 1) % 7] - rootInterval + 12) % 12;
+    const third = (modeIntervals[(i + 2) % 7] - rootInterval + 12) % 12;
+    const fourth = (modeIntervals[(i + 3) % 7] - rootInterval + 12) % 12;
+    const fifth = (modeIntervals[(i + 4) % 7] - rootInterval + 12) % 12;
+    const seventh = (modeIntervals[(i + 6) % 7] - rootInterval + 12) % 12;
+
+    const classified = classifyTriad(third, fifth);
+    const isMajor = classified?.isMajor ?? false;
+    const numeral =
+      numeralAccidental(rootInterval, i) +
+      (isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase());
+    const rootNote = spelled[i];
+
+    const variants = [
+      {
+        positions: [(i + 1) % 7, (i + 4) % 7],
+        intervals: [0, second, fifth],
+      },
+      {
+        positions: [(i + 3) % 7, (i + 4) % 7],
+        intervals: [0, fourth, fifth],
+      },
+      {
+        positions: [(i + 3) % 7, (i + 4) % 7, (i + 6) % 7],
+        intervals: [0, fourth, fifth, seventh],
+      },
+    ];
+
+    for (const variant of variants) {
+      const symbol = symbolByIntervals.get(variant.intervals.join(','));
+      if (!symbol) continue;
+
+      chords.push({
+        degree: i + 1,
+        romanNumeral: numeral,
+        quality: symbol,
+        rootNote,
+        name: `${rootNote}${symbol}`,
+        scaleDegrees: [
+          degreeLabel(modeIntervals, i),
+          ...variant.positions.map((p) => degreeLabel(modeIntervals, p)),
+        ],
+        chordIntervals: intervalsToDegrees(variant.intervals),
+      });
+    }
+  });
+
+  return chords;
+}
+
+// Build the diatonic "6", "add9", and "6/9" chord sequence (e.g. I6,
+// Iadd9, I6/9, IV6, iim6, iimadd9, iim6/9) for the given mode + tonic. None
+// of these are stacked-thirds extensions - each adds the plain 6th and/or
+// plain 9th scale degree directly to a triad (no 7th involved at all) - so
+// this is computed independently of classify7thChord/getDiatonicExtendedChords
+// above, and only ever attempted for a real major or minor triad
+// (classifyTriad returns null for diminished/augmented, which have no
+// conventional chord in this family).
+//
+// A minor triad's 6-chord is only valid when the scale's own 6th degree
+// lands as a NATURAL 6th above that triad's root, matching the `m6`
+// quality's own definition ([0,3,7,9]). When a mode's diatonic 6th lands
+// flat instead (e.g. iii and vi in a major scale), the resulting 4 notes
+// are provably a disguised maj7 chord of a DIFFERENT scale degree - that
+// triad's own 3 notes already ARE that maj7's 3rd/5th/7th by construction
+// (e.g. major-scale iii + its own flat 6 = {E,G,B,C} = Cmaj7, the I chord's
+// own maj7, reordered) - not a real, distinct m6 sonority. No quality in
+// chord_qualities is catalogued for that interval set ([0,3,7,8]), so the
+// standard exact-interval-match below excludes it with no special-casing -
+// same reasoning extends to add9/6/9 (each needs its own tier(s) natural).
+export function getDiatonicSixthChords(
+  modeIntervals: number[],
+  tonicNote: string,
+  qualities: { symbol: string; intervals: number[] }[],
+): DiatonicChord[] | null {
+  if (modeIntervals.length !== 7) return null;
+
+  const spelled = spellScale(tonicNote, modeIntervals);
+  const symbolByIntervals = new Map(
+    qualities.map((q) => [q.intervals.join(','), q.symbol]),
+  );
+
+  const chords: DiatonicChord[] = [];
+
+  modeIntervals.forEach((rootInterval, i) => {
+    const third = (modeIntervals[(i + 2) % 7] - rootInterval + 12) % 12;
+    const fifth = (modeIntervals[(i + 4) % 7] - rootInterval + 12) % 12;
+    const sixth = (modeIntervals[(i + 5) % 7] - rootInterval + 12) % 12;
+    const ninthPosition = (i + 8) % 7;
+    const ninth =
+      ((modeIntervals[ninthPosition] - rootInterval + 12) % 12) + 12;
+
+    const classified = classifyTriad(third, fifth);
+    if (!classified) return;
+
+    const numeral =
+      numeralAccidental(rootInterval, i) +
+      (classified.isMajor
+        ? ROMAN_NUMERALS[i]
+        : ROMAN_NUMERALS[i].toLowerCase());
+    const rootNote = spelled[i];
+
+    const variants = [
+      {
+        positions: [(i + 2) % 7, (i + 4) % 7, (i + 5) % 7],
+        intervals: [0, third, fifth, sixth],
+      },
+      {
+        positions: [(i + 2) % 7, (i + 4) % 7, ninthPosition],
+        intervals: [0, third, fifth, ninth],
+      },
+      {
+        positions: [(i + 2) % 7, (i + 4) % 7, (i + 5) % 7, ninthPosition],
+        intervals: [0, third, fifth, sixth, ninth],
+      },
+    ];
+
+    for (const variant of variants) {
+      const symbol = symbolByIntervals.get(variant.intervals.join(','));
+      if (!symbol) continue;
+
+      chords.push({
+        degree: i + 1,
+        romanNumeral: numeral,
+        quality: symbol,
+        rootNote,
+        name: `${rootNote}${symbol}`,
+        scaleDegrees: [
+          degreeLabel(modeIntervals, i),
+          ...variant.positions.map((p) => degreeLabel(modeIntervals, p)),
+        ],
+        chordIntervals: intervalsToDegrees(variant.intervals),
+      });
+    }
+  });
+
+  return chords;
 }
 
 export function getDiatonicTriads(
@@ -732,9 +925,9 @@ export function getDiatonicTriads(
     const quality = classified?.quality ?? '?';
     const isMajor = classified?.isMajor ?? false;
 
-    const numeral = isMajor
-      ? ROMAN_NUMERALS[i]
-      : ROMAN_NUMERALS[i].toLowerCase();
+    const numeral =
+      numeralAccidental(rootInterval, i) +
+      (isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase());
     const rootNote = spelled[i];
 
     return {
@@ -743,6 +936,12 @@ export function getDiatonicTriads(
       quality,
       rootNote,
       name: `${rootNote}${quality === 'maj' ? '' : quality}`,
+      scaleDegrees: [
+        degreeLabel(modeIntervals, i),
+        degreeLabel(modeIntervals, (i + 2) % 7),
+        degreeLabel(modeIntervals, (i + 4) % 7),
+      ],
+      chordIntervals: intervalsToDegrees([0, third, fifth]),
     };
   });
 }
@@ -793,9 +992,9 @@ export function getDiatonicChords(
     const quality = classified?.quality ?? '?';
     const isMajor = classified?.isMajor ?? false;
 
-    const numeral = isMajor
-      ? ROMAN_NUMERALS[i]
-      : ROMAN_NUMERALS[i].toLowerCase();
+    const numeral =
+      numeralAccidental(rootInterval, i) +
+      (isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase());
     const rootNote = spelled[i];
 
     return {
@@ -804,6 +1003,123 @@ export function getDiatonicChords(
       quality,
       rootNote,
       name: `${rootNote}${quality}`,
+      scaleDegrees: [
+        degreeLabel(modeIntervals, i),
+        degreeLabel(modeIntervals, (i + 2) % 7),
+        degreeLabel(modeIntervals, (i + 4) % 7),
+        degreeLabel(modeIntervals, (i + 6) % 7),
+      ],
+      chordIntervals: intervalsToDegrees([0, third, fifth, seventh]),
     };
   });
+}
+
+// Build the diatonic extended-chord sequence (9th, 11th, 13th tiers) for the
+// given mode + tonic. Continues the same stacking-thirds pattern as the 7th
+// chords (docs/MUSIC_THEORY.md's "Diatonic Chord Construction"), but doesn't
+// require the tiers to be cumulative: a chord can skip a tier and still be a
+// real, commonly-voiced extension — e.g. maj#11 is 1 3 5 7 #11 with the 9th
+// left out entirely, not 1 3 5 7 9 #11. So every non-empty combination of
+// {9th, 11th, 13th} is tried per degree, and a combination is only included
+// when its resulting interval set matches a real `chord_qualities` row —
+// some degrees have several valid combinations, others have none, because
+// the DB has no catalogued quality for that interval set. Takes the quality
+// list as a parameter rather than querying the DB itself, so this stays a
+// pure function like its siblings above.
+const EXTENSION_TIERS = [4, 5, 6]; // stack positions for the 9th, 11th, 13th
+// Every non-empty subset of the 3 tiers, as bit-index arrays in ascending
+// order (so intervals are always pushed low-to-high, matching how the DB
+// stores them) — [0], [1], [2], [0,1], [0,2], [1,2], [0,1,2].
+const EXTENSION_COMBOS = [1, 2, 3, 4, 5, 6, 7].map((mask) =>
+  [0, 1, 2].filter((bit) => mask & (1 << bit)),
+);
+
+export function getDiatonicExtendedChords(
+  modeIntervals: number[],
+  tonicNote: string,
+  qualities: { symbol: string; intervals: number[] }[],
+): DiatonicChord[] | null {
+  if (modeIntervals.length !== 7) return null;
+
+  const spelled = spellScale(tonicNote, modeIntervals);
+  const symbolByIntervals = new Map(
+    qualities.map((q) => [q.intervals.join(','), q.symbol]),
+  );
+
+  const chords: DiatonicChord[] = [];
+
+  modeIntervals.forEach((rootInterval, i) => {
+    const third = (modeIntervals[(i + 2) % 7] - rootInterval + 12) % 12;
+    const fifth = (modeIntervals[(i + 4) % 7] - rootInterval + 12) % 12;
+    const seventh = (modeIntervals[(i + 6) % 7] - rootInterval + 12) % 12;
+
+    const base = classify7thChord(third, fifth, seventh);
+    if (!base) return;
+
+    const numeral =
+      numeralAccidental(rootInterval, i) +
+      (base.isMajor ? ROMAN_NUMERALS[i] : ROMAN_NUMERALS[i].toLowerCase());
+    const rootNote = spelled[i];
+
+    const baseIntervals = [0, third, fifth, seventh];
+    const baseDegrees = [
+      degreeLabel(modeIntervals, i),
+      degreeLabel(modeIntervals, (i + 2) % 7),
+      degreeLabel(modeIntervals, (i + 4) % 7),
+      degreeLabel(modeIntervals, (i + 6) % 7),
+    ];
+
+    const tiers = EXTENSION_TIERS.map((stackIndex) => {
+      const position = (i + 2 * stackIndex) % 7;
+      const extendedInterval =
+        ((modeIntervals[position] - rootInterval + 12) % 12) + 12;
+      return { position, extendedInterval };
+    });
+
+    // A natural (unraised) 11th is only structurally impossible against a
+    // MAJOR 3rd specifically: a perfect 4th above the root (the natural 11,
+    // extended value's pc = 5) always lands exactly a half-step above a
+    // major 3rd (pc 4), and unlike the 9th/13th tiers there's no usable
+    // "altered" spelling for this collision (a flattened 11 is simply the
+    // same pitch class as the 3rd itself - not a new, nameable tone the way
+    // b9/b13 are real, catalogued alterations). This is why I's and V's
+    // natural 11 is excluded while a degree's own natural/flat 9th or 13th
+    // is NOT filtered here at all: those are genuine diatonic notes with
+    // real quality symbols to match against below (e.g. iii's b9 -> m7b9)
+    // - excluding them pre-emptively, as an earlier version of this code
+    // did, would wrongly hide real diatonic chords just because they're
+    // less conventional. A minor 3rd or a raised (#11) 11th never produces
+    // this collision, so IV's Lydian #11 and every minor-3rd degree keep
+    // their 11 freely.
+    const avoidTierBits =
+      third === 4 && tiers[1].extendedInterval % 12 === 5
+        ? new Set([1])
+        : new Set<number>();
+
+    for (const combo of EXTENSION_COMBOS) {
+      if (combo.some((bit) => avoidTierBits.has(bit))) continue;
+
+      const intervals = [...baseIntervals];
+      const degrees = [...baseDegrees];
+      for (const bit of combo) {
+        intervals.push(tiers[bit].extendedInterval);
+        degrees.push(degreeLabel(modeIntervals, tiers[bit].position));
+      }
+
+      const symbol = symbolByIntervals.get(intervals.join(','));
+      if (!symbol) continue;
+
+      chords.push({
+        degree: i + 1,
+        romanNumeral: numeral,
+        quality: symbol,
+        rootNote,
+        name: `${rootNote}${symbol}`,
+        scaleDegrees: degrees,
+        chordIntervals: intervalsToDegrees(intervals),
+      });
+    }
+  });
+
+  return chords;
 }
