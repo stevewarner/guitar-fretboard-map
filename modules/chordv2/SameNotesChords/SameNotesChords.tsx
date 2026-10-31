@@ -3,7 +3,7 @@ import { ChordPreviewCard } from '@/components/ChordPreviewCard';
 import { SectionLabel } from '@/components/SectionLabel';
 import { PC_TO_NOTE } from '@/app/utils/constants';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
-import { getQualitiesWithCleanestShape } from '@/modules/chordv2/utils/actualQualityIntervals';
+import { getQualityShapeCandidates } from '@/modules/chordv2/utils/actualQualityIntervals';
 import { findSameNotesChords } from '@/modules/chordv2/utils/sameNotesChords';
 import {
   ROOT_STRINGS,
@@ -32,25 +32,27 @@ export async function SameNotesChords({
 
   // Candidates search every root string, not just the one currently on
   // screen - unlike RelatedChords, "same notes" isn't about a nearby hand
-  // position, and a quality's only shape on the current string can happen
-  // to drop a note even when a complete voicing exists elsewhere (see
-  // getQualitiesWithCleanestShape's own doc comment). The current chord's
-  // own string is searched first so a matched card lands nearby when a
-  // complete voicing happens to exist there too.
+  // position, and a quality's shapes can drop different notes on different
+  // strings (see getQualityShapeCandidates's own doc comment for why every
+  // shape is checked, not just one representative per quality). The current
+  // chord's own string is searched first so a matched card lands nearby
+  // when a match happens to exist there too.
   const rootStringSearchOrder = [
     position.rootString,
     ...ROOT_STRINGS.filter((rs) => rs !== position.rootString),
   ];
-  const withActualIntervals = await getQualitiesWithCleanestShape(
+  const shapeCandidates = await getQualityShapeCandidates(
     allQualities,
     rootStringSearchOrder,
-    position.rootFinger,
     rootPc,
   );
 
-  const currentEntry = withActualIntervals.find(
-    (c) => c.quality.id === current.id,
-  );
+  const currentEntry =
+    shapeCandidates.find(
+      (c) =>
+        c.quality.id === current.id &&
+        c.shape.root_finger === position.rootFinger,
+    ) ?? shapeCandidates.find((c) => c.quality.id === current.id);
   const referenceIntervals =
     actualIntervals ?? currentEntry?.intervals ?? current.intervals;
 
@@ -58,14 +60,12 @@ export async function SameNotesChords({
     referenceIntervals,
     symbol,
     rootPc,
-    withActualIntervals,
+    shapeCandidates,
   );
 
   if (matches.length === 0) return null;
 
   const cards = matches.flatMap((match) => {
-    if (!match.shape) return [];
-
     const transposed = transposeShape(
       match.shape.tab_relative as (number | 'x')[],
       match.shape.root_string,

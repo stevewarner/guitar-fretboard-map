@@ -1,6 +1,7 @@
 'use server';
 
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
+import { isShapeValidForRoot } from '@/modules/chordv2/utils/shapeValidity';
 import {
   getAllQualities,
   getCanonicalShapePerQuality,
@@ -164,10 +165,24 @@ export async function identifyChord(
         }
       }
 
-      const shape =
+      const candidateShape =
         tabMatchedShape ??
         keySpecificBySymbolAndPc.get(`${quality.symbol}:${rootPc}`) ??
         shapeBySymbol.get(quality.symbol);
+
+      // shapeBySymbol (the global canonical-shape fallback) is fetched
+      // without a rootPc, so it can hand back a FIXED shape tied to a
+      // different root (e.g. mMaj9's only shape is hardcoded to E) with no
+      // awareness of the root actually being matched here - using it
+      // regardless, as this used to, produces a nonsensical transposition
+      // of a shape that was never meant to move. The other two sources are
+      // already root-safe by construction (tabMatchedShape is filtered to
+      // root_pc === rootPc above; keySpecificBySymbolAndPc is keyed by the
+      // exact rootPc), so this only ever discards the unsafe case.
+      const shape =
+        candidateShape && isShapeValidForRoot(candidateShape, rootPc)
+          ? candidateShape
+          : null;
 
       const transposed = shape
         ? transposeShape(

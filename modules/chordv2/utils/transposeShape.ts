@@ -45,9 +45,16 @@ export function transposeShape(
 
   if (hasOpenStrings) {
     const maxFret = frettedValues.length ? Math.max(...frettedValues) : 0;
-    const numFrets = Math.max(4, maxFret);
-    if (numFrets > 22) return null;
-    return { tab, startFret: 1, numFrets };
+    const minFret = frettedValues.length ? Math.min(...frettedValues) : 0;
+    // Anchor to fret 1 for genuine open-position shapes (fretted notes near
+    // the nut) so the nut stays in frame; a shape whose fretted notes sit
+    // further up the neck (open strings ringing alongside a high stretch)
+    // windows around where the fretting actually is instead of dragging in
+    // several empty rows down to the nut.
+    const startFret = minFret > 4 ? minFret : 1;
+    const numFrets = Math.max(4, maxFret - startFret + 1);
+    if (startFret + numFrets - 1 > 22) return null;
+    return { tab, startFret, numFrets };
   }
 
   const minFret = Math.min(...frettedValues);

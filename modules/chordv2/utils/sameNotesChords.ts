@@ -2,7 +2,7 @@ import type {
   DbChordQuality,
   DbChordShape,
 } from '@/modules/chordv2/db/queries';
-import type { QualityWithActualIntervals } from './actualQualityIntervals';
+import type { QualityShapeCandidate } from './actualQualityIntervals';
 
 function sameIntervalSet(a: number[], b: number[]): boolean {
   const setA = [...new Set(a.map((i) => i % 12))].sort((x, y) => x - y);
@@ -35,7 +35,7 @@ function findRootOffsets(
 export interface SameNotesMatch {
   quality: DbChordQuality;
   rootPc: number;
-  shape: DbChordShape | null;
+  shape: DbChordShape;
 }
 
 // Finds every (quality, root) pair whose actual notes exactly match the
@@ -44,23 +44,31 @@ export interface SameNotesMatch {
 // rotation-symmetric, so e.g. Bdim7/Ddim7/Fdim7/Abdim7 are the literal same
 // 4 notes - a real, distinct fact. The only exclusion is the trivial
 // self-match (same quality AND the root already on screen).
+//
+// candidates is one entry per (quality, shape) pair, not one per quality -
+// a quality with two shapes that actually play different note sets (one
+// drops a tone, one doesn't) needs both checked, since only one of them may
+// match. The same (quality, root) pair can therefore turn up via more than
+// one shape; only the first one found is kept, so each match still renders
+// as a single card.
 export function findSameNotesChords(
   referenceIntervals: number[],
   referenceSymbol: string,
   referenceRootPc: number,
-  candidates: QualityWithActualIntervals[],
+  candidates: QualityShapeCandidate[],
 ): SameNotesMatch[] {
   const matches: SameNotesMatch[] = [];
+  const seen = new Set<string>();
   for (const candidate of candidates) {
     const offsets = findRootOffsets(referenceIntervals, candidate.intervals);
     for (const offset of offsets) {
       if (offset === 0 && candidate.quality.symbol === referenceSymbol)
         continue;
-      matches.push({
-        quality: candidate.quality,
-        rootPc: (referenceRootPc + offset) % 12,
-        shape: candidate.shape,
-      });
+      const rootPc = (referenceRootPc + offset) % 12;
+      const key = `${candidate.quality.id}-${rootPc}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      matches.push({ quality: candidate.quality, rootPc, shape: candidate.shape });
     }
   }
   return matches;

@@ -49,6 +49,25 @@ function accidentalString(semitones: number): string {
   return semitones > 0 ? '#'.repeat(semitones) : 'b'.repeat(-semitones);
 }
 
+// Shared by spellScale and spellChordNotes: given which letter (by index
+// into LETTER_ORDER, wrapping mod 7) a note should use, compute the
+// accidental needed to actually reach `interval` semitones above the tonic.
+// The two callers only differ in how they pick `letterIndex` - a sequential
+// scale-degree position for spellScale, a degree label's numeral for
+// spellChordNotes - everything after that (the diff-and-wraparound math) is
+// identical, so it lives here once instead of twice.
+function spellNote(
+  tonic: ParsedNote,
+  letterIndex: number,
+  interval: number,
+): string {
+  const letter = LETTER_ORDER[((letterIndex % 7) + 7) % 7];
+  const targetPc = (tonic.pc + interval) % 12;
+  let diff = (targetPc - NATURAL_PC[letter] + 12) % 12;
+  if (diff > 6) diff -= 12;
+  return letter + accidentalString(diff);
+}
+
 // Spell each scale degree so every letter A–G appears exactly once (for 7-note
 // scales). `tonicNote` is the spelled tonic (e.g. 'C', 'F#', 'Bb'); `intervals`
 // are semitone offsets from the tonic, sorted ascending.
@@ -63,12 +82,32 @@ export function spellScale(tonicNote: string, intervals: number[]): string[] {
   }
 
   const startIdx = LETTER_ORDER.indexOf(tonic.letter);
+  return intervals.map((interval, i) =>
+    spellNote(tonic, startIdx + i, interval),
+  );
+}
+
+// Spell each chord tone using its degree label's numeral (e.g. 'b7' -> 7,
+// '#11' -> 11) to pick the letter, keyed by the degree's numeral (mod 7)
+// instead of a sequential 1-7 index, since a chord's degrees aren't
+// necessarily consecutive. The degree label's own b/# prefix is relative to
+// the *major scale* degree, not the tonic's natural letter, so it can't be
+// applied directly (e.g. G's b7 is F natural — zero accidentals — even
+// though the label is 'b7'); only its numeral is used here; intervals
+// carries the real semitone offsets.
+export function spellChordNotes(
+  tonicNote: string,
+  intervals: number[],
+  degreeLabels: string[],
+): string[] {
+  const tonic = parseNote(tonicNote);
+  const startIdx = LETTER_ORDER.indexOf(tonic.letter);
 
   return intervals.map((interval, i) => {
-    const letter = LETTER_ORDER[(startIdx + i) % 7];
-    const targetPc = (tonic.pc + interval) % 12;
-    let diff = (targetPc - NATURAL_PC[letter] + 12) % 12;
-    if (diff > 6) diff -= 12;
-    return letter + accidentalString(diff);
+    const label = degreeLabels[i];
+    const match = label?.match(/^[#b]*(\d+)$/);
+    if (!match) return SHARP_FALLBACK[(tonic.pc + interval + 144) % 12];
+    const numeral = Number(match[1]);
+    return spellNote(tonic, startIdx + numeral - 1, interval);
   });
 }

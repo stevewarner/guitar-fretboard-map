@@ -46,7 +46,7 @@ import {
   fingerLabel,
   noteLabels as computeNoteLabels,
 } from '@/app/utils/musicUtils';
-import { parseNote } from '@/app/utils/noteSpelling';
+import { parseNote, spellChordNotes } from '@/app/utils/noteSpelling';
 import type { FlatTabValue } from '@/types';
 import {
   isValidPosition,
@@ -318,18 +318,6 @@ export default async function ChordQualityPage({
 
   const rootNote = parseRootNote(sp.root);
   const rootPc = parseNote(rootNote).pc;
-  const position = parsePosition(sp.string, sp.position, rootPc);
-  const {
-    compactName,
-    title: rootAwareTitle,
-    description: chordDescription,
-  } = buildChordDisplayNames(
-    rootNote,
-    symbol,
-    fullName,
-    qualityMeta.intervals,
-    qualityMeta.interval_overrides ?? {},
-  );
 
   // A moveable shape is valid at a given root unless it's root-restricted:
   //   - it has its own open_chords entries → valid ONLY at those roots (an
@@ -366,6 +354,47 @@ export default async function ChordQualityPage({
         (openRootsByShapeId.get(sib.id) ?? []).includes(targetRootPc),
     );
   };
+
+  // parsePosition always resolves a *string*, defaulting to 6 whenever the
+  // caller didn't explicitly request one - but a quality can easily have no
+  // shape at all on string 6 for this root while having one on string 5 or
+  // 4 (e.g. m6/9, whose only shape so far lives on string 5). Only cross
+  // over to another string when none was explicitly requested; an explicit
+  // `?string=` that genuinely has nothing still reports "No shape found"
+  // honestly rather than silently substituting a different string.
+  const requestedString = Number(sp.string);
+  const hasExplicitString = (ROOT_STRINGS as number[]).includes(
+    requestedString,
+  );
+  let position = parsePosition(sp.string, sp.position, rootPc);
+  if (!hasExplicitString) {
+    const hasShapeOnDefaultString = shapes.some(
+      (s) =>
+        s.root_string === position.rootString && isShapeValidAtRoot(s, rootPc),
+    );
+    if (!hasShapeOnDefaultString) {
+      const fallbackString = ROOT_STRINGS.find((rs) =>
+        shapes.some(
+          (s) => s.root_string === rs && isShapeValidAtRoot(s, rootPc),
+        ),
+      );
+      if (fallbackString !== undefined) {
+        position = { ...position, rootString: fallbackString };
+      }
+    }
+  }
+
+  const {
+    compactName,
+    title: rootAwareTitle,
+    description: chordDescription,
+  } = buildChordDisplayNames(
+    rootNote,
+    symbol,
+    fullName,
+    qualityMeta.intervals,
+    qualityMeta.interval_overrides ?? {},
+  );
 
   const availableFingers = Array.from(
     new Set(
@@ -572,9 +601,7 @@ export default async function ChordQualityPage({
       )
     : null;
 
-  const noteNames = qualityMeta.intervals.map(
-    (interval) => PC_TO_NOTE[(rootPc + interval) % 12],
-  );
+  const noteNames = spellChordNotes(rootNote, qualityMeta.intervals, degrees);
   const svgDescription =
     transposed && tabString
       ? buildChordSvgDescription(
@@ -680,7 +707,7 @@ export default async function ChordQualityPage({
               <p className="mt-2 font-mono text-sm tracking-wider">
                 {qualityMeta.intervals
                   .map((interval, i) => {
-                    const note = PC_TO_NOTE[(rootPc + interval) % 12];
+                    const note = noteNames[i];
                     const label = missingPcs.has(interval % 12)
                       ? `(${note})`
                       : note;
