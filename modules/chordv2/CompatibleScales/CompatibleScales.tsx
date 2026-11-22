@@ -6,7 +6,7 @@ import {
   isScaleCompatibleWithChord,
   type ScaleModeOption,
 } from '@/modules/scale/utils/scaleCompatibility';
-import { INTERVAL_LABELS } from '@/app/utils/constants';
+import { spellScaleIntervals } from '@/modules/scale/utils/scaleUtils';
 import { getOrdinal } from '@/app/utils';
 
 // "2nd mode of Major scale" — matches the phrasing the scale pages'
@@ -76,15 +76,17 @@ export function CompatibleScales({
               <span className="flex flex-col items-center gap-0.5">
                 <span>{describeSystem(opt)}</span>
                 <span>
-                  {opt.intervals.map((interval, i) => (
+                  {spellScaleIntervals(opt.intervals).map((label, i) => (
                     <span
                       key={i}
                       className={
-                        chordPcs.has(interval) ? 'font-bold text-fg' : undefined
+                        chordPcs.has(opt.intervals[i])
+                          ? 'font-bold text-fg'
+                          : undefined
                       }
                     >
                       {i > 0 && ' '}
-                      {INTERVAL_LABELS[interval]}
+                      {label}
                     </span>
                   ))}
                 </span>

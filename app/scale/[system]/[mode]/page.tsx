@@ -2,10 +2,11 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { SCALE_INTERVALS } from '@/modules/scale/data/scaleIntervals';
-import { INTERVAL_LABELS, NOTE_TO_PC, PC_TO_NOTE } from '@/app/utils/constants';
+import { NOTE_TO_PC, PC_TO_NOTE } from '@/app/utils/constants';
 import { STRING_LABELS } from '@/app/utils/musicUtils';
 import {
   getModeIntervals,
+  spellScaleIntervals,
   isValidPosition,
   getValidFingersForString,
   getDiatonicChords,
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const system = SCALE_SYSTEMS.find((s) => s.slug === systemSlug);
   const mode = system?.modes.find((m) => m.slug === modeSlug);
   if (!system || !mode) return {};
-  const title = `${mode.displayName} — ${system.displayName}`;
+  const title = `${mode.displayName} - ${system.displayName}`;
   const description = mode.description;
   return {
     title,
@@ -93,9 +94,8 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   const parentIntervals = SCALE_INTERVALS[dbName];
   if (!parentIntervals) notFound();
   const modeIntervals = getModeIntervals(parentIntervals, modeData.degree);
-  const intervalFormula = modeIntervals
-    .map((i) => INTERVAL_LABELS[i])
-    .join('  ');
+  const scaleIntervalLabels = spellScaleIntervals(modeIntervals);
+  const intervalFormula = scaleIntervalLabels.join('  ');
   const quality =
     modeIntervals.includes(4) && !modeIntervals.includes(3)
       ? 'Major'
@@ -121,7 +121,6 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   const scaleNoteNames = modeIntervals.map(
     (i) => PC_TO_NOTE[(rootPc + i) % 12],
   );
-  const scaleIntervalLabels = modeIntervals.map((i) => INTERVAL_LABELS[i]);
   const scaleSvgDescription = `${modeTitle} ${system.slug === 'pentatonic' ? 'scale' : 'mode'} in ${rootNote} guitar fretboard diagram. Notes ${scaleNoteNames.join(', ')}. Intervals ${scaleIntervalLabels.join(', ')}. Root ${rootNote} on the ${STRING_LABELS[position.rootString]}.`;
 
   return (
@@ -138,7 +137,7 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
       />
       <JsonLd
         data={definedTerm({
-          name: `${modeTitle} — ${system.displayName}`,
+          name: `${modeTitle} - ${system.displayName}`,
           description: modeData.description,
           termSetName: 'Guitar Scales',
           termSetPath: '/scale',

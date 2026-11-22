@@ -34,25 +34,6 @@ const BRIGHTNESS_ORDER = [
   { slug: 'locrian', name: 'Locrian', degree: 6 },
 ];
 
-// The site's shared interval labeling (INTERVAL_LABELS, used by every
-// scale/chord diagram via computeIntervalTab) always calls semitone 6 "b5"
-// — there's no mode-aware override the way chords get via
-// interval_overrides (see docs/MUSIC_THEORY.md). Lydian is the one mode
-// here where that's wrong: its raised 4th, not a lowered 5th, so its
-// diagram needs "#4" instead. Scoped to this lesson only; the shared
-// site-wide labeling (and the real /scale/major-scale/lydian page) is a
-// separate, bigger fix, not made here.
-function relabelLydianDiagram(layers: ScaleChartLayer[]): ScaleChartLayer[] {
-  return layers.map((layer) => ({
-    ...layer,
-    intervals: Array.isArray(layer.intervals)
-      ? (layer.intervals as (string | number)[][]).map((row) =>
-          row.map((label) => (label === 'b5' ? '#4' : label)),
-        )
-      : layer.intervals,
-  }));
-}
-
 interface ModeStep {
   slug: string;
   name: string;
@@ -224,11 +205,7 @@ export function BrightnessSpectrumExplorer() {
           ...POSITION,
         };
         const built = buildChart(source, rootPc);
-        const layers =
-          step.slug === 'lydian'
-            ? relabelLydianDiagram(built.layers)
-            : built.layers;
-        return { ...step, built, layers };
+        return { ...step, built, layers: built.layers };
       }),
     [steps, rootPc],
   );

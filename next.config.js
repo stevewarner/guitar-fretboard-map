@@ -35,6 +35,26 @@ module.exports = {
         destination: '/lesson/foundations/triads',
         permanent: true,
       },
+      {
+        source: '/scale/harmonic-minor/harmonic-minor',
+        destination: '/scale/harmonic-minor/aeolian-augmented-7',
+        permanent: true,
+      },
+      {
+        source: '/scale/harmonic-minor/ionian-augmented',
+        destination: '/scale/harmonic-minor/ionian-sharp-5',
+        permanent: true,
+      },
+      {
+        source: '/scale/harmonic-minor/phrygian-dominant',
+        destination: '/scale/harmonic-minor/mixolydian-flat-9-flat-13',
+        permanent: true,
+      },
+      {
+        source: '/scale/harmonic-minor/ultra-locrian',
+        destination: '/scale/harmonic-minor/locrian-diminished',
+        permanent: true,
+      },
     ];
   },
 };

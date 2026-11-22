@@ -21,15 +21,31 @@ export function getModeIntervals(
     .sort((a, b) => a - b);
 }
 
+// Label each interval by the scale degree it occupies, so a 7-note scale uses
+// every degree 1-7 exactly once (Ionian ♯5's semitone 8 is #5, not b6).
+// Non-7-note scales (pentatonic) have no degree-per-note rule, so they keep
+// the default pitch-class labels.
+export function spellScaleIntervals(modeIntervals: number[]): string[] {
+  if (modeIntervals.length !== 7) {
+    return modeIntervals.map((i) => INTERVAL_LABELS[i]);
+  }
+  return modeIntervals.map((_, i) => degreeLabel(modeIntervals, i));
+}
+
 // For each string, return interval labels matching the positions in scaleTab.
 export function computeIntervalTab(
   scaleTab: number[][],
   rootPc: number,
+  modeIntervals: number[],
 ): string[][] {
+  const spelled = spellScaleIntervals(modeIntervals);
+  const pcToLabel = new Map<number, string>();
+  modeIntervals.forEach((interval, i) => pcToLabel.set(interval, spelled[i]));
   return STANDARD_TUNING_PC.map((openPc, stringIndex) =>
-    scaleTab[stringIndex].map(
-      (fret) => INTERVAL_LABELS[(openPc + fret - rootPc + 12) % 12],
-    ),
+    scaleTab[stringIndex].map((fret) => {
+      const interval = (openPc + fret - rootPc + 12) % 12;
+      return pcToLabel.get(interval) ?? INTERVAL_LABELS[interval];
+    }),
   );
 }
 
@@ -139,7 +155,7 @@ export function computePositionWindow(
 
   const numFrets = 5;
   const computeStart = (rf: number) => {
-    if (position.rootFinger === 0) return rf === 0 ? 0 : rf - 1;
+    if (position.rootFinger === 0) return rf;
     return rf - (position.rootFinger - 1);
   };
 
@@ -296,7 +312,7 @@ function renderScaleWindow(
     computeRootTab(rootPc, startFret, numFrets),
     fallbackFret,
   );
-  const scaleIntervalTab = computeIntervalTab(scaleTab, rootPc);
+  const scaleIntervalTab = computeIntervalTab(scaleTab, rootPc, modeIntervals);
   const rootIntervalTab = rootTab.map((frets) => frets.map(() => '1'));
 
   return {
@@ -333,7 +349,7 @@ function trimUnusedPaddingFret<
     scaleIntervalTab: string[][];
     rootIntervalTab: string[][];
   },
->(rendered: T, rootPc: number, paddingAtStart: boolean): T {
+>(rendered: T, paddingAtStart: boolean): T {
   if (rendered.numFrets <= 4) return rendered;
 
   const paddingFret = paddingAtStart
@@ -352,6 +368,9 @@ function trimUnusedPaddingFret<
     tab.map((frets) => frets.filter((f) => f !== paddingFret));
   const scaleTab = dropPaddingFret(rendered.scaleTab);
   const rootTab = dropPaddingFret(rendered.rootTab);
+  const scaleIntervalTab = rendered.scaleIntervalTab.map((labels, si) =>
+    labels.filter((_, j) => rendered.scaleTab[si][j] !== paddingFret),
+  );
 
   return {
     ...rendered,
@@ -364,17 +383,16 @@ function trimUnusedPaddingFret<
     numFrets: rendered.numFrets - 1,
     scaleTab,
     rootTab,
-    scaleIntervalTab: computeIntervalTab(scaleTab, rootPc),
+    scaleIntervalTab,
     rootIntervalTab: rootTab.map((frets) => frets.map(() => '1')),
   };
 }
 
-// Every position has a natural 4-finger span (finger 0 shares finger 1's
-// span — "same as position 1", per the docs) plus room for one more note one
-// fret beyond it. Finger 0 natively reaches for that extra note *below* the
-// span (finger 1 stretching back); every other finger natively reaches
-// *above* it (finger 4 either sitting on the root — for finger 4 itself — or
-// just being the top of the natural span — for fingers 1–3).
+// Finger 0 always puts the root on the window's first fret (see the early
+// return below). Every other position has a natural 4-finger span plus room
+// for one more note one fret beyond it, and natively reaches *above* it
+// (finger 4 either sitting on the root — for finger 4 itself — or just being
+// the top of the natural span — for fingers 1–3).
 //
 // The natural span's own edge finger can turn out to need the same finger as
 // the extension fret, on the same string — but that's not automatically
@@ -412,9 +430,9 @@ function trimUnusedPaddingFret<
 //
 // Either way, the opposite direction can have the identical problem on its
 // own edge (a different string), in which case there's no legal 5th note at
-// all: fall back further, to the plain 4-finger span with no extension —
-// whatever note needed the extra reach just isn't part of this position; a
-// neighboring position picks it up instead. Returns the window to render
+// all: keep the native 5-fret window and accept the same-string conflict,
+// rather than shrinking to 4 frets and dropping scale notes from the
+// position. Returns the window to render
 // and, when a conflict-driven fallback kicks in, which fret is the fallback
 // one (for deduplicateUnisonStrings to give it last-resort priority on any
 // *other* duplicate the shifted window turns up).
@@ -432,17 +450,28 @@ function resolveWindowForPosition(
   const { rootFinger } = position;
   const { rootFret } = primaryWindow;
 
+  // Finger 0: the 1st finger stretches back to play the root, and fingers 1-4
+  // cover the 4 frets above it, so the root is always the window's first
+  // fret. The stretch fret gets last-resort dedup priority (don't stretch for
+  // a note another string already has), except an open-string root, where no
+  // finger is placed at all.
+  if (rootFinger === 0) {
+    return {
+      startFret: rootFret,
+      numFrets: 5,
+      fallbackFret: rootFret > 0 ? rootFret : undefined,
+    };
+  }
+
   const hasContentAt = (fret: number) =>
     fret >= 0 &&
     computeScaleTab(modeIntervals, rootPc, fret, 1).some(
       (frets) => frets.length > 0,
     );
 
-  const naturalBottom =
-    rootFinger === 0 ? rootFret : rootFret - (rootFinger - 1);
+  const naturalBottom = rootFret - (rootFinger - 1);
   const naturalTop = naturalBottom + 3;
-  const nativeBelow = rootFinger === 0;
-  const nativeStart = nativeBelow ? primaryWindow.startFret : naturalBottom;
+  const nativeStart = naturalBottom;
   const nativeWindow = { startFret: nativeStart, numFrets: 5 };
 
   // True when, after deduplication, some string still needs both of these
@@ -463,9 +492,8 @@ function resolveWindowForPosition(
     );
   };
 
-  const nativeExtensionFret = nativeBelow ? naturalBottom - 1 : naturalTop + 1;
-  const nativeEdgeFret = nativeBelow ? naturalBottom : naturalTop;
-  if (nativeExtensionFret < 0) return nativeWindow; // open root: nothing below to extend into
+  const nativeExtensionFret = naturalTop + 1;
+  const nativeEdgeFret = naturalTop;
 
   const hasConflict = stillConflicts(
     nativeStart,
@@ -489,11 +517,9 @@ function resolveWindowForPosition(
     return nativeWindow;
   }
 
-  const fallbackExtensionFret = nativeBelow
-    ? naturalTop + 1
-    : naturalBottom - 1;
-  const fallbackEdgeFret = nativeBelow ? naturalTop : naturalBottom;
-  const fallbackStart = nativeBelow ? naturalBottom : fallbackExtensionFret;
+  const fallbackExtensionFret = naturalBottom - 1;
+  const fallbackEdgeFret = naturalBottom;
+  const fallbackStart = fallbackExtensionFret;
   // The "same finger can't be in two places on one string" conflict this
   // guards against doesn't apply when the extension fret is the open string
   // — no finger is placed there at all, so it can never collide with
@@ -509,9 +535,9 @@ function resolveWindowForPosition(
         fallbackExtensionFret,
       ));
 
-  if (fallbackBlocked) {
-    return { startFret: naturalBottom, numFrets: 4 };
-  }
+  // Both directions conflict: keep the native 5-fret window anyway. Dropping
+  // to 4 frets would cut scale notes out of the position entirely.
+  if (fallbackBlocked) return nativeWindow;
 
   return {
     startFret: fallbackStart,
@@ -557,17 +583,15 @@ export function deriveScaleRender(
     fallbackFret,
   );
 
-  // Finger 0's blank/extension slot is always the bottom row: natively it's
-  // the literal stretch-1 fret below the root; when it falls back to
-  // extending above instead, the root itself becomes the note reached by
-  // stretching back, and the numbered fingers occupy the natural span above
-  // it — either way, row 0 is blank. Every other finger is the mirror image:
+  // Finger 0's blank slot is always row 0: the root fret, reached by the 1st
+  // finger stretching back, with the numbered fingers on the 4 frets above
+  // it. Every other finger is the mirror image:
   // its blank slot is the top row natively (the extra fret above the natural
   // span), but flips to the bottom row on a fallback (the natural span stays
   // put, with a new extension fret added below it).
   const stretch =
     !isOpenPosition && (position.rootFinger === 0 || !!usedFallback);
-  const trimmed = trimUnusedPaddingFret(rendered, rootPc, stretch);
+  const trimmed = trimUnusedPaddingFret(rendered, stretch);
 
   const fingerLabels: string[] =
     trimmed.numFrets === 4

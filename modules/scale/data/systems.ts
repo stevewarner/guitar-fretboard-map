@@ -30,7 +30,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
         degree: 0,
         dbName: 'pentatonic_major',
         description:
-          "The major pentatonic removes the 4th and 7th from the major scale — the two notes most likely to clash — leaving five notes that always sound consonant together. It's the fastest way to start improvising over a major-key progression.",
+          'The major pentatonic scale consists of 5 notes with a natural third. Compared to a 7 note major scale, it is missing the 4 and 7 intervals.',
       },
       {
         slug: 'minor',
@@ -39,7 +39,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
         degree: 0,
         dbName: 'pentatonic_minor',
         description:
-          'The minor pentatonic removes the 2nd and 6th from natural minor, leaving the five notes most associated with blues and rock soloing. The "box shape" is this scale in one position.',
+          'The minor pentatonic scale consists of 5 notes with a flat third and flat seventh. Compared to a 7 note minor scale, it is missing the 2 and 6 intervals.',
       },
     ],
   },
@@ -55,49 +55,49 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
         displayName: 'Ionian',
         degree: 0,
         description:
-          "Ionian is the brightest mode of the major scale — it's the major scale itself, the one most guitarists already know by ear. Every other mode here is the same seven notes, just starting from a different degree.",
+          "Ionian (aka Major Scale) is the first mode of the major scale system. Its step pattern is W W H W W W H, and its intervals are the reference that every other mode's intervals are compared against.",
       },
       {
         slug: 'dorian',
         displayName: 'Dorian',
         degree: 1,
         description:
-          'Dorian is a minor mode with a natural 6th instead of a b6, one shade brighter than natural minor. That raised 6th gives it a hopeful, non-heavy sound used throughout jazz, funk, and modal rock.',
+          'Dorian is the second mode of the major scale system. Its step pattern is W H W W W H W. Compared to Ionian, it has a flat 3 and a flat 7.',
       },
       {
         slug: 'phrygian',
         displayName: 'Phrygian',
         degree: 2,
         description:
-          'Phrygian is a minor mode with a b2 instead of a natural 2, the darkest of the common minor modes. That half-step above the root gives Phrygian its flamenco-adjacent, tense sound.',
+          'Phrygian is the third mode of the major scale system. Its step pattern is H W W W H W W. Compared to Ionian, it has a flat 2, flat 3, flat 6, and flat 7.',
       },
       {
         slug: 'lydian',
         displayName: 'Lydian',
         degree: 3,
         description:
-          'Lydian is a major mode with a #4 instead of a natural 4, one shade brighter than Ionian. That raised 4th is also why a fully extended IV chord in any major key has no avoid notes.',
+          'Lydian is the fourth mode of the major scale system. Its step pattern is W W W H W W H. Compared to Ionian, it has a sharp 4.',
       },
       {
         slug: 'mixolydian',
         displayName: 'Mixolydian',
         degree: 4,
         description:
-          'Mixolydian is a major mode with a b7 instead of a natural 7, one shade darker than Ionian. That flattened 7th is the sound of the dominant chord and of countless blues and rock melodies.',
+          'Mixolydian is the fifth mode of the major scale system. Its step pattern is W W H W W H W. Compared to Ionian, it has a flat 7.',
       },
       {
         slug: 'aeolian',
         displayName: 'Aeolian',
         degree: 5,
         description:
-          'Aeolian is the direct minor counterpart to Ionian, and what most people mean when they just say "minor" — it\'s the natural minor scale itself. It shares every note with its relative major, starting from the 6th degree.',
+          'Aeolian (aka Natural Minor) is the sixth mode of the major scale system. Its step pattern is W H W W H W W. Compared to Ionian, it has a flat 3, flat 6, and flat 7.',
       },
       {
         slug: 'locrian',
         displayName: 'Locrian',
         degree: 6,
         description:
-          "Locrian is a minor mode with both a b2 and a b5, the darkest mode of the major scale, built on a diminished triad. It's rarely a tonal center on its own, but it explains why the vii° chord in any key is diminished.",
+          'Locrian is the seventh mode of the major scale system. Its step pattern is H W W H W W W. Compared to Ionian, it has a flat 2, flat 3, flat 5, flat 6, and flat 7.',
       },
     ],
   },
@@ -108,53 +108,53 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
     showModes: true,
     modes: [
       {
-        slug: 'harmonic-minor',
-        displayName: 'Harmonic Minor',
+        slug: 'aeolian-augmented-7',
+        displayName: 'Aeolian ♮7',
         degree: 0,
         description:
-          "Harmonic minor is natural minor with a raised 7th, giving it a dominant V chord that resolves strongly to a minor i. That raised 7th also creates the scale's signature augmented 2nd gap, for a distinctive, exotic sound.",
+          'Aeolian ♮7 (aka Harmonic Minor) is the first mode of Harmonic Minor. It most closely resembles the Aeolian mode of the major scale system, but with a natural 7.',
       },
       {
         slug: 'locrian-natural-6',
         displayName: 'Locrian ♮6',
         degree: 1,
         description:
-          "Locrian ♮6 is the 2nd mode of harmonic minor — Locrian with a raised 6th instead of the usual b6. It softens Locrian's usual instability slightly, though it's still built on a diminished triad.",
+          'Locrian ♮6 is the second mode of Harmonic Minor. It most closely resembles the Locrian mode of the major scale system, but with a natural 6.',
       },
       {
-        slug: 'ionian-augmented',
-        displayName: 'Ionian Augmented',
+        slug: 'ionian-sharp-5',
+        displayName: 'Ionian ♯5',
         degree: 2,
         description:
-          "Ionian Augmented is the 3rd mode of harmonic minor — Ionian with a #5 instead of a natural 5, producing an augmented triad on the root. It's a tense, uncommon color outside of jazz and classical contexts.",
+          'Ionian ♯5 (aka Ionian Augmented) is the third mode of Harmonic Minor. It most closely resembles the Ionian mode of the major scale system, but with a sharp 5.',
       },
       {
         slug: 'dorian-sharp-4',
         displayName: 'Dorian ♯4',
         degree: 3,
         description:
-          'Dorian ♯4 is the 4th mode of harmonic minor — Dorian with a raised 4th, adding an augmented 2nd between the b3 and #4. That gap gives it a Middle Eastern, exotic character.',
+          'Dorian ♯4 is the fourth mode of Harmonic Minor. It most closely resembles the Dorian mode of the major scale system, but with a sharp 4.',
       },
       {
-        slug: 'phrygian-dominant',
-        displayName: 'Phrygian Dominant',
+        slug: 'mixolydian-flat-9-flat-13',
+        displayName: 'Mixolydian ♭9 ♭13',
         degree: 4,
         description:
-          "Phrygian Dominant is the most recognizable mode of harmonic minor — Mixolydian with a b2 and b6. It's the sound of flamenco and klezmer, and functions as the V chord of the parent harmonic minor scale.",
+          'Mixolydian ♭9 ♭13 (aka Phrygian Dominant) is the fifth mode of Harmonic Minor. It most closely resembles the Mixolydian mode of the major scale system, but with a flat 9 and a flat 13.',
       },
       {
         slug: 'lydian-sharp-2',
         displayName: 'Lydian ♯2',
         degree: 5,
         description:
-          "Lydian ♯2 is the 6th mode of harmonic minor — Lydian with a raised 2nd, adding another augmented-2nd gap for an unresolved brightness. It's an uncommon color used mostly in modern jazz.",
+          'Lydian ♯2 is the sixth mode of Harmonic Minor. It most closely resembles the Lydian mode of the major scale system, but with a sharp 2.',
       },
       {
-        slug: 'ultra-locrian',
-        displayName: 'Ultra Locrian',
+        slug: 'locrian-diminished',
+        displayName: 'Locrian Diminished',
         degree: 6,
         description:
-          "Ultra Locrian is the darkest mode of harmonic minor — Locrian with an even further lowered 7th on top of its already-flat 2nd and 5th. It's almost never used as a tonal center.",
+          'Locrian Diminished (aka Ultra Locrian) is the seventh mode of Harmonic Minor. It most closely resembles the Locrian mode of the major scale system, but with a flat 4 and a double-flat 7.',
       },
     ],
   },
@@ -169,49 +169,49 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
         displayName: 'Melodic Minor',
         degree: 0,
         description:
-          "Melodic minor (the jazz form) is natural minor with both the 6th and 7th raised — a minor scale with a major scale's upper half. That combination gives it a sound that's simultaneously minor and bright.",
+          'Melodic Minor is the first mode of Melodic Minor. It is one alteration away from two modes of the major scale system: the Dorian mode with a natural 7, or the Ionian mode with a flat 3.',
       },
       {
         slug: 'dorian-flat-2',
         displayName: 'Dorian ♭2',
         degree: 1,
         description:
-          "Dorian ♭2 is the 2nd mode of melodic minor — Dorian with a b2 instead of a natural 2, blending Dorian's brightness with Phrygian's dark half-step above the root.",
+          'Dorian ♭2 is the second mode of Melodic Minor. It most closely resembles the Dorian mode of the major scale system, but with a flat 2.',
       },
       {
         slug: 'lydian-augmented',
         displayName: 'Lydian Augmented',
         degree: 2,
         description:
-          'Lydian Augmented is the 3rd mode of melodic minor — Lydian with a #5 instead of a natural 5, stacking two of the brightest, most unresolved-sounding raised tones available.',
+          'Lydian Augmented is the third mode of Melodic Minor. It most closely resembles the Lydian mode of the major scale system, but with a sharp 5.',
       },
       {
         slug: 'lydian-dominant',
         displayName: 'Lydian Dominant',
         degree: 3,
         description:
-          "Lydian Dominant is the 4th mode of melodic minor — Mixolydian with a #4, combining a dominant 7th sound with Lydian's brightness. It's the standard choice over dominant 7#11 chords.",
+          'Lydian Dominant is the fourth mode of Melodic Minor. It most closely resembles the Lydian mode of the major scale system, but with a flat 7.',
       },
       {
         slug: 'mixolydian-flat-6',
         displayName: 'Mixolydian ♭6',
         degree: 4,
         description:
-          'Mixolydian ♭6 is the 5th mode of melodic minor — Mixolydian with a b6 instead of a natural 6, darkening the dominant sound. It works well over dominant chords resolving to a minor key.',
+          'Mixolydian ♭6 is the fifth mode of Melodic Minor. It most closely resembles the Mixolydian mode of the major scale system, but with a flat 6.',
       },
       {
         slug: 'locrian-natural-2',
         displayName: 'Locrian ♮2',
         degree: 5,
         description:
-          "Locrian ♮2 is the 6th mode of melodic minor — Locrian with a natural 2 instead of b2. It's the standard choice over half-diminished chords in a minor ii–V–i progression.",
+          'Locrian ♮2 is the sixth mode of Melodic Minor. It most closely resembles the Locrian mode of the major scale system, but with a natural 2.',
       },
       {
         slug: 'altered',
         displayName: 'Altered',
         degree: 6,
         description:
-          "The Altered scale is the 7th and most dissonant mode of melodic minor, packing every common alteration on a dominant chord — b9, #9, #11, b13 — into one scale. It's the go-to choice for maximum tension before resolving to a minor key.",
+          'Altered is the seventh mode of Melodic Minor. It most closely resembles the Locrian mode of the major scale system, but with a flat 4.',
       },
     ],
   },
