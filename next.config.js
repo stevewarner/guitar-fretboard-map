@@ -10,6 +10,9 @@ module.exports = {
     },
   },
   reactStrictMode: true,
+  experimental: {
+    agentUpgrade: 'security',
+  },
   async redirects() {
     return [
       {
