@@ -5,10 +5,15 @@ import { isShapeValidForRoot } from '@/modules/chordv2/utils/shapeValidity';
 import {
   getAllQualities,
   getCanonicalShapePerQuality,
+  getInversionShapesBySymbols,
   getNonMoveableShapesByRootPcs,
   getShapesBySymbols,
   type DbChordQuality,
 } from '@/modules/chordv2/db/queries';
+import {
+  chordNoteNames,
+  chordRootName,
+} from '@/modules/chordv2/utils/chordRootName';
 import { STANDARD_TUNING_PC, PC_TO_NOTE } from '@/app/utils/constants';
 import type { FlatTabValue } from '@/types';
 
@@ -25,6 +30,9 @@ export type FreeformMatch = {
   numFrets: number;
   root_string: number | null;
   root_finger: number | null;
+  inversion: number;
+  // The card's notes, low string to high, spelled for this chord's root.
+  notes: string[];
 };
 
 type RawMatch = {
@@ -122,10 +130,21 @@ export async function identifyChord(
     const candidateRootStrings = [
       ...new Set([...rootPcToRootStrings.values()].flat()),
     ];
-    const tabShapes =
+    // Inversions are anchored on their bass note, so only the lowest played
+    // string can carry one.
+    const bassSi = tab.findIndex((fret) => fret !== undefined);
+    const bassString = 6 - bassSi;
+    const bassFret = tab[bassSi] as number;
+    const bassPc = (STANDARD_TUNING_PC[bassSi] + bassFret) % 12;
+    const [tabShapes, inversionShapes] = await Promise.all([
       matchedSymbols.length && candidateRootStrings.length
-        ? await getShapesBySymbols(matchedSymbols, candidateRootStrings)
-        : [];
+        ? getShapesBySymbols(matchedSymbols, candidateRootStrings)
+        : [],
+      getInversionShapesBySymbols(matchedSymbols, bassString),
+    ]);
+    const bassRelativeTab = tab.map<number | 'x'>((v) =>
+      v === undefined ? 'x' : v - bassFret,
+    );
 
     const shapesByKey = new Map<string, typeof tabShapes>();
     for (const shape of tabShapes) {
@@ -134,6 +153,29 @@ export async function identifyChord(
       arr.push(shape);
       shapesByKey.set(k, arr);
     }
+
+    const spellPlayedNotes = (
+      quality: DbChordQuality,
+      rootPc: number,
+      shownTab: (number | 'x' | undefined)[],
+    ): string[] => {
+      const names = chordNoteNames(
+        chordRootName(rootPc, quality.intervals, quality.interval_overrides),
+        quality.intervals,
+        quality.interval_overrides,
+      );
+      const nameByPc = new Map(
+        quality.intervals.map((interval, i) => [
+          (rootPc + interval) % 12,
+          names[i],
+        ]),
+      );
+      return shownTab.flatMap((fret, si) => {
+        if (typeof fret !== 'number') return [];
+        const pc = (STANDARD_TUNING_PC[si] + fret) % 12;
+        return [nameByPc.get(pc) ?? PC_TO_NOTE[pc]];
+      });
+    };
 
     // Phase 4: build FreeformMatch, preferring a tab-matched shape over canonical
     const buildMatch = ({
@@ -163,6 +205,44 @@ export async function identifyChord(
           tabMatchedShape = found;
           break;
         }
+      }
+
+      const inversionShape = tabMatchedShape
+        ? null
+        : (inversionShapes.find(
+            (shape) =>
+              shape.quality_symbol === quality.symbol &&
+              isShapeValidForRoot(shape, rootPc) &&
+              (rootPc + quality.intervals[shape.inversion]) % 12 === bassPc &&
+              shape.tab_relative.length === bassRelativeTab.length &&
+              shape.tab_relative.every((v, i) => v === bassRelativeTab[i]),
+          ) ?? null);
+
+      if (inversionShape) {
+        const transposed = transposeShape(
+          inversionShape.tab_relative,
+          inversionShape.bass_string ?? inversionShape.root_string,
+          inversionShape.bass_finger ?? inversionShape.root_finger ?? 1,
+          bassPc,
+        );
+        return {
+          rootNote: chordRootName(
+            rootPc,
+            quality.intervals,
+            quality.interval_overrides,
+          ),
+          rootPc,
+          quality_symbol: quality.symbol,
+          quality_full_name: quality.full_name,
+          matchType: 'exact',
+          tab: transposed?.tab ?? null,
+          startFret: transposed?.startFret ?? 1,
+          numFrets: transposed?.numFrets ?? 4,
+          root_string: inversionShape.root_string,
+          root_finger: inversionShape.root_finger,
+          inversion: inversionShape.inversion,
+          notes: spellPlayedNotes(quality, rootPc, transposed?.tab ?? tab),
+        };
       }
 
       const candidateShape =
@@ -202,7 +282,11 @@ export async function identifyChord(
         : matchType;
 
       return {
-        rootNote: PC_TO_NOTE[rootPc],
+        rootNote: chordRootName(
+          rootPc,
+          quality.intervals,
+          quality.interval_overrides,
+        ),
         rootPc,
         quality_symbol: quality.symbol,
         quality_full_name: quality.full_name,
@@ -212,6 +296,8 @@ export async function identifyChord(
         root_string: shape?.root_string ?? null,
         root_finger: shape?.root_finger ?? null,
         numFrets: transposed?.numFrets ?? 4,
+        inversion: 0,
+        notes: spellPlayedNotes(quality, rootPc, transposed?.tab ?? tab),
       };
     };
 

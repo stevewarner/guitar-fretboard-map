@@ -1,5 +1,5 @@
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
-import { ScalesNav } from '@/modules/scale/ScalesNav';
+import { ScalesNavSidebar } from '@/modules/scale/ScalesNav';
 
 export default function ScalesLayout({
   children,
@@ -7,7 +7,7 @@ export default function ScalesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col gap-8 md:flex-row">
+    <div className="flex flex-1 flex-col gap-4 md:flex-row md:gap-8">
       {/* The scale-system nav renders before the page content in the DOM
           (below), so the root layout's "Skip to main content" link lands
           here rather than at the actual scale content — this second,
@@ -18,9 +18,7 @@ export default function ScalesLayout({
       >
         Skip to scale content
       </a>
-      <aside className="shrink-0 md:w-44">
-        <ScalesNav systems={SCALE_SYSTEMS} />
-      </aside>
+      <ScalesNavSidebar systems={SCALE_SYSTEMS} />
       <div
         id="scale-content"
         tabIndex={-1}

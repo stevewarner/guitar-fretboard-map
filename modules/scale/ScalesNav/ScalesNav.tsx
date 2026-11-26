@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SectionLabel } from '@/components/SectionLabel';
 import { ScaleSystem } from '@/modules/scale/data/systems';
 
 export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
@@ -9,7 +8,6 @@ export function ScalesNav({ systems }: { systems: ScaleSystem[] }) {
 
   return (
     <nav aria-label="Scale systems">
-      <SectionLabel className="mb-3">Scale Systems</SectionLabel>
       {systems.map((system) => {
         const firstModeHref = `/scale/${system.slug}/${system.modes[0].slug}`;
         const isSystemActive = pathname.startsWith(`/scale/${system.slug}`);

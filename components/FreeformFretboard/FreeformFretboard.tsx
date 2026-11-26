@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
-import { STANDARD_TUNING_PC, PC_TO_NOTE } from '@/app/utils/constants';
+import { STANDARD_TUNING_PC } from '@/app/utils/constants';
 import {
   fbHeight,
   strHeight,
@@ -10,6 +10,24 @@ import {
   numStrings,
   svgDimension,
 } from '@/components/FretboardChart/constants';
+
+// No chord or key yet when a note is tapped, so each black key gets the
+// name guitarists see most on chord charts (Bb, not A#) instead of
+// PC_TO_NOTE's all-sharps.
+const NOTE_NAMES = [
+  'C',
+  'C#',
+  'D',
+  'Eb',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'Ab',
+  'A',
+  'Bb',
+  'B',
+];
 
 const stringX = (si: number) => topSpace + stroke / 2 + strHeight * si;
 
@@ -82,7 +100,7 @@ export const FreeformFretboard = ({
     const cx = stringX(si);
     const y = fret === 0 ? 0 : topSpace * fret;
     const cy = dotY(fret);
-    const noteName = PC_TO_NOTE[(STANDARD_TUNING_PC[si] + fret) % 12];
+    const noteName = NOTE_NAMES[(STANDARD_TUNING_PC[si] + fret) % 12];
     const fretLabel = fret === 0 ? 'open' : `fret ${fret}`;
     const label = isActive
       ? `String ${6 - si}, ${fretLabel}, ${noteName}`

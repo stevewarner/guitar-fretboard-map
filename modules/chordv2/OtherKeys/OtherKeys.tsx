@@ -1,8 +1,9 @@
-import { CardRow } from '@/components/CardRow';
-import { ChordPreviewCard } from '@/components/ChordPreviewCard';
-import { SectionLabel } from '@/components/SectionLabel';
+import { RelatedChordCard } from '@/modules/chordv2/RelatedChordCard';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
-import { PC_TO_NOTE } from '@/app/utils/constants';
+import {
+  chordNoteNames,
+  chordRootName,
+} from '@/modules/chordv2/utils/chordRootName';
 
 interface Props {
   symbol: string;
@@ -22,6 +23,7 @@ interface Props {
   anchorString: number;
   anchorFinger: number;
   qualityIntervals: number[];
+  qualityOverrides: Record<string, string> | null;
 }
 
 // Same shape, transposed to every other key — a real crawlable link graph
@@ -44,6 +46,7 @@ export function OtherKeys({
   anchorString,
   anchorFinger,
   qualityIntervals,
+  qualityOverrides,
 }: Props) {
   // Semitones from the root to whatever's anchored at anchorString/
   // anchorFinger — 0 for a root-position shape, or the interval the
@@ -51,9 +54,10 @@ export function OtherKeys({
   // the bass). Mirrors the bassPc math in app/chord/[quality]/page.tsx.
   const intervalOffset = (qualityIntervals[inversion] ?? 0) % 12;
 
-  const cards = PC_TO_NOTE.map((note, pc) => ({ note, pc }))
-    .filter(({ pc }) => pc !== rootPc)
-    .flatMap(({ note, pc }) => {
+  const cards = Array.from({ length: 12 }, (_, pc) => pc)
+    .filter((pc) => pc !== rootPc)
+    .flatMap((pc) => {
+      const note = chordRootName(pc, qualityIntervals, qualityOverrides);
       const targetPc = (pc + intervalOffset) % 12;
       const transposed = transposeShape(
         tabRelative,
@@ -63,7 +67,10 @@ export function OtherKeys({
       );
       if (!transposed) return [];
 
-      const bassNote = intervalOffset > 0 ? PC_TO_NOTE[targetPc] : null;
+      const bassNote =
+        intervalOffset > 0
+          ? chordNoteNames(note, qualityIntervals, qualityOverrides)[inversion]
+          : null;
       const label = bassNote
         ? `${note}${symbol}/${bassNote}`
         : `${note}${symbol}`;
@@ -76,15 +83,13 @@ export function OtherKeys({
       if (inversion) params.set('inversion', String(inversion));
 
       return [
-        <ChordPreviewCard
+        <RelatedChordCard
           key={note}
-          variant="raised"
           href={`/chord/${encodeURIComponent(symbol)}?${params.toString()}`}
           label={label}
           tab={transposed.tab}
           startFret={transposed.startFret}
           numFrets={transposed.numFrets}
-          className="w-36 shrink-0"
         />,
       ];
     });
@@ -92,14 +97,11 @@ export function OtherKeys({
   if (cards.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* uppercase off for consistency with the other section headings on
-          this page that must stay natural-case (embedded chord symbols) —
-          see docs/STYLE_GUIDE.md's "Chord symbols" section. */}
-      <SectionLabel as="h2" uppercase={false}>
-        Same shape, different key
-      </SectionLabel>
-      <CardRow>{cards}</CardRow>
+    <div className="flex flex-col gap-2.5">
+      <h3 className="text-sm font-semibold">Same shape, different key</h3>
+      <div className="flex flex-nowrap gap-3 overflow-x-auto p-0.5 pb-2">
+        {cards}
+      </div>
     </div>
   );
 }

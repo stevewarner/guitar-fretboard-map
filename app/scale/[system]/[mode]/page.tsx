@@ -1,11 +1,12 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { SCALE_INTERVALS } from '@/modules/scale/data/scaleIntervals';
-import { NOTE_TO_PC, PC_TO_NOTE } from '@/app/utils/constants';
+import { parseNote, spellScale } from '@/app/utils/noteSpelling';
 import { STRING_LABELS } from '@/app/utils/musicUtils';
 import {
   getModeIntervals,
+  scaleRootName,
   spellScaleIntervals,
   isValidPosition,
   getValidFingersForString,
@@ -23,6 +24,7 @@ import { ScaleViewer } from '@/modules/scale/ScaleViewer';
 import { ModeChords } from '@/modules/scale/ModeChords';
 import { PentatonicBoxChart } from '@/modules/scale/PentatonicBoxChart';
 import { SectionLabel } from '@/components/SectionLabel';
+import { PageSection } from '@/components/PageSection';
 import { JsonLd } from '@/components/JsonLd';
 import { breadcrumbList, definedTerm } from '@/app/utils/structuredData';
 
@@ -56,7 +58,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function parseRootNote(raw: string | undefined): string {
-  return raw && raw in NOTE_TO_PC ? raw : 'A';
+  if (!raw) return 'A';
+  try {
+    parseNote(raw);
+    return raw;
+  } catch {
+    return 'A';
+  }
 }
 
 function parsePosition(
@@ -95,7 +103,6 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   if (!parentIntervals) notFound();
   const modeIntervals = getModeIntervals(parentIntervals, modeData.degree);
   const scaleIntervalLabels = spellScaleIntervals(modeIntervals);
-  const intervalFormula = scaleIntervalLabels.join('  ');
   const quality =
     modeIntervals.includes(4) && !modeIntervals.includes(3)
       ? 'Major'
@@ -104,7 +111,20 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
         : null;
 
   const rootNote = parseRootNote(sp.root);
-  const rootPc = NOTE_TO_PC[rootNote];
+  const rootPc = parseNote(rootNote).pc;
+
+  // Same rule as chord pages: ?root=A%23 on Ionian #5 moves to ?root=Bb.
+  const preferredRootNote = scaleRootName(rootPc, modeIntervals);
+  if (sp.root && rootNote !== preferredRootNote) {
+    const redirectParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(sp)) {
+      if (typeof value === 'string') redirectParams.set(key, value);
+    }
+    redirectParams.set('root', preferredRootNote);
+    permanentRedirect(
+      `/scale/${system.slug}/${modeData.slug}?${redirectParams.toString()}`,
+    );
+  }
   const position = parsePosition(sp.string, sp.position, rootPc);
   const degree = modeData.degree + 1;
 
@@ -118,13 +138,13 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
   // screen reader that only reads the diagram's own accessible name still
   // gets the full answer. See buildChordSvgDescription in
   // app/chord/[quality]/page.tsx for the equivalent on chord pages.
-  const scaleNoteNames = modeIntervals.map(
-    (i) => PC_TO_NOTE[(rootPc + i) % 12],
-  );
+  const scaleNoteNames = spellScale(rootNote, modeIntervals);
   const scaleSvgDescription = `${modeTitle} ${system.slug === 'pentatonic' ? 'scale' : 'mode'} in ${rootNote} guitar fretboard diagram. Notes ${scaleNoteNames.join(', ')}. Intervals ${scaleIntervalLabels.join(', ')}. Root ${rootNote} on the ${STRING_LABELS[position.rootString]}.`;
 
+  const isPentatonic = system.slug === 'pentatonic';
+
   return (
-    <div>
+    <div className="flex flex-col gap-12 lg:gap-16">
       <JsonLd
         data={breadcrumbList([
           { name: 'Home', path: '/' },
@@ -143,62 +163,95 @@ export default async function ScaleModePage({ params, searchParams }: Props) {
           termSetPath: '/scale',
         })}
       />
-      <SectionLabel>
-        Scales / {system.displayName} / {modeData.displayName}
-      </SectionLabel>
-      <h1 className="mb-2 mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-        {modeTitle}
-      </h1>
-      <p className="mb-4 max-w-2xl text-sm text-fg-secondary">
-        {modeData.description}
-      </p>
-      {system.showModeInfo && (
-        <p className="mb-6 text-sm text-fg-secondary">
-          {degree}
-          {getOrdinal(degree)} mode of the {system.displayName} scale
-          {quality && ` · ${quality}`}
-        </p>
-      )}
-      <SectionLabel as="h2" className="mb-1">
-        Intervals
-      </SectionLabel>
-      <p className="mb-6 font-mono text-sm tracking-wider">{intervalFormula}</p>
-      <SectionLabel as="h2" className="mb-3">
-        Diagram
-      </SectionLabel>
-      {/* key resets ScaleViewer's root-highlight toggle when navigating to a
-          different system/mode — root/string/position changes reuse the
-          same key, so those intentionally leave the toggle as-is. */}
-      <ScaleViewer
-        key={`${system.slug}-${modeData.slug}`}
-        modeIntervals={modeIntervals}
-        modeTitle={modeTitle}
-        patternKind={system.slug === 'pentatonic' ? 'scale' : 'mode'}
-        rootNote={rootNote}
-        rootPc={rootPc}
-        position={position}
-        description={scaleSvgDescription}
-      />
-      {system.slug === 'pentatonic' && (
-        <>
-          <SectionLabel as="h2" className="mb-3 mt-8">
-            Pentatonic Pattern
+
+      <div className="flex flex-col gap-6 lg:gap-8">
+        <div>
+          {/* Lines up with the scale-systems toggle beside it on desktop. */}
+          <SectionLabel className="flex min-h-9 items-center">
+            Scales / {system.displayName} / {modeData.displayName}
           </SectionLabel>
+          <h1 className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">
+            {modeTitle}
+          </h1>
+          {/* Major or Minor from the 3rd. A label, not a link — so a grey
+              pill, not the black link Tags used elsewhere. */}
+          {quality && (
+            <span className="mt-3 inline-block rounded-full bg-surface-sunken px-3 py-1.5 text-xs font-bold">
+              {quality}
+            </span>
+          )}
+          {/* Pentatonic's 2 entries are separate scales, not modes of one
+              another. */}
+          {!isPentatonic && (
+            <p className="mt-4 text-sm text-fg-secondary">
+              {degree}
+              {getOrdinal(degree)} mode of the {system.displayName} scale
+            </p>
+          )}
+          {modeData.aka && (
+            <p className="mt-1 text-sm text-fg-secondary">
+              Also known as &lsquo;{modeData.aka}&rsquo;
+            </p>
+          )}
+        </div>
+
+        {/* key resets the panel's toggles when navigating to a different
+            system/mode — root/string/position changes reuse the same key, so
+            those intentionally leave the toggles as-is. */}
+        <PageSection
+          ariaLabel={`${rootNote} ${modeTitle} position`}
+          lessons={[
+            ...(isPentatonic
+              ? ['foundations/pentatonic']
+              : [
+                  'understanding-modes/comparing-modes',
+                  'understanding-modes/relative-vs-parallel-modes',
+                ]),
+            'learning-the-fretboard/position-playing',
+            'learning-the-fretboard/scale-positions-full-neck',
+          ]}
+        >
+          <ScaleViewer
+            key={`${system.slug}-${modeData.slug}`}
+            modeIntervals={modeIntervals}
+            modeTitle={modeTitle}
+            patternKind={isPentatonic ? 'scale' : 'mode'}
+            rootNote={rootNote}
+            rootPc={rootPc}
+            position={position}
+            intervalLabels={scaleIntervalLabels}
+            noteNames={scaleNoteNames}
+            description={scaleSvgDescription}
+          />
+        </PageSection>
+      </div>
+
+      {isPentatonic && (
+        <PageSection title="Pentatonic pattern">
           <PentatonicBoxChart
             rootPc={rootPc}
             modeIntervals={modeIntervals}
             rootString={position.rootString}
           />
-        </>
+        </PageSection>
       )}
+
       {diatonicChords && diatonicTriads && (
-        <ModeChords
-          triads={diatonicTriads}
-          sevenths={diatonicChords}
-          rootPc={rootPc}
-          modeIntervals={modeIntervals}
-          tonicNote={rootNote}
-        />
+        <PageSection
+          title={`Chords in ${rootNote} ${modeTitle}`}
+          lessons={[
+            'understanding-modes/primary-chords-in-every-mode',
+            'foundations/diatonic-harmony',
+          ]}
+        >
+          <ModeChords
+            triads={diatonicTriads}
+            sevenths={diatonicChords}
+            rootPc={rootPc}
+            modeIntervals={modeIntervals}
+            tonicNote={rootNote}
+          />
+        </PageSection>
       )}
     </div>
   );

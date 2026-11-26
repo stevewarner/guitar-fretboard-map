@@ -1,8 +1,6 @@
-import { CardRow } from '@/components/CardRow';
-import { ChordPreviewCard } from '@/components/ChordPreviewCard';
-import { SectionLabel } from '@/components/SectionLabel';
-import { PC_TO_NOTE } from '@/app/utils/constants';
+import { RelatedChordCard } from '@/modules/chordv2/RelatedChordCard';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
+import { chordRootName } from '@/modules/chordv2/utils/chordRootName';
 import { getQualityShapeCandidates } from '@/modules/chordv2/utils/actualQualityIntervals';
 import { findSameNotesChords } from '@/modules/chordv2/utils/sameNotesChords';
 import {
@@ -75,20 +73,22 @@ export async function SameNotesChords({
 
     if (!transposed) return [];
 
-    const matchRootNote = PC_TO_NOTE[match.rootPc];
+    const matchRootNote = chordRootName(
+      match.rootPc,
+      match.quality.intervals,
+      match.quality.interval_overrides,
+    );
     const href = `/chord/${encodeURIComponent(match.quality.symbol)}?root=${encodeURIComponent(matchRootNote)}&string=${match.shape.root_string}&position=${match.shape.root_finger ?? 0}`;
 
     return [
-      <ChordPreviewCard
+      <RelatedChordCard
         key={`${match.quality.symbol}-${match.rootPc}`}
-        variant="raised"
         href={href}
         label={`${matchRootNote}${match.quality.symbol}`}
         sublabel={match.quality.full_name}
         tab={transposed.tab}
         startFret={transposed.startFret}
         numFrets={transposed.numFrets}
-        className="w-36 shrink-0"
       />,
     ];
   });
@@ -96,14 +96,11 @@ export async function SameNotesChords({
   if (cards.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* uppercase off for consistency with the other section headings on
-          this page that must stay natural-case (embedded chord symbols) —
-          see docs/STYLE_GUIDE.md's "Chord symbols" section. */}
-      <SectionLabel as="h2" uppercase={false}>
-        Same notes, different chord
-      </SectionLabel>
-      <CardRow>{cards}</CardRow>
+    <div className="flex flex-col gap-2.5">
+      <h3 className="text-sm font-semibold">Same notes, different chord</h3>
+      <div className="flex flex-nowrap gap-3 overflow-x-auto p-0.5 pb-2">
+        {cards}
+      </div>
     </div>
   );
 }

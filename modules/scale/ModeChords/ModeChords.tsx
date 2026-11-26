@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Fretboard, Pattern } from '@/components/FretboardChart';
-import { SectionLabel } from '@/components/SectionLabel';
 import {
   DiatonicChord,
   computePositionWindow,
@@ -245,10 +244,7 @@ export async function ModeChords({
   const extendedWithShape = withShape(extended);
 
   return (
-    <section className="mt-12">
-      <SectionLabel as="h2" className="mb-6">
-        Chords
-      </SectionLabel>
+    <div>
       <h3 className="mb-3 text-sm font-medium">Triads</h3>
       <ChordGrid chords={triadsWithShape} />
       <h3 className="mb-3 mt-8 text-sm font-medium">7th Chords</h3>
@@ -265,6 +261,6 @@ export async function ModeChords({
           <ChordGrid chords={extendedWithShape} />
         </>
       )}
-    </section>
+    </div>
   );
 }

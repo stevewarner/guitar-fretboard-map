@@ -58,8 +58,8 @@ export const NewChordShapeForm = ({ qualities }: Props) => {
       return { previewTab: empty, previewStartFret: 1, previewNumFrets: 5 };
 
     if (moveable) {
-      const shifted = parsed.map(
-        (v): FlatTabValue => (typeof v === 'number' ? v + 1 : v),
+      const shifted = parsed.map((v): FlatTabValue =>
+        typeof v === 'number' ? v + 1 : v,
       );
       return { previewTab: shifted, previewStartFret: 1, previewNumFrets: 5 };
     }

@@ -1,9 +1,9 @@
-import { CardRow } from '@/components/CardRow';
-import { ChordPreviewCard } from '@/components/ChordPreviewCard';
-import { SectionLabel } from '@/components/SectionLabel';
+import { RelatedChordCard } from '@/modules/chordv2/RelatedChordCard';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
 import { findQualitiesWithinNoteDifference } from '@/modules/chordv2/utils/relatedChords';
 import { getQualitiesWithActualIntervals } from '@/modules/chordv2/utils/actualQualityIntervals';
+import { intervalsToDegrees } from '@/modules/chordv2/utils/intervalDegrees';
+import { chordRootName } from '@/modules/chordv2/utils/chordRootName';
 import type { ScalePosition } from '@/modules/scale/utils/scaleUtils';
 import { getAllQualities } from '@/modules/chordv2/db/queries';
 
@@ -63,6 +63,8 @@ export async function RelatedChords({
 
   if (oneAway.length === 0) return null;
 
+  const referencePcs = new Set(referenceIntervals.map((i) => i % 12));
+
   const cards = oneAway.flatMap((quality) => {
     const shape = shapeByQualityId.get(quality.id);
     if (!shape) return [];
@@ -76,19 +78,28 @@ export async function RelatedChords({
 
     if (!transposed) return [];
 
-    const href = `/chord/${encodeURIComponent(quality.symbol)}?root=${rootNote}&string=${shape.root_string}&position=${shape.root_finger ?? 0}`;
+    const overrides =
+      allQualities.find((q) => q.id === quality.id)?.interval_overrides ?? {};
+    const qualityRootNote = chordRootName(rootPc, quality.intervals, overrides);
+    const href = `/chord/${encodeURIComponent(quality.symbol)}?root=${encodeURIComponent(qualityRootNote)}&string=${shape.root_string}&position=${shape.root_finger ?? 0}`;
+
+    // Spelled from what the card's shape actually plays, the same intervals
+    // relatedness was judged on, so the accent marks exactly the one change.
+    const degrees = intervalsToDegrees(quality.intervals, overrides);
 
     return [
-      <ChordPreviewCard
+      <RelatedChordCard
         key={quality.symbol}
-        variant="raised"
         href={href}
-        label={`${rootNote}${quality.symbol}`}
+        label={`${qualityRootNote}${quality.symbol}`}
         sublabel={quality.full_name}
+        intervals={quality.intervals.map((interval, i) => ({
+          label: degrees[i],
+          changed: !referencePcs.has(interval % 12),
+        }))}
         tab={transposed.tab}
         startFret={transposed.startFret}
         numFrets={transposed.numFrets}
-        className="w-36 shrink-0"
       />,
     ];
   });
@@ -96,14 +107,11 @@ export async function RelatedChords({
   if (cards.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* uppercase off for consistency with the other section headings on
-          this page that must stay natural-case (embedded chord symbols) —
-          see docs/STYLE_GUIDE.md's "Chord symbols" section. */}
-      <SectionLabel as="h2" uppercase={false}>
-        Related chords
-      </SectionLabel>
-      <CardRow>{cards}</CardRow>
+    <div className="flex flex-col gap-2.5">
+      <h3 className="text-sm font-semibold">Same root, different quality</h3>
+      <div className="flex flex-nowrap gap-3 overflow-x-auto p-0.5 pb-2">
+        {cards}
+      </div>
     </div>
   );
 }

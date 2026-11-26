@@ -40,6 +40,7 @@ function MatchResult({
   const params = new URLSearchParams({ root: m.rootNote });
   if (m.root_string != null) params.set('string', String(m.root_string));
   if (m.root_finger != null) params.set('position', String(m.root_finger));
+  if (m.inversion > 0) params.set('inversion', String(m.inversion));
   const href = `/chord/${encodeURIComponent(m.quality_symbol)}?${params}`;
 
   // Prefer the match's own real shape when one exists — only fall back to
@@ -57,6 +58,7 @@ function MatchResult({
       tab={tab}
       startFret={startFret}
       numFrets={numFrets}
+      notes={m.notes}
       className="w-32"
     />
   );

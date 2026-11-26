@@ -1,9 +1,8 @@
-import { CardRow } from '@/components/CardRow';
-import { ChordPreviewCard } from '@/components/ChordPreviewCard';
-import { SectionLabel } from '@/components/SectionLabel';
+import { ShapeOptionCard } from '@/modules/chordv2/ShapeOptionCard';
 import { transposeShape } from '@/modules/chordv2/utils/transposeShape';
-import { PC_TO_NOTE } from '@/app/utils/constants';
+import { chordNoteNames } from '@/modules/chordv2/utils/chordRootName';
 import type { ScalePosition } from '@/modules/scale/utils/scaleUtils';
+import type { FlatTabValue } from '@/types';
 import type {
   DbChordQuality,
   DbChordShape,
@@ -21,22 +20,29 @@ interface Props {
   rootPc: number;
   position: ScalePosition;
   currentInversion: number;
+  // The root-position shape at the current position, transposed: the row's
+  // first card. Its inversions only make sense next to the shape they're
+  // inversions of, so this is whichever position was picked last, not a
+  // fixed cycle base.
+  rootPosition: {
+    tab: FlatTabValue[];
+    startFret: number;
+    numFrets: number;
+  } | null;
 }
 
 const ORDINAL: Record<number, string> = { 1: '1st', 2: '2nd', 3: '3rd' };
 
 // One "Inversions" row combining both pools the app tracks separately:
-//   - fixed (open-position) inversions, discoverable purely by root — a
-//     curated slash-chord shape like C/G.
+//   - fixed (open-position) inversions, a curated slash-chord shape like
+//     C/G, shown at their own parent position.
 //   - moveable multi-string-set inversions (e.g. maj7's drop-2 cycle),
 //     scoped to the current string.
-// These used to render as two different UI patterns (a dropdown for fixed,
-// this card row for moveable) depending on which pool had data for the
-// current quality/root/string — confusing, since which one showed up looked
-// arbitrary. Now every available inversion, from either pool, is one card
-// in one row. app/chord/[quality]/page.tsx resolves `?inversion=N` by
-// checking the fixed pool first, moveable second — deduped the same way
-// here, so a card never links to a shape other than the one it previews.
+// Every available inversion, from either pool, is one card in one row, led
+// by the root position, with the one on screen marked. The caller has
+// already narrowed both pools to one shape per inversion for the current
+// position, the same lists it resolves `?inversion=N` against, so a card
+// never links to a shape other than the one it previews.
 export function Inversions({
   symbol,
   quality,
@@ -46,8 +52,15 @@ export function Inversions({
   rootPc,
   position,
   currentInversion,
+  rootPosition,
 }: Props) {
-  const base = `/chord/${encodeURIComponent(symbol)}?root=${rootNote}&string=${position.rootString}&position=${position.rootFinger}`;
+  const base = `/chord/${encodeURIComponent(symbol)}?root=${encodeURIComponent(rootNote)}&string=${position.rootString}&position=${position.rootFinger}`;
+  const chordName = `${rootNote}${symbol}`;
+  const noteNames = chordNoteNames(
+    rootNote,
+    quality.intervals,
+    quality.interval_overrides,
+  );
 
   const buildCard = (shape: DbChordShape) => {
     const bassSemitone = quality.intervals[shape.inversion] % 12;
@@ -62,67 +75,48 @@ export function Inversions({
     );
     if (!transposed) return null;
 
-    const isBase = shape.inversion === 0;
-    const bassNote = PC_TO_NOTE[bassPc];
-
     return (
-      <ChordPreviewCard
+      <ShapeOptionCard
         key={shape.id}
-        variant="raised"
-        href={isBase ? base : `${base}&inversion=${shape.inversion}`}
-        label={
-          isBase ? `${rootNote}${symbol}` : `${rootNote}${symbol}/${bassNote}`
-        }
-        sublabel={
-          isBase
-            ? 'Root position'
-            : `${ORDINAL[shape.inversion] ?? `${shape.inversion}th`} inversion`
-        }
+        href={`${base}&inversion=${shape.inversion}`}
+        label={`${chordName}/${noteNames[shape.inversion]}`}
+        sublabel={`${ORDINAL[shape.inversion] ?? `${shape.inversion}th`} inversion`}
         tab={transposed.tab}
         startFret={transposed.startFret}
         numFrets={transposed.numFrets}
-        className="w-36 shrink-0"
+        current={shape.inversion === currentInversion}
       />
     );
   };
 
-  const fixedInversionNumbers = new Set(fixedShapes.map((s) => s.inversion));
+  const inversionShapes = [...fixedShapes, ...moveableShapes]
+    .filter((shape) => shape.inversion > 0)
+    .sort((a, b) => a.inversion - b.inversion);
 
-  const candidateShapes = [
-    ...fixedShapes.filter((s) => s.inversion !== currentInversion),
-    ...moveableShapes.filter((shape) => {
-      if (shape.inversion === currentInversion) return false;
-      // Ceded to the fixed pool above (see this file's top comment) —
-      // otherwise the same inversion number would show twice, and the
-      // moveable card's link would silently resolve to the fixed shape
-      // instead of the one it previews.
-      if (shape.inversion > 0 && fixedInversionNumbers.has(shape.inversion))
-        return false;
-      // Fixed (non-moveable) shapes sharing this bass_string but belonging
-      // to a different root (e.g. G/B also anchored on string 5) would
-      // otherwise get dynamically re-transposed here, producing a diagram
-      // that doesn't match the shape at all.
-      if (!shape.moveable && shape.root_pc !== rootPc) return false;
-      return true;
-    }),
-  ].sort((a, b) => a.inversion - b.inversion);
-
-  const cards = candidateShapes.flatMap((shape) => {
+  const inversionCards = inversionShapes.flatMap((shape) => {
     const card = buildCard(shape);
     return card ? [card] : [];
   });
 
-  if (cards.length === 0) return null;
+  if (inversionCards.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* uppercase off for consistency with the other section headings on
-          this page that must stay natural-case (embedded chord symbols) —
-          see docs/STYLE_GUIDE.md's "Chord symbols" section. */}
-      <SectionLabel as="h2" uppercase={false}>
-        Inversions
-      </SectionLabel>
-      <CardRow>{cards}</CardRow>
+    <div className="flex flex-col gap-2">
+      <h3 className="text-sm font-semibold">Inversions</h3>
+      <div className="flex flex-nowrap gap-2 overflow-x-auto p-0.5 pb-1.5">
+        {rootPosition && (
+          <ShapeOptionCard
+            href={base}
+            label={chordName}
+            sublabel="Root position"
+            tab={rootPosition.tab}
+            startFret={rootPosition.startFret}
+            numFrets={rootPosition.numFrets}
+            current={currentInversion === 0}
+          />
+        )}
+        {inversionCards}
+      </div>
     </div>
   );
 }

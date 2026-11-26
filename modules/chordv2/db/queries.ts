@@ -470,6 +470,27 @@ export const getShapesBySymbols = unstable_cache(
   { tags: CHORD_DATA_TAGS, revalidate: CHORD_DATA_REVALIDATE },
 );
 
+export const getInversionShapesBySymbols = unstable_cache(
+  async (symbols: string[], bassString: number): Promise<DbChordShape[]> => {
+    if (symbols.length === 0) return [];
+    const { rows } = await sql.query<
+      Omit<DbChordShape, 'tab_relative'> & { tab_relative: (number | null)[] }
+    >(
+      `SELECT cs.id, cs.quality_id, cq.symbol AS quality_symbol, cq.full_name AS quality_full_name,
+              cs.moveable, cs.tab_relative, cs.root_string, cs.root_finger, cs.root_pc,
+              cs.inversion, cs.bass_string, cs.bass_finger, cs.description, cs.is_manual
+       FROM chord_shapes cs
+       JOIN chord_qualities cq ON cs.quality_id = cq.id
+       WHERE cq.symbol = ANY($1) AND cs.inversion > 0 AND cs.bass_string = $2
+       ORDER BY cs.id`,
+      [symbols, bassString],
+    );
+    return rows.map((r) => ({ ...r, tab_relative: parseTab(r.tab_relative) }));
+  },
+  ['getInversionShapesBySymbols'],
+  { tags: CHORD_DATA_TAGS, revalidate: CHORD_DATA_REVALIDATE },
+);
+
 export const getNonMoveableShapesByRootPcs = unstable_cache(
   async (rootPcs: number[]): Promise<DbChordShape[]> => {
     if (rootPcs.length === 0) return [];

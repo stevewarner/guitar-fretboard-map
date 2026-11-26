@@ -68,7 +68,11 @@ export function findSameNotesChords(
       const key = `${candidate.quality.id}-${rootPc}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      matches.push({ quality: candidate.quality, rootPc, shape: candidate.shape });
+      matches.push({
+        quality: candidate.quality,
+        rootPc,
+        shape: candidate.shape,
+      });
     }
   }
   return matches;

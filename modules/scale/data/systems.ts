@@ -2,6 +2,8 @@ export type ModeDefinition = {
   slug: string;
   displayName: string;
   pageTitle?: string;
+  // Common name the systematic displayName replaced.
+  aka?: string;
   degree: number;
   dbName?: string;
   description: string;
@@ -12,7 +14,6 @@ export type ScaleSystem = {
   displayName: string;
   dbName: string;
   showModes: boolean;
-  showModeInfo?: boolean;
   modes: ModeDefinition[];
 };
 
@@ -48,7 +49,6 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
     displayName: 'Major',
     dbName: 'major',
     showModes: true,
-    showModeInfo: true,
     modes: [
       {
         slug: 'ionian',
@@ -110,6 +110,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
       {
         slug: 'aeolian-augmented-7',
         displayName: 'Aeolian ♮7',
+        aka: 'Harmonic Minor',
         degree: 0,
         description:
           'Aeolian ♮7 (aka Harmonic Minor) is the first mode of Harmonic Minor. It most closely resembles the Aeolian mode of the major scale system, but with a natural 7.',
@@ -124,6 +125,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
       {
         slug: 'ionian-sharp-5',
         displayName: 'Ionian ♯5',
+        aka: 'Ionian Augmented',
         degree: 2,
         description:
           'Ionian ♯5 (aka Ionian Augmented) is the third mode of Harmonic Minor. It most closely resembles the Ionian mode of the major scale system, but with a sharp 5.',
@@ -138,6 +140,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
       {
         slug: 'mixolydian-flat-9-flat-13',
         displayName: 'Mixolydian ♭9 ♭13',
+        aka: 'Phrygian Dominant',
         degree: 4,
         description:
           'Mixolydian ♭9 ♭13 (aka Phrygian Dominant) is the fifth mode of Harmonic Minor. It most closely resembles the Mixolydian mode of the major scale system, but with a flat 9 and a flat 13.',
@@ -152,6 +155,7 @@ export const SCALE_SYSTEMS: ScaleSystem[] = [
       {
         slug: 'locrian-diminished',
         displayName: 'Locrian Diminished',
+        aka: 'Ultra Locrian',
         degree: 6,
         description:
           'Locrian Diminished (aka Ultra Locrian) is the seventh mode of Harmonic Minor. It most closely resembles the Locrian mode of the major scale system, but with a flat 4 and a double-flat 7.',

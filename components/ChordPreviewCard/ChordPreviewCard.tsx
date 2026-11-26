@@ -8,6 +8,8 @@ interface Props {
   label: string;
   sublabel?: string;
   note?: string;
+  // Shown under the chart, e.g. the voicing's notes low to high.
+  notes?: string[];
   tab: FlatTabValue[];
   startFret: number;
   numFrets: number;
@@ -24,6 +26,7 @@ export function ChordPreviewCard({
   label,
   sublabel,
   note,
+  notes,
   tab,
   startFret,
   numFrets,
@@ -49,6 +52,11 @@ export function ChordPreviewCard({
       >
         <Pattern tab={tab} startFret={startFret} fillColor="#000" />
       </Fretboard>
+      {notes && (
+        <span className="mt-1 text-center font-mono text-xs text-fg-secondary">
+          {notes.join(' ')}
+        </span>
+      )}
     </Link>
   );
 }

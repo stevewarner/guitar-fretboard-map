@@ -15,7 +15,10 @@ import {
   type ChordFamily,
 } from '@/modules/chordv2/utils/chordFamily';
 import { parseNote } from '@/app/utils/noteSpelling';
-import { PC_TO_NOTE } from '@/app/utils/constants';
+import {
+  chordNoteNames,
+  chordRootName,
+} from '@/modules/chordv2/utils/chordRootName';
 import {
   ROOT_STRINGS,
   getValidFingersForString,
@@ -55,6 +58,12 @@ function buildInversionCard(
   );
   if (!transposed) return null;
 
+  const rootNote = chordRootName(
+    rootPc,
+    quality.intervals,
+    quality.interval_overrides,
+  );
+
   return {
     id: `${shape.id}-${rootPc}`,
     qualitySymbol: shape.quality_symbol,
@@ -62,8 +71,12 @@ function buildInversionCard(
     family,
     rootString: shape.root_string,
     rootFinger: shape.root_finger ?? 1,
-    rootNote: PC_TO_NOTE[rootPc],
-    bassNote: PC_TO_NOTE[bassPc],
+    rootNote,
+    bassNote: chordNoteNames(
+      rootNote,
+      quality.intervals,
+      quality.interval_overrides,
+    )[shape.inversion],
     inversion: shape.inversion,
     tab: transposed.tab,
     startFret: transposed.startFret,
@@ -346,7 +359,8 @@ async function OpenChordsView() {
       shape.root_finger ?? 1,
       shape.open_root_pc,
     );
-    if (!transposed || !family) return [];
+    const quality = qualityById.get(shape.quality_id);
+    if (!transposed || !family || !quality) return [];
 
     return [
       {
@@ -356,7 +370,11 @@ async function OpenChordsView() {
         family,
         rootString: shape.root_string,
         rootFinger: shape.root_finger ?? 1,
-        rootNote: PC_TO_NOTE[shape.open_root_pc],
+        rootNote: chordRootName(
+          shape.open_root_pc,
+          quality.intervals,
+          quality.interval_overrides,
+        ),
         tab: transposed.tab,
         startFret: transposed.startFret,
         numFrets: transposed.numFrets,

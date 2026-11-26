@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/app/utils/site';
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { getAllQualities } from '@/modules/chordv2/db/queries';
-import { PC_TO_NOTE } from '@/app/utils/constants';
+import { chordRootName } from '@/modules/chordv2/utils/chordRootName';
 import { LESSONS } from '@/modules/lesson/lessons';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -38,11 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // sitemap at odds with the page's own declared canonical. See
   // docs/SEO_IMPROVEMENTS.md's 2026-08-06 interim check-in.
   const chordPages: MetadataRoute.Sitemap = qualities.flatMap((q) =>
-    PC_TO_NOTE.map((root) => ({
-      url: `${SITE_URL}/chord/${encodeURIComponent(q.symbol)}?root=${encodeURIComponent(root)}`,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    })),
+    Array.from({ length: 12 }, (_, pc) => {
+      const root = chordRootName(pc, q.intervals, q.interval_overrides);
+      return {
+        url: `${SITE_URL}/chord/${encodeURIComponent(q.symbol)}?root=${encodeURIComponent(root)}`,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      };
+    }),
   );
 
   const scalePages: MetadataRoute.Sitemap = SCALE_SYSTEMS.flatMap((system) =>

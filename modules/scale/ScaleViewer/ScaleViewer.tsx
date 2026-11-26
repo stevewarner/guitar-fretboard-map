@@ -1,10 +1,13 @@
+import { Suspense } from 'react';
 import {
   Fretboard,
+  NeckChart,
   Pattern,
   scaleChartDefaultLayer,
 } from '@/components/FretboardChart';
 import { PositionControls } from '@/components/PositionControls';
 import { Panel } from '@/components/Panel';
+import { IntervalsNotesTable } from '@/components/IntervalsNotesTable';
 import {
   RootHighlightProvider,
   RootHighlightToggle,
@@ -16,11 +19,16 @@ import {
   LabelModeLayer,
 } from '@/components/LabelModeToggle';
 import { ACCENT_HEX } from '@/app/utils/constants';
+import { STRING_LABELS, fingerLabel } from '@/app/utils/musicUtils';
 import {
   deriveScaleRender,
+  computeIntervalTab,
   computeNoteTab,
+  computeScaleTab,
   type ScalePosition,
 } from '@/modules/scale/utils/scaleUtils';
+
+const NECK_FRETS = 15;
 
 interface ScaleViewerProps {
   modeIntervals: number[];
@@ -34,6 +42,9 @@ interface ScaleViewerProps {
   rootNote: string;
   rootPc: number;
   position: ScalePosition;
+  // Same order as modeIntervals: spelled interval labels and note names.
+  intervalLabels: string[];
+  noteNames: string[];
   // SVG-only <desc> summary (notes/intervals/root string) — see
   // components/FretboardChart/Fretboard.tsx and docs/GEO_STRATEGY.md item 5.
   // Built by the page (has the notes/interval-label data already) and just
@@ -41,6 +52,9 @@ interface ScaleViewerProps {
   description?: string;
 }
 
+// The scale detail panel: everything the Root / String / Position selects
+// control — the position diagram, the notes and intervals, and the whole
+// neck with this position lit.
 export function ScaleViewer({
   modeIntervals,
   modeTitle,
@@ -48,6 +62,8 @@ export function ScaleViewer({
   rootNote,
   rootPc,
   position,
+  intervalLabels,
+  noteNames,
   description,
 }: ScaleViewerProps) {
   const render = deriveScaleRender(modeIntervals, rootPc, position);
@@ -78,62 +94,136 @@ export function ScaleViewer({
     ...(rootNoteTab[i] ?? []),
   ]);
 
+  const scaleName = `${rootNote} ${modeTitle}`;
+  const finger = fingerLabel(position.rootFinger, position.rootString, rootPc);
+  const positionPhrase = `${STRING_LABELS[position.rootString]}, ${finger === 'open' ? 'open position' : `played with ${finger}`}`;
+
+  // Full neck: every scale tone to the 15th fret, with this position (its
+  // dots, root included) drawn on top in the accent color. Frets above the
+  // neck view are dropped from the highlight rather than stretching the neck
+  // for a single high position.
+  const neckTab = computeScaleTab(modeIntervals, rootPc, 0, NECK_FRETS + 1);
+  // layer.tab lists the root fret twice (scale tones + root overlay).
+  const positionTab = (layer.tab as number[][]).map((frets) =>
+    [...new Set(frets)].filter((fret) => fret <= NECK_FRETS),
+  );
+  const neckTitle = `${scaleName} notes to the ${NECK_FRETS}th fret, root on ${positionPhrase} position highlighted`;
+  const neck = (labelTab: (tab: number[][]) => string[][]) => (
+    // Scrolls sideways on a phone rather than shrinking the dots.
+    <div className="overflow-x-auto pb-2 sm:pb-0">
+      <NeckChart
+        numFrets={NECK_FRETS}
+        layers={[
+          { tab: neckTab, labels: labelTab(neckTab), fillColor: '#000' },
+          {
+            tab: positionTab,
+            labels: labelTab(positionTab),
+            fillColor: ACCENT_HEX,
+            fillOpen: true,
+          },
+        ]}
+        title={neckTitle}
+        className="w-[760px] max-w-none sm:w-full sm:max-w-full"
+      />
+    </div>
+  );
+  const intervalLabelTab = (tab: number[][]) =>
+    computeIntervalTab(tab, rootPc, modeIntervals);
+  const noteLabelTab = (tab: number[][]) =>
+    computeNoteTab(tab, rootNote, rootPc, modeIntervals);
+
+  const toggles = (
+    <div className="flex flex-row flex-wrap gap-4 sm:flex-col sm:gap-2.5">
+      <LabelModeToggle />
+      <RootHighlightToggle />
+    </div>
+  );
+
   return (
     <LabelModeProvider>
       <RootHighlightProvider>
         <Panel>
-          <PositionControls
-            rootNote={rootNote}
-            rootPc={rootPc}
-            position={position}
-          />
-
-          <p className="sr-only" aria-live="polite">
-            {`Showing ${modeTitle} ${patternKind} in ${rootNote}, string ${position.rootString}, position ${position.rootFinger}`}
-          </p>
-
-          <div className="mt-4 w-64">
-            <Fretboard
-              numFrets={render.numFrets}
-              startFret={render.startFret > 1 ? render.startFret : undefined}
-              fingerLabels={render.fingerLabels}
-              title={`${modeTitle} ${patternKind} in ${rootNote} — guitar fretboard diagram`}
-              description={description}
-            >
-              <LabelModeLayer
-                intervalContent={<Pattern {...layer} />}
-                noteContent={<Pattern {...layer} intervals={noteIntervals} />}
-              />
-              <RootHighlightLayer>
-                <LabelModeLayer
-                  intervalContent={
-                    <Pattern
-                      tab={render.rootTab}
-                      intervals={render.rootIntervalTab}
-                      fillColor={ACCENT_HEX}
-                      fillOpen
-                      startFret={render.patternStartFret}
-                    />
-                  }
-                  noteContent={
-                    <Pattern
-                      tab={render.rootTab}
-                      intervals={rootNoteTab}
-                      fillColor={ACCENT_HEX}
-                      fillOpen
-                      startFret={render.patternStartFret}
-                    />
-                  }
+          <div className="flex flex-col gap-10">
+            <div>
+              <Suspense>
+                <PositionControls
+                  rootNote={rootNote}
+                  rootPc={rootPc}
+                  position={position}
                 />
-              </RootHighlightLayer>
-            </Fretboard>
-          </div>
-          {/* Not width-constrained to the w-64 diagram column above — these
-              2 labels don't fit side by side in 256px, and the point of a
-              row layout is that they don't wrap. */}
-          <div className="mt-2 flex flex-row items-center gap-4">
-            <LabelModeToggle />
-            <RootHighlightToggle />
+              </Suspense>
+
+              <p className="sr-only" aria-live="polite">
+                {`Showing ${modeTitle} ${patternKind} in ${rootNote}, string ${position.rootString}, position ${position.rootFinger}`}
+              </p>
+
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-10">
+                <div className="order-2 w-64 shrink-0 sm:order-1">
+                  <Fretboard
+                    numFrets={render.numFrets}
+                    startFret={
+                      render.startFret > 1 ? render.startFret : undefined
+                    }
+                    fingerLabels={render.fingerLabels}
+                    title={`${modeTitle} ${patternKind} in ${rootNote} — guitar fretboard diagram`}
+                    description={description}
+                  >
+                    <LabelModeLayer
+                      intervalContent={<Pattern {...layer} />}
+                      noteContent={
+                        <Pattern {...layer} intervals={noteIntervals} />
+                      }
+                    />
+                    <RootHighlightLayer>
+                      <LabelModeLayer
+                        intervalContent={
+                          <Pattern
+                            tab={render.rootTab}
+                            intervals={render.rootIntervalTab}
+                            fillColor={ACCENT_HEX}
+                            fillOpen
+                            startFret={render.patternStartFret}
+                          />
+                        }
+                        noteContent={
+                          <Pattern
+                            tab={render.rootTab}
+                            intervals={rootNoteTab}
+                            fillColor={ACCENT_HEX}
+                            fillOpen
+                            startFret={render.patternStartFret}
+                          />
+                        }
+                      />
+                    </RootHighlightLayer>
+                  </Fretboard>
+                </div>
+
+                <div className="order-1 flex min-w-0 flex-col gap-5 sm:order-2 sm:gap-6 sm:pt-1">
+                  <div>
+                    <h2 className="text-lg font-semibold">{scaleName}</h2>
+                    <p className="mt-1 text-sm leading-snug text-fg-secondary">
+                      Root on {positionPhrase}.
+                    </p>
+                  </div>
+                  <IntervalsNotesTable
+                    degrees={intervalLabels}
+                    notes={noteNames}
+                  />
+                  {toggles}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex min-w-0 flex-col gap-3">
+              <h3 className="text-base font-semibold">
+                {scaleName} on the fretboard
+              </h3>
+              <LabelModeLayer
+                intervalContent={neck(intervalLabelTab)}
+                noteContent={neck(noteLabelTab)}
+              />
+            </div>
           </div>
         </Panel>
       </RootHighlightProvider>

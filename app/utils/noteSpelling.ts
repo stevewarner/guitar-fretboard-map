@@ -1,3 +1,5 @@
+import { INTERVAL_LABELS } from '@/app/utils/constants';
+
 const LETTER_ORDER = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
 type Letter = (typeof LETTER_ORDER)[number];
 
@@ -72,13 +74,18 @@ function spellNote(
 // scales). `tonicNote` is the spelled tonic (e.g. 'C', 'F#', 'Bb'); `intervals`
 // are semitone offsets from the tonic, sorted ascending.
 //
-// Non-7-note inputs fall back to sharp-only spelling — pentatonic doesn't have
-// a unique letter-per-degree rule.
+// Non-7-note inputs (pentatonic) take each note's letter from its interval
+// label instead, the way spellChordNotes does: C minor pentatonic's b3 and b7
+// are Eb and Bb, not D# and A#.
 export function spellScale(tonicNote: string, intervals: number[]): string[] {
   const tonic = parseNote(tonicNote);
 
   if (intervals.length !== 7) {
-    return intervals.map((i) => SHARP_FALLBACK[(tonic.pc + i + 144) % 12]);
+    return spellChordNotes(
+      tonicNote,
+      intervals,
+      intervals.map((i) => INTERVAL_LABELS[i % 12]),
+    );
   }
 
   const startIdx = LETTER_ORDER.indexOf(tonic.letter);
@@ -110,4 +117,42 @@ export function spellChordNotes(
     const numeral = Number(match[1]);
     return spellNote(tonic, startIdx + numeral - 1, interval);
   });
+}
+
+// Black-key roots list the tie-break first: the names most common on chord
+// charts and key signatures.
+const ROOT_NAMES = [
+  ['C'],
+  ['Db', 'C#'],
+  ['D'],
+  ['Eb', 'D#'],
+  ['E'],
+  ['F'],
+  ['F#', 'Gb'],
+  ['G'],
+  ['Ab', 'G#'],
+  ['A'],
+  ['Bb', 'A#'],
+  ['B'],
+];
+
+// Names a black-key root whichever way `spell` gives fewer accidentals, where
+// a double sharp/flat outweighs any number of single ones — Bb6#11, not
+// A#6#11 (A# C## E# F## D##). Shared by chord and scale roots; see
+// docs/MUSIC_THEORY.md's "Chord and Scale Root Names".
+export function fewestAccidentalsRoot(
+  rootPc: number,
+  spell: (rootNote: string) => string[],
+): string {
+  const cost = (rootNote: string) =>
+    spell(rootNote).reduce((sum, note) => {
+      const accidentals = note.length - 1;
+      return sum + (accidentals >= 2 ? 10 : accidentals);
+    }, 0);
+
+  const [preferred, ...others] = ROOT_NAMES[((rootPc % 12) + 12) % 12];
+  return others.reduce(
+    (best, name) => (cost(name) < cost(best) ? name : best),
+    preferred,
+  );
 }

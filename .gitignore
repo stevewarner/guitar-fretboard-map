@@ -37,3 +37,6 @@ next-env.d.ts
 # local docs and audits
 CLAUDE.md
 /docs/
+
+# claude code local settings
+.claude/

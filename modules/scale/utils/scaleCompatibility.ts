@@ -1,6 +1,9 @@
 import { SCALE_SYSTEMS } from '@/modules/scale/data/systems';
 import { SCALE_INTERVALS } from '@/modules/scale/data/scaleIntervals';
-import { getModeIntervals } from '@/modules/scale/utils/scaleUtils';
+import {
+  getModeIntervals,
+  spellScaleIntervals,
+} from '@/modules/scale/utils/scaleUtils';
 
 export interface ScaleModeOption {
   systemSlug: string;
@@ -36,29 +39,36 @@ export function getAllScaleModeOptions(): ScaleModeOption[] {
   );
 }
 
-// Groups each semitone (0-11) by scale-degree family, ignoring accidental —
-// e.g. semitones 1 (b2) and 2 (2) are both "the 2nd degree," just a
-// different version of it. Mirrors INTERVAL_LABELS' own grouping (the
-// numeric part of each label, '1'..'7').
-const DEGREE_FAMILY = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
+// The degree number (1-7) a label names, ignoring accidentals; extensions
+// fold back into the octave ('b9' -> 2, '#11' -> 4, '13' -> 6).
+function degreeNumber(label: string): number {
+  const numeral = Number(label.replace(/^[#b]+/, ''));
+  return ((numeral - 1) % 7) + 1;
+}
 
 // A scale is compatible with a chord if none of its notes contradict a
-// chord tone — for every chord tone, the scale either contains that exact
-// note, or has nothing at all in that degree family (e.g. major pentatonic
-// omits the 7th degree entirely, so it doesn't conflict with a dominant
-// chord's b7 even though it doesn't contain it either). A scale with a
-// DIFFERENT version of a degree the chord specifies — a natural 7 where the
-// chord wants b7 — is excluded. Compares by semitone only, never by note
-// name/spelling (see app/utils/noteSpelling.ts for that separate concern).
+// chord tone. For every chord tone, the scale either contains that exact
+// note, or has nothing at all in that degree (e.g. major pentatonic omits
+// the 7th degree entirely, so it doesn't conflict with a dominant chord's b7
+// even though it doesn't contain it either). A scale with a DIFFERENT
+// version of a degree the chord specifies (Ionian ♯5's #5 against a maj7
+// chord's natural 5) is excluded.
+//
+// Degrees come from each side's own spelling, not a fixed semitone table:
+// `chordDegrees` is the chord's labels (intervalsToDegrees, overrides like
+// '#5' and 'bb7' included), and the scale's come from spellScaleIntervals, so
+// a 7-note scale's semitone 8 counts as a 5th when the scale spells it #5.
 export function isScaleCompatibleWithChord(
   chordIntervals: number[],
+  chordDegrees: string[],
   scaleIntervals: number[],
 ): boolean {
-  const chordPcs = new Set(chordIntervals.map((i) => i % 12));
-  const scalePcs = new Set(scaleIntervals.map((i) => i % 12));
-  return [...chordPcs].every((pc) => {
-    if (scalePcs.has(pc)) return true;
-    const family = DEGREE_FAMILY[pc];
-    return ![...scalePcs].some((s) => DEGREE_FAMILY[s] === family);
+  const scalePcs = new Set(scaleIntervals);
+  const scaleDegrees = new Set(
+    spellScaleIntervals(scaleIntervals).map(degreeNumber),
+  );
+  return chordIntervals.every((interval, i) => {
+    if (scalePcs.has(interval % 12)) return true;
+    return !scaleDegrees.has(degreeNumber(chordDegrees[i]));
   });
 }

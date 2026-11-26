@@ -3,8 +3,7 @@ import {
   INTERVAL_LABELS,
   PC_TO_NOTE,
 } from '@/app/utils/constants';
-import { spellScale } from '@/app/utils/noteSpelling';
-import { intervalsToDegrees } from '@/modules/chordv2/utils/intervalDegrees';
+import { fewestAccidentalsRoot, spellScale } from '@/app/utils/noteSpelling';
 
 // Ionian = the major scale itself — the reference scale most lesson
 // explorers and modes are derived from or compared against.
@@ -30,6 +29,13 @@ export function spellScaleIntervals(modeIntervals: number[]): string[] {
     return modeIntervals.map((i) => INTERVAL_LABELS[i]);
   }
   return modeIntervals.map((_, i) => degreeLabel(modeIntervals, i));
+}
+
+// Bb Ionian #5 (Bb C D Eb F# G A), not A# (A# B# C## D# E## F## G##).
+export function scaleRootName(rootPc: number, modeIntervals: number[]): string {
+  return fewestAccidentalsRoot(rootPc, (rootNote) =>
+    spellScale(rootNote, modeIntervals),
+  );
 }
 
 // For each string, return interval labels matching the positions in scaleTab.
@@ -754,6 +760,20 @@ function degreeLabel(modeIntervals: number[], positionIndex: number): string {
   );
 }
 
+// Label a chord tone by its stacked degree above the chord root (step 2 =
+// 3rd, 4 = 5th, 8 = 9th...), so Ionian ♯5's augmented I chord reads
+// 1 3 #5 rather than intervalsToDegrees' pitch-class 1 3 b6.
+function chordToneLabel(semitones: number, step: number): string {
+  const reference = MAJOR_SCALE_INTERVALS[step % 7] + 12 * Math.floor(step / 7);
+  const diff = semitones - reference;
+  const accidental = diff < 0 ? 'b'.repeat(-diff) : '#'.repeat(diff);
+  return accidental + String(step + 1);
+}
+
+function chordToneLabels(intervals: number[], steps: number[]): string[] {
+  return intervals.map((interval, n) => chordToneLabel(interval, steps[n]));
+}
+
 function classifyTriad(
   third: number,
   fifth: number,
@@ -811,14 +831,17 @@ export function getDiatonicSusChords(
       {
         positions: [(i + 1) % 7, (i + 4) % 7],
         intervals: [0, second, fifth],
+        steps: [0, 1, 4],
       },
       {
         positions: [(i + 3) % 7, (i + 4) % 7],
         intervals: [0, fourth, fifth],
+        steps: [0, 3, 4],
       },
       {
         positions: [(i + 3) % 7, (i + 4) % 7, (i + 6) % 7],
         intervals: [0, fourth, fifth, seventh],
+        steps: [0, 3, 4, 6],
       },
     ];
 
@@ -836,7 +859,7 @@ export function getDiatonicSusChords(
           degreeLabel(modeIntervals, i),
           ...variant.positions.map((p) => degreeLabel(modeIntervals, p)),
         ],
-        chordIntervals: intervalsToDegrees(variant.intervals),
+        chordIntervals: chordToneLabels(variant.intervals, variant.steps),
       });
     }
   });
@@ -900,14 +923,17 @@ export function getDiatonicSixthChords(
       {
         positions: [(i + 2) % 7, (i + 4) % 7, (i + 5) % 7],
         intervals: [0, third, fifth, sixth],
+        steps: [0, 2, 4, 5],
       },
       {
         positions: [(i + 2) % 7, (i + 4) % 7, ninthPosition],
         intervals: [0, third, fifth, ninth],
+        steps: [0, 2, 4, 8],
       },
       {
         positions: [(i + 2) % 7, (i + 4) % 7, (i + 5) % 7, ninthPosition],
         intervals: [0, third, fifth, sixth, ninth],
+        steps: [0, 2, 4, 5, 8],
       },
     ];
 
@@ -925,7 +951,7 @@ export function getDiatonicSixthChords(
           degreeLabel(modeIntervals, i),
           ...variant.positions.map((p) => degreeLabel(modeIntervals, p)),
         ],
-        chordIntervals: intervalsToDegrees(variant.intervals),
+        chordIntervals: chordToneLabels(variant.intervals, variant.steps),
       });
     }
   });
@@ -965,7 +991,7 @@ export function getDiatonicTriads(
         degreeLabel(modeIntervals, (i + 2) % 7),
         degreeLabel(modeIntervals, (i + 4) % 7),
       ],
-      chordIntervals: intervalsToDegrees([0, third, fifth]),
+      chordIntervals: chordToneLabels([0, third, fifth], [0, 2, 4]),
     };
   });
 }
@@ -1033,7 +1059,7 @@ export function getDiatonicChords(
         degreeLabel(modeIntervals, (i + 4) % 7),
         degreeLabel(modeIntervals, (i + 6) % 7),
       ],
-      chordIntervals: intervalsToDegrees([0, third, fifth, seventh]),
+      chordIntervals: chordToneLabels([0, third, fifth, seventh], [0, 2, 4, 6]),
     };
   });
 }
@@ -1097,7 +1123,7 @@ export function getDiatonicExtendedChords(
       const position = (i + 2 * stackIndex) % 7;
       const extendedInterval =
         ((modeIntervals[position] - rootInterval + 12) % 12) + 12;
-      return { position, extendedInterval };
+      return { position, extendedInterval, step: 2 * stackIndex };
     });
 
     // A natural (unraised) 11th is only structurally impossible against a
@@ -1124,9 +1150,11 @@ export function getDiatonicExtendedChords(
       if (combo.some((bit) => avoidTierBits.has(bit))) continue;
 
       const intervals = [...baseIntervals];
+      const steps = [0, 2, 4, 6];
       const degrees = [...baseDegrees];
       for (const bit of combo) {
         intervals.push(tiers[bit].extendedInterval);
+        steps.push(tiers[bit].step);
         degrees.push(degreeLabel(modeIntervals, tiers[bit].position));
       }
 
@@ -1140,7 +1168,7 @@ export function getDiatonicExtendedChords(
         rootNote,
         name: `${rootNote}${symbol}`,
         scaleDegrees: degrees,
-        chordIntervals: intervalsToDegrees(intervals),
+        chordIntervals: chordToneLabels(intervals, steps),
       });
     }
   });
